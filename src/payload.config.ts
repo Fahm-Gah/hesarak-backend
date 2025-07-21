@@ -1,4 +1,4 @@
-// storage-adapter-import-placeholder
+import { uploadthingStorage } from '@payloadcms/storage-uploadthing'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -33,6 +33,14 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
-    // storage-adapter-placeholder
+    uploadthingStorage({
+      collections: {
+        media: true, // Apply to 'media' collection
+      },
+      options: {
+        token: process.env.UPLOADTHING_TOKEN || '',
+        acl: 'public-read', // This is optional
+      },
+    }),
   ],
 })
