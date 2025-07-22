@@ -70,6 +70,10 @@ export interface Config {
     users: User;
     media: Media;
     posts: Post;
+    busTypes: BusType;
+    terminals: Terminal;
+    tripSchedules: TripSchedule;
+    tickets: Ticket;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +84,10 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    busTypes: BusTypesSelect<false> | BusTypesSelect<true>;
+    terminals: TerminalsSelect<false> | TerminalsSelect<true>;
+    tripSchedules: TripSchedulesSelect<false> | TripSchedulesSelect<true>;
+    tickets: TicketsSelect<false> | TicketsSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -178,7 +186,21 @@ export interface Post {
    * Upload an image for the post
    */
   image?: (string | null) | Media;
-  content: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   author?: (string | null) | User;
   publishedAt?: string | null;
   slug?: string | null;
@@ -186,6 +208,114 @@ export interface Post {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "busTypes".
+ */
+export interface BusType {
+  id: string;
+  name: string;
+  /**
+   * Image of the bus type
+   */
+  image?: (string | null) | Media;
+  capacity: number;
+  amenities?:
+    | {
+        amenity: string;
+        id?: string | null;
+      }[]
+    | null;
+  seats?:
+    | {
+        label: string;
+        row?: number | null;
+        col?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "terminals".
+ */
+export interface Terminal {
+  id: string;
+  /**
+   * must be unique across all terminals e.g. "Kabul Main Terminal"
+   */
+  name: string;
+  province: string;
+  address: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tripSchedules".
+ */
+export interface TripSchedule {
+  id: string;
+  /**
+   * must be unique across all trip schedules e.g. "VIP | Kabul - Parwaan - Mazaar | 10:00 AM | Daily"
+   */
+  name: string;
+  /**
+   * Price per seat
+   */
+  price: number;
+  busType: string | BusType;
+  /**
+   * Departure time (recurring)
+   */
+  timeOfDay: string;
+  from: string | Terminal;
+  stops?:
+    | {
+        terminal: string | Terminal;
+        time: string;
+        id?: string | null;
+      }[]
+    | null;
+  frequency: 'daily' | 'specific-days';
+  days?:
+    | {
+        day: 'sat' | 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
+        id?: string | null;
+      }[]
+    | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets".
+ */
+export interface Ticket {
+  id: string;
+  ticketNumber: string;
+  user: string | User;
+  trip: string | TripSchedule;
+  /**
+   * Date of travel
+   */
+  date: string;
+  bookedSeats: {
+    /**
+     * Seat identifier (e.g., A1, B2)
+     */
+    seatLabel: string;
+    id?: string | null;
+  }[];
+  totalPrice: number;
+  status?: ('unpaid' | 'cancelled' | 'paid') | null;
+  bookingTime?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -299,6 +429,22 @@ export interface PayloadLockedDocument {
         value: string | Post;
       } | null)
     | ({
+        relationTo: 'busTypes';
+        value: string | BusType;
+      } | null)
+    | ({
+        relationTo: 'terminals';
+        value: string | Terminal;
+      } | null)
+    | ({
+        relationTo: 'tripSchedules';
+        value: string | TripSchedule;
+      } | null)
+    | ({
+        relationTo: 'tickets';
+        value: string | Ticket;
+      } | null)
+    | ({
         relationTo: 'payload-jobs';
         value: string | PayloadJob;
       } | null);
@@ -400,6 +546,91 @@ export interface PostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "busTypes_select".
+ */
+export interface BusTypesSelect<T extends boolean = true> {
+  name?: T;
+  image?: T;
+  capacity?: T;
+  amenities?:
+    | T
+    | {
+        amenity?: T;
+        id?: T;
+      };
+  seats?:
+    | T
+    | {
+        label?: T;
+        row?: T;
+        col?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "terminals_select".
+ */
+export interface TerminalsSelect<T extends boolean = true> {
+  name?: T;
+  province?: T;
+  address?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tripSchedules_select".
+ */
+export interface TripSchedulesSelect<T extends boolean = true> {
+  name?: T;
+  price?: T;
+  busType?: T;
+  timeOfDay?: T;
+  from?: T;
+  stops?:
+    | T
+    | {
+        terminal?: T;
+        time?: T;
+        id?: T;
+      };
+  frequency?: T;
+  days?:
+    | T
+    | {
+        day?: T;
+        id?: T;
+      };
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets_select".
+ */
+export interface TicketsSelect<T extends boolean = true> {
+  ticketNumber?: T;
+  user?: T;
+  trip?: T;
+  date?: T;
+  bookedSeats?:
+    | T
+    | {
+        seatLabel?: T;
+        id?: T;
+      };
+  totalPrice?: T;
+  status?: T;
+  bookingTime?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

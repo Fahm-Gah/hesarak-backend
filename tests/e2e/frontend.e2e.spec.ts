@@ -15,6 +15,6 @@ test.describe('Frontend', () => {
 
     const headging = page.locator('h1').first()
 
-    await expect(headging).toHaveText('Welcome to your new project.')
+    await expect(headging).toHaveText('Welcome to hesarak backend.')
   })
 })

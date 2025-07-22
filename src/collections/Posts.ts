@@ -1,5 +1,14 @@
-import { slugField } from '@/fields/slug'
 import type { CollectionConfig } from 'payload'
+
+import {
+  FixedToolbarFeature,
+  HeadingFeature,
+  HorizontalRuleFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
+
+import { slugField } from '@/fields/slug'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -23,7 +32,19 @@ export const Posts: CollectionConfig = {
     },
     {
       name: 'content',
-      type: 'textarea',
+      type: 'richText',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+            HorizontalRuleFeature(),
+          ]
+        },
+      }),
+      label: false,
       required: true,
     },
     {
