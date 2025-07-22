@@ -47,4 +47,10 @@ export default buildConfig({
       },
     }),
   ],
+  cors: {
+    origins: [
+      '*', // Allow all origins
+      'http://localhost:3000', // local dev
+    ],
+  },
 })
