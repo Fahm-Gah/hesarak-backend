@@ -11,6 +11,9 @@ import {
 import { slugField } from '@/fields/slug'
 
 export const Posts: CollectionConfig = {
+  access: {
+    read: () => true,
+  },
   slug: 'posts',
   admin: {
     useAsTitle: 'title',

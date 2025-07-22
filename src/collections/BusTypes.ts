@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 export const BusTypes: CollectionConfig = {
-  slug: 'busTypes',
+  slug: 'bus-types',
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'capacity', 'updatedAt'],
@@ -21,7 +21,7 @@ export const BusTypes: CollectionConfig = {
     {
       name: 'amenities',
       type: 'array',
-      fields: [{ name: 'amenity', type: 'text', required: true }],
+      fields: [{ name: 'name', type: 'text', required: true }],
     },
     {
       name: 'seats',

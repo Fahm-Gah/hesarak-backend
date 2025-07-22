@@ -4,7 +4,7 @@ export const Tickets: CollectionConfig = {
   slug: 'tickets',
   admin: {
     useAsTitle: 'ticketNumber',
-    defaultColumns: ['ticketNumber', 'user', 'trip', 'date', 'status', 'updatedAt'],
+    defaultColumns: ['ticketNumber', 'user', 'trip', 'date', 'status'],
   },
   fields: [
     {
@@ -26,7 +26,7 @@ export const Tickets: CollectionConfig = {
       },
     },
     { name: 'user', type: 'relationship', relationTo: 'users', required: true },
-    { name: 'trip', type: 'relationship', relationTo: 'tripSchedules', required: true },
+    { name: 'trip', type: 'relationship', relationTo: 'trip-schedules', required: true },
     {
       name: 'date',
       type: 'date',
@@ -96,7 +96,7 @@ export const Tickets: CollectionConfig = {
         if (data.trip && data.bookedSeats) {
           try {
             const trip = await req.payload.findByID({
-              collection: 'tripSchedules',
+              collection: 'trip-schedules',
               id: data.trip,
             })
             data.totalPrice = trip.price * data.bookedSeats.length

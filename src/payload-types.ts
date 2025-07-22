@@ -70,9 +70,9 @@ export interface Config {
     users: User;
     media: Media;
     posts: Post;
-    busTypes: BusType;
+    'bus-types': BusType;
     terminals: Terminal;
-    tripSchedules: TripSchedule;
+    'trip-schedules': TripSchedule;
     tickets: Ticket;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -84,9 +84,9 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
-    busTypes: BusTypesSelect<false> | BusTypesSelect<true>;
+    'bus-types': BusTypesSelect<false> | BusTypesSelect<true>;
     terminals: TerminalsSelect<false> | TerminalsSelect<true>;
-    tripSchedules: TripSchedulesSelect<false> | TripSchedulesSelect<true>;
+    'trip-schedules': TripSchedulesSelect<false> | TripSchedulesSelect<true>;
     tickets: TicketsSelect<false> | TicketsSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -211,7 +211,7 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "busTypes".
+ * via the `definition` "bus-types".
  */
 export interface BusType {
   id: string;
@@ -223,7 +223,7 @@ export interface BusType {
   capacity: number;
   amenities?:
     | {
-        amenity: string;
+        name: string;
         id?: string | null;
       }[]
     | null;
@@ -255,7 +255,7 @@ export interface Terminal {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tripSchedules".
+ * via the `definition` "trip-schedules".
  */
 export interface TripSchedule {
   id: string;
@@ -429,7 +429,7 @@ export interface PayloadLockedDocument {
         value: string | Post;
       } | null)
     | ({
-        relationTo: 'busTypes';
+        relationTo: 'bus-types';
         value: string | BusType;
       } | null)
     | ({
@@ -437,7 +437,7 @@ export interface PayloadLockedDocument {
         value: string | Terminal;
       } | null)
     | ({
-        relationTo: 'tripSchedules';
+        relationTo: 'trip-schedules';
         value: string | TripSchedule;
       } | null)
     | ({
@@ -549,7 +549,7 @@ export interface PostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "busTypes_select".
+ * via the `definition` "bus-types_select".
  */
 export interface BusTypesSelect<T extends boolean = true> {
   name?: T;
@@ -558,7 +558,7 @@ export interface BusTypesSelect<T extends boolean = true> {
   amenities?:
     | T
     | {
-        amenity?: T;
+        name?: T;
         id?: T;
       };
   seats?:
@@ -585,7 +585,7 @@ export interface TerminalsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tripSchedules_select".
+ * via the `definition` "trip-schedules_select".
  */
 export interface TripSchedulesSelect<T extends boolean = true> {
   name?: T;
