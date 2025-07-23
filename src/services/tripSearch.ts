@@ -122,6 +122,7 @@ const formatBusTypeImage = (image: (string | null) | Media | undefined) => {
 const buildTerminalInfo = (terminal: Terminal) => {
   return {
     id: terminal.id,
+    name: terminal.name,
     province: terminal.province,
     address: terminal.address,
     createdAt: terminal.createdAt,
