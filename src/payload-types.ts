@@ -247,6 +247,7 @@ export interface BusType {
  */
 export interface Terminal {
   id: string;
+  name: string;
   province: string;
   address: string;
   updatedAt: string;
@@ -575,6 +576,7 @@ export interface BusTypesSelect<T extends boolean = true> {
  * via the `definition` "terminals_select".
  */
 export interface TerminalsSelect<T extends boolean = true> {
+  name?: T;
   province?: T;
   address?: T;
   updatedAt?: T;

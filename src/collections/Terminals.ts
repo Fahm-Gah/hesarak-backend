@@ -3,14 +3,18 @@ import type { CollectionConfig } from 'payload'
 export const Terminals: CollectionConfig = {
   slug: 'terminals',
   admin: {
-    useAsTitle: 'province',
+    useAsTitle: 'name',
   },
   fields: [
+    {
+      name: 'name',
+      type: 'text',
+      required: true,
+    },
     {
       name: 'province',
       type: 'text',
       required: true,
-      unique: false,
     },
     {
       name: 'address',
