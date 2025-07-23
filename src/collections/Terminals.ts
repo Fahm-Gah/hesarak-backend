@@ -10,6 +10,7 @@ export const Terminals: CollectionConfig = {
       name: 'province',
       type: 'text',
       required: true,
+      unique: false,
     },
     {
       name: 'address',
