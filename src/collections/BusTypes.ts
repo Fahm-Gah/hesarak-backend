@@ -6,6 +6,19 @@ export const BusTypes: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'capacity', 'updatedAt'],
   },
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        // Automatically calculate capacity from seats array
+        if (data.seats && Array.isArray(data.seats)) {
+          data.capacity = data.seats.length
+        } else {
+          data.capacity = 0
+        }
+        return data
+      },
+    ],
+  },
   fields: [
     { name: 'name', type: 'text', required: true },
     {
@@ -17,7 +30,6 @@ export const BusTypes: CollectionConfig = {
         description: 'Image of the bus type',
       },
     },
-    { name: 'capacity', type: 'number', required: true },
     {
       name: 'amenities',
       type: 'array',
@@ -32,6 +44,15 @@ export const BusTypes: CollectionConfig = {
         { name: 'row', type: 'number', required: false },
         { name: 'col', type: 'number', required: false },
       ],
+    },
+    {
+      name: 'capacity',
+      type: 'number',
+      required: true,
+      admin: {
+        readOnly: true,
+        description: 'Automatically calculated from the number of seats',
+      },
     },
   ],
 }

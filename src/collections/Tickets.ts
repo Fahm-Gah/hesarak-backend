@@ -14,6 +14,7 @@ export const Tickets: CollectionConfig = {
       unique: true,
       admin: {
         readOnly: true,
+        hidden: true,
       },
       hooks: {
         beforeChange: [
@@ -64,29 +65,10 @@ export const Tickets: CollectionConfig = {
       type: 'select',
       options: [
         { label: 'Unpaid', value: 'unpaid' },
-        { label: 'Cancelled', value: 'cancelled' },
         { label: 'Paid', value: 'paid' },
+        { label: 'Cancelled', value: 'cancelled' },
       ],
       defaultValue: 'unpaid',
-    },
-    {
-      name: 'bookingTime',
-      type: 'date',
-      admin: {
-        date: {
-          pickerAppearance: 'dayAndTime',
-        },
-        readOnly: true,
-      },
-      hooks: {
-        beforeChange: [
-          ({ data }) => {
-            if (data && !data.bookingTime) {
-              data.bookingTime = new Date()
-            }
-          },
-        ],
-      },
     },
   ],
   hooks: {

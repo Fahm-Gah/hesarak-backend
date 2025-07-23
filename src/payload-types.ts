@@ -220,7 +220,6 @@ export interface BusType {
    * Image of the bus type
    */
   image?: (string | null) | Media;
-  capacity: number;
   amenities?:
     | {
         name: string;
@@ -235,6 +234,10 @@ export interface BusType {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Automatically calculated from the number of seats
+   */
+  capacity: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -244,10 +247,6 @@ export interface BusType {
  */
 export interface Terminal {
   id: string;
-  /**
-   * must be unique across all terminals e.g. "Kabul Main Terminal"
-   */
-  name: string;
   province: string;
   address: string;
   updatedAt: string;
@@ -312,8 +311,7 @@ export interface Ticket {
     id?: string | null;
   }[];
   totalPrice: number;
-  status?: ('unpaid' | 'cancelled' | 'paid') | null;
-  bookingTime?: string | null;
+  status?: ('unpaid' | 'paid' | 'cancelled') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -554,7 +552,6 @@ export interface PostsSelect<T extends boolean = true> {
 export interface BusTypesSelect<T extends boolean = true> {
   name?: T;
   image?: T;
-  capacity?: T;
   amenities?:
     | T
     | {
@@ -569,6 +566,7 @@ export interface BusTypesSelect<T extends boolean = true> {
         col?: T;
         id?: T;
       };
+  capacity?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -577,7 +575,6 @@ export interface BusTypesSelect<T extends boolean = true> {
  * via the `definition` "terminals_select".
  */
 export interface TerminalsSelect<T extends boolean = true> {
-  name?: T;
   province?: T;
   address?: T;
   updatedAt?: T;
@@ -628,7 +625,6 @@ export interface TicketsSelect<T extends boolean = true> {
       };
   totalPrice?: T;
   status?: T;
-  bookingTime?: T;
   updatedAt?: T;
   createdAt?: T;
 }

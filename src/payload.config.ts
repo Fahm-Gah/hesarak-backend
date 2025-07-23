@@ -14,6 +14,8 @@ import { BusTypes } from './collections/BusTypes'
 import { Terminals } from './collections/Terminals'
 import { TripSchedules } from './collections/TripSchedules'
 import { Tickets } from './collections/Tickets'
+import { availableTripsEndpoint } from './endpoints/availableTrips'
+import { provincesEndpoint } from './endpoints/provinces'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -50,7 +52,7 @@ export default buildConfig({
   cors: {
     origins: [
       '*', // Allow all origins
-      'http://localhost:3000', // local dev
     ],
   },
+  endpoints: [availableTripsEndpoint, provincesEndpoint],
 })
