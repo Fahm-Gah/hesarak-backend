@@ -1,7 +1,7 @@
 import type { PayloadRequest, Endpoint } from 'payload'
 import { validateDate, getDayOfWeek, formatTime } from '@/utils/dateUtils'
 
-export const tripDetailsEndpoint: Omit<Endpoint, 'root'> = {
+export const tripDetailsEndpoint: Endpoint = {
   path: '/:tripId/:date/details',
   method: 'get',
   handler: async (req: PayloadRequest) => {
