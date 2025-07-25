@@ -8,8 +8,6 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { slugField } from '@/fields/slug'
-
 export const Posts: CollectionConfig = {
   access: {
     read: () => true,
@@ -17,7 +15,7 @@ export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'author', 'updatedAt'],
   },
   fields: [
     {
@@ -78,7 +76,6 @@ export const Posts: CollectionConfig = {
         ],
       },
     },
-    ...slugField(),
   ],
   versions: {
     drafts: {
