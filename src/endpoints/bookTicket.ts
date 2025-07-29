@@ -193,7 +193,7 @@ export const bookTicketEndpoint: Endpoint = {
       }
 
       // Check user's total seat count for this trip (max 2 seats total)
-      const userExistingBookings = existingBookings.filter((ticket) => ticket.user === userId)
+      const userExistingBookings = existingBookings.filter((ticket) => ticket.passenger === userId)
       const userCurrentSeatCount = userExistingBookings.reduce(
         (total, ticket) => total + (ticket.bookedSeats || []).length,
         0,

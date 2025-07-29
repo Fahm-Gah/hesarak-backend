@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    profiles: Profile;
     media: Media;
     posts: Post;
     'bus-types': BusType;
@@ -82,6 +83,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    profiles: ProfilesSelect<false> | ProfilesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'bus-types': BusTypesSelect<false> | BusTypesSelect<true>;
@@ -137,6 +139,12 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
+  profile?: (string | null) | Profile;
+  roles: ('customer' | 'agent' | 'admin')[];
+  /**
+   * Terminal where this agent works
+   */
+  terminal?: (string | Terminal)[] | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -154,6 +162,31 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "profiles".
+ */
+export interface Profile {
+  id: string;
+  fullName: string;
+  fatherName?: string | null;
+  phoneNumber?: string | null;
+  gender?: ('male' | 'female') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "terminals".
+ */
+export interface Terminal {
+  id: string;
+  name: string;
+  province: string;
+  address: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -241,18 +274,6 @@ export interface BusType {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "terminals".
- */
-export interface Terminal {
-  id: string;
-  name: string;
-  province: string;
-  address: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "trip-schedules".
  */
 export interface TripSchedule {
@@ -296,7 +317,7 @@ export interface TripSchedule {
 export interface Ticket {
   id: string;
   ticketNumber: string;
-  user: string | User;
+  passenger: string | Profile;
   trip: string | TripSchedule;
   /**
    * Date of travel
@@ -304,13 +325,21 @@ export interface Ticket {
   date: string;
   bookedSeats: {
     /**
-     * Seat identifier (e.g., A1, B2)
+     * Seat identifier (e.g. 24)
      */
     seatLabel: string;
     id?: string | null;
   }[];
+  /**
+   * Override price per seat (leave empty to use trip's fixed price)
+   */
+  pricePerTicket?: number | null;
+  /**
+   * Automatically calculated based on seats and price
+   */
   totalPrice: number;
   status?: ('unpaid' | 'paid' | 'cancelled') | null;
+  bookedBy?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -418,6 +447,10 @@ export interface PayloadLockedDocument {
         value: string | User;
       } | null)
     | ({
+        relationTo: 'profiles';
+        value: string | Profile;
+      } | null)
+    | ({
         relationTo: 'media';
         value: string | Media;
       } | null)
@@ -492,6 +525,9 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  profile?: T;
+  roles?: T;
+  terminal?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -508,6 +544,18 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "profiles_select".
+ */
+export interface ProfilesSelect<T extends boolean = true> {
+  fullName?: T;
+  fatherName?: T;
+  phoneNumber?: T;
+  gender?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -612,7 +660,7 @@ export interface TripSchedulesSelect<T extends boolean = true> {
  */
 export interface TicketsSelect<T extends boolean = true> {
   ticketNumber?: T;
-  user?: T;
+  passenger?: T;
   trip?: T;
   date?: T;
   bookedSeats?:
@@ -621,8 +669,10 @@ export interface TicketsSelect<T extends boolean = true> {
         seatLabel?: T;
         id?: T;
       };
+  pricePerTicket?: T;
   totalPrice?: T;
   status?: T;
+  bookedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
