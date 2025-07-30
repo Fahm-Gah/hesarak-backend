@@ -71,6 +71,7 @@ export interface Config {
     profiles: Profile;
     media: Media;
     posts: Post;
+    buses: Bus;
     'bus-types': BusType;
     terminals: Terminal;
     'trip-schedules': TripSchedule;
@@ -86,6 +87,7 @@ export interface Config {
     profiles: ProfilesSelect<false> | ProfilesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    buses: BusesSelect<false> | BusesSelect<true>;
     'bus-types': BusTypesSelect<false> | BusTypesSelect<true>;
     terminals: TerminalsSelect<false> | TerminalsSelect<true>;
     'trip-schedules': TripSchedulesSelect<false> | TripSchedulesSelect<true>;
@@ -140,7 +142,7 @@ export interface UserAuthOperations {
 export interface User {
   id: string;
   profile?: (string | null) | Profile;
-  roles: ('customer' | 'agent' | 'admin')[];
+  roles: ('customer' | 'agent' | 'driver' | 'admin' | 'superadmin')[];
   /**
    * Terminal where this agent works
    */
@@ -242,32 +244,70 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "buses".
+ */
+export interface Bus {
+  id: string;
+  number: string;
+  type: string | BusType;
+  /**
+   * Images of the Bus
+   */
+  images?: (string | Media)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "bus-types".
  */
 export interface BusType {
   id: string;
-  name: string;
   /**
-   * Image of the bus type
+   * Name of the bus type (e.g., "VIP 2+1", "Standard 2+2")
    */
-  image?: (string | null) | Media;
+  name: string;
   amenities?:
     | {
         name: string;
         id?: string | null;
       }[]
     | null;
-  seats?:
-    | {
-        label: string;
-        row?: number | null;
-        col?: number | null;
-        id?: string | null;
-      }[]
-    | null;
   /**
-   * Automatically calculated from the number of seats
+   * Define the complete bus layout including seats, WC, doors, etc.
    */
+  seats: {
+    type: 'seat' | 'wc' | 'driver' | 'door';
+    seatNumber?: string | null;
+    position: {
+      /**
+       * Grid row position LTR
+       */
+      row: number;
+      /**
+       * Grid column position TTB
+       */
+      col: number;
+    };
+    /**
+     * Size of the element in grid cells
+     */
+    size?: {
+      /**
+       * Number of rows this element spans
+       */
+      rowSpan?: number | null;
+      /**
+       * Number of columns this element spans
+       */
+      colSpan?: number | null;
+    };
+    /**
+     * If checked, this seat will not be bookable by end users through the website
+     */
+    disabled?: boolean | null;
+    id?: string | null;
+  }[];
   capacity: number;
   updatedAt: string;
   createdAt: string;
@@ -286,7 +326,7 @@ export interface TripSchedule {
    * Price per seat
    */
   price: number;
-  busType: string | BusType;
+  bus: string | Bus;
   /**
    * Departure time (recurring)
    */
@@ -324,21 +364,19 @@ export interface Ticket {
    */
   date: string;
   bookedSeats: {
-    /**
-     * Seat identifier (e.g. 24)
-     */
-    seatLabel: string;
+    seat: string;
     id?: string | null;
   }[];
   /**
-   * Override price per seat (leave empty to use trip's fixed price)
+   * Override price per seat (leave empty to use the trip's fixed price)
    */
   pricePerTicket?: number | null;
   /**
    * Automatically calculated based on seats and price
    */
   totalPrice: number;
-  status?: ('unpaid' | 'paid' | 'cancelled') | null;
+  isPaid?: boolean | null;
+  isCancelled?: boolean | null;
   bookedBy?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -457,6 +495,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: string | Post;
+      } | null)
+    | ({
+        relationTo: 'buses';
+        value: string | Bus;
       } | null)
     | ({
         relationTo: 'bus-types';
@@ -592,11 +634,21 @@ export interface PostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "buses_select".
+ */
+export interface BusesSelect<T extends boolean = true> {
+  number?: T;
+  type?: T;
+  images?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "bus-types_select".
  */
 export interface BusTypesSelect<T extends boolean = true> {
   name?: T;
-  image?: T;
   amenities?:
     | T
     | {
@@ -606,9 +658,21 @@ export interface BusTypesSelect<T extends boolean = true> {
   seats?:
     | T
     | {
-        label?: T;
-        row?: T;
-        col?: T;
+        type?: T;
+        seatNumber?: T;
+        position?:
+          | T
+          | {
+              row?: T;
+              col?: T;
+            };
+        size?:
+          | T
+          | {
+              rowSpan?: T;
+              colSpan?: T;
+            };
+        disabled?: T;
         id?: T;
       };
   capacity?: T;
@@ -633,7 +697,7 @@ export interface TerminalsSelect<T extends boolean = true> {
 export interface TripSchedulesSelect<T extends boolean = true> {
   name?: T;
   price?: T;
-  busType?: T;
+  bus?: T;
   timeOfDay?: T;
   from?: T;
   stops?:
@@ -666,12 +730,13 @@ export interface TicketsSelect<T extends boolean = true> {
   bookedSeats?:
     | T
     | {
-        seatLabel?: T;
+        seat?: T;
         id?: T;
       };
   pricePerTicket?: T;
   totalPrice?: T;
-  status?: T;
+  isPaid?: T;
+  isCancelled?: T;
   bookedBy?: T;
   updatedAt?: T;
   createdAt?: T;

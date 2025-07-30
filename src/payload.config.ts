@@ -11,6 +11,7 @@ import { Users } from './collections/Users'
 import { Profiles } from './collections/Profiles'
 import { Media } from './collections/Media'
 import { Posts } from './collections/Posts'
+import { Buses } from './collections/Buses'
 import { BusTypes } from './collections/BusTypes'
 import { Terminals } from './collections/Terminals'
 import { TripSchedules } from './collections/TripSchedules'
@@ -31,7 +32,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Profiles, Media, Posts, BusTypes, Terminals, TripSchedules, Tickets],
+  collections: [Users, Profiles, Media, Posts, Buses, BusTypes, Terminals, TripSchedules, Tickets],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -4,7 +4,7 @@ export const TripSchedules: CollectionConfig = {
   slug: 'trip-schedules',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'busType', 'timeOfDay', 'from', 'to', 'price'],
+    defaultColumns: ['name', 'bus', 'timeOfDay', 'from', 'to', 'price'],
   },
   fields: [
     {
@@ -27,9 +27,9 @@ export const TripSchedules: CollectionConfig = {
       },
     },
     {
-      name: 'busType',
+      name: 'bus',
       type: 'relationship',
-      relationTo: 'bus-types',
+      relationTo: 'buses',
       required: true,
     },
     {

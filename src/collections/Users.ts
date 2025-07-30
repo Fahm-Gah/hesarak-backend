@@ -20,7 +20,9 @@ export const Users: CollectionConfig = {
       options: [
         { label: 'Customer', value: 'customer' },
         { label: 'Agent', value: 'agent' },
+        { label: 'Driver', value: 'driver' },
         { label: 'Admin', value: 'admin' },
+        { label: 'Super Admin', value: 'superadmin' },
       ],
       defaultValue: 'customer',
       required: true,
