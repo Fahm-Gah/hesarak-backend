@@ -16,8 +16,8 @@ import { BusTypes } from './collections/BusTypes'
 import { Terminals } from './collections/Terminals'
 import { TripSchedules } from './collections/TripSchedules'
 import { Tickets } from './collections/Tickets'
-import { availableTripsEndpoint } from './endpoints/availableTrips'
-import { provincesEndpoint } from './endpoints/provinces'
+import { getProvinces } from './endpoints/provinces'
+import { searchTrips } from './endpoints/searchTrips'
 import { tripDetailsEndpoint } from './endpoints/tripDetails'
 import { bookTicketEndpoint } from './endpoints/bookTicket'
 import { userBookingsEndpoint } from './endpoints/userBookings'
@@ -61,8 +61,8 @@ export default buildConfig({
     ],
   },
   endpoints: [
-    availableTripsEndpoint,
-    provincesEndpoint,
+    getProvinces,
+    searchTrips,
     tripDetailsEndpoint,
     bookTicketEndpoint,
     userBookingsEndpoint,

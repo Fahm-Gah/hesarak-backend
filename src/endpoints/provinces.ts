@@ -1,6 +1,6 @@
 import type { PayloadRequest, Endpoint } from 'payload'
 
-export const provincesEndpoint: Endpoint = {
+export const getProvinces: Endpoint = {
   path: '/provinces',
   method: 'get',
   handler: async (req: PayloadRequest) => {
