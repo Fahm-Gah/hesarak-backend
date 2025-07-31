@@ -89,6 +89,11 @@ export const Tickets: CollectionConfig = {
       relationTo: 'users',
       admin: { hidden: true },
     },
+    {
+      name: 'paymentDeadline',
+      type: 'date',
+      hidden: true,
+    },
   ],
   hooks: {
     beforeChange: [generateUniqueTicket, populateBookedBy, calculateTotalPrice],

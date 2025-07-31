@@ -378,6 +378,7 @@ export interface Ticket {
   isPaid?: boolean | null;
   isCancelled?: boolean | null;
   bookedBy?: (string | null) | User;
+  paymentDeadline?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -738,6 +739,7 @@ export interface TicketsSelect<T extends boolean = true> {
   isPaid?: T;
   isCancelled?: T;
   bookedBy?: T;
+  paymentDeadline?: T;
   updatedAt?: T;
   createdAt?: T;
 }
