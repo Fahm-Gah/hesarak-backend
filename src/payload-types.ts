@@ -118,38 +118,77 @@ export interface Config {
   };
 }
 export interface UserAuthOperations {
-  forgotPassword: {
-    email: string;
-    password: string;
-  };
-  login: {
-    email: string;
-    password: string;
-  };
+  forgotPassword:
+    | {
+        email: string;
+      }
+    | {
+        username: string;
+      };
+  login:
+    | {
+        email: string;
+        password: string;
+      }
+    | {
+        password: string;
+        username: string;
+      };
   registerFirstUser: {
-    email: string;
     password: string;
+    username: string;
+    email?: string;
   };
-  unlock: {
-    email: string;
-    password: string;
-  };
+  unlock:
+    | {
+        email: string;
+      }
+    | {
+        username: string;
+      };
 }
 /**
+ * User accounts with phone-based authentication
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: string;
-  profile?: (string | null) | Profile;
-  roles: ('customer' | 'agent' | 'driver' | 'admin' | 'superadmin')[];
   /**
-   * Terminal where this agent works
+   * E.164 formatted phone number (auto-generated)
+   */
+  normalizedPhone?: string | null;
+  /**
+   * User profile information
+   */
+  profile?: (string | null) | Profile;
+  /**
+   * User roles and permissions
+   */
+  roles: ('customer' | 'agent' | 'driver' | 'admin' | 'superadmin' | 'dev')[];
+  /**
+   * Terminals where this agent works
    */
   terminal?: (string | Terminal)[] | null;
-  updatedAt: string;
+  /**
+   * Whether the user account is active
+   */
+  isActive?: boolean | null;
+  /**
+   * Last login timestamp
+   */
+  lastLoginAt?: string | null;
+  /**
+   * Account creation date
+   */
   createdAt: string;
-  email: string;
+  updatedAt: string;
+  email?: string | null;
+  /**
+   * Phone number in E.164 format (automatically normalized)
+   */
+  username: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
   salt?: string | null;
@@ -166,6 +205,8 @@ export interface User {
   password?: string | null;
 }
 /**
+ * User profile information
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "profiles".
  */
@@ -173,6 +214,9 @@ export interface Profile {
   id: string;
   fullName: string;
   fatherName?: string | null;
+  /**
+   * Original phone number as entered by user
+   */
   phoneNumber?: string | null;
   gender?: ('male' | 'female') | null;
   updatedAt: string;
@@ -568,12 +612,16 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  normalizedPhone?: T;
   profile?: T;
   roles?: T;
   terminal?: T;
-  updatedAt?: T;
+  isActive?: T;
+  lastLoginAt?: T;
   createdAt?: T;
+  updatedAt?: T;
   email?: T;
+  username?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
   salt?: T;

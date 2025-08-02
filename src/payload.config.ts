@@ -19,6 +19,7 @@ import { Tickets } from './collections/Tickets'
 import { getProvinces } from './endpoints/provinces'
 import { searchTrips } from './endpoints/searchTrips'
 import { getTripDetails } from './endpoints/getTripDetails'
+import { registerUser } from './endpoints/registerUser'
 // import { bookTicketEndpoint } from './endpoints/bookTicket'
 // import { userBookingsEndpoint } from './endpoints/userBookings'
 
@@ -64,6 +65,7 @@ export default buildConfig({
     getProvinces,
     searchTrips,
     getTripDetails,
+    registerUser,
     // bookTicketEndpoint,
     // userBookingsEndpoint,
   ],

@@ -38,6 +38,9 @@ importers:
       graphql:
         specifier: ^16.8.1
         version: 16.11.0
+      libphonenumber-js:
+        specifier: ^1.12.10
+        version: 1.12.10
       moment:
         specifier: ^2.30.1
         version: 2.30.1
@@ -63,9 +66,6 @@ importers:
       '@testing-library/react':
         specifier: 16.3.0
         version: 16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@19.1.2(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@types/moment':
-        specifier: ^2.13.0
-        version: 2.13.0
       '@types/node':
         specifier: ^22.5.4
         version: 22.16.5
@@ -1662,10 +1662,6 @@ packages:
   '@types/moment-jalaali@0.7.9':
     resolution: {integrity: sha512-gsDOoAzRnCfQTbfdlUrCvX6R0wIto6CvwfvV2C3j4qJLK+DEiTK8Rl/xlOCBO9C6qeUfX8oyZ2UfjnXJTOvHSA==}
 
-  '@types/moment@2.13.0':
-    resolution: {integrity: sha512-DyuyYGpV6r+4Z1bUznLi/Y7HpGn4iQ4IVcGn8zrr1P4KotKLdH0sbK1TFR6RGyX6B+G8u83wCzL+bpawKU/hdQ==}
-    deprecated: This is a stub types definition for Moment (https://github.com/moment/moment). Moment provides its own type definitions, so you don't need @types/moment installed!
-
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
@@ -3062,6 +3058,9 @@ packages:
     resolution: {integrity: sha512-gcxmNFzA4hv8UYi8j43uPlQ7CGcyMJ2KQb5kZASw6SnAKAf10hK12i2fjrS3Cl/ugZa5Ui6WwIu1/6MIXiHttQ==}
     engines: {node: '>=16'}
     hasBin: true
+
+  libphonenumber-js@1.12.10:
+    resolution: {integrity: sha512-E91vHJD61jekHHR/RF/E83T/CMoaLXT7cwYA75T4gim4FZjnM6hbJjVIGg7chqlSqRsSvQ3izGmOjHy1SQzcGQ==}
 
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
@@ -6404,10 +6403,6 @@ snapshots:
     dependencies:
       moment: 2.30.1
 
-  '@types/moment@2.13.0':
-    dependencies:
-      moment: 2.30.1
-
   '@types/ms@2.1.0': {}
 
   '@types/node@22.16.5':
@@ -8025,6 +8020,8 @@ snapshots:
   lib0@0.2.114:
     dependencies:
       isomorphic.js: 0.2.5
+
+  libphonenumber-js@1.12.10: {}
 
   lines-and-columns@1.2.4: {}
 

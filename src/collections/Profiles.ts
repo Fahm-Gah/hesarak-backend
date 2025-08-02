@@ -4,22 +4,31 @@ export const Profiles: CollectionConfig = {
   slug: 'profiles',
   admin: {
     useAsTitle: 'fullName',
-    defaultColumns: ['fullName', 'fatherName', 'phoneNumber'],
+    defaultColumns: ['fullName', 'fatherName', 'phoneNumber', 'gender'],
+    description: 'User profile information',
   },
   fields: [
     {
       name: 'fullName',
       type: 'text',
       required: true,
+      minLength: 2,
+      maxLength: 100,
     },
     {
       name: 'fatherName',
       type: 'text',
+      required: false,
+      maxLength: 100,
     },
     {
       name: 'phoneNumber',
       type: 'text',
       required: false,
+      admin: {
+        description: 'Original phone number as entered by user',
+        readOnly: true,
+      },
     },
     {
       name: 'gender',
