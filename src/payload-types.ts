@@ -205,8 +205,6 @@ export interface User {
   password?: string | null;
 }
 /**
- * User profile information
- *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "profiles".
  */
@@ -400,7 +398,7 @@ export interface TripSchedule {
  */
 export interface Ticket {
   id: string;
-  ticketNumber: string;
+  ticketNumber?: string | null;
   passenger: string | Profile;
   trip: string | TripSchedule;
   /**

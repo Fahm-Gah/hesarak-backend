@@ -114,12 +114,6 @@ export const convertPersianDateToGregorian = (dateString: string): string => {
 
       if (persianMoment.isValid()) {
         const gregorianDate = persianMoment.format('YYYY-MM-DD')
-
-        // Optional: Log conversion for debugging (remove in production if not needed)
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`Persian ${year}/${month}/${day} → Gregorian ${gregorianDate}`)
-        }
-
         return gregorianDate
       } else {
         console.warn(`Invalid Persian date: ${dateString}`)

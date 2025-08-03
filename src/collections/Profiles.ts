@@ -5,7 +5,6 @@ export const Profiles: CollectionConfig = {
   admin: {
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'fatherName', 'phoneNumber', 'gender'],
-    description: 'User profile information',
   },
   fields: [
     {

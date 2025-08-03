@@ -4,7 +4,7 @@ export const calculateCapacity: CollectionBeforeChangeHook = async ({ data }) =>
   let totalSeats = 0
   if (data.seats && Array.isArray(data.seats)) {
     data.seats.forEach((item: any) => {
-      if (item.type === 'seat' && !item.disabled) {
+      if (item.type === 'seat') {
         totalSeats += 1
       }
     })

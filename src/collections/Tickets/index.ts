@@ -7,13 +7,12 @@ export const Tickets: CollectionConfig = {
   slug: 'tickets',
   admin: {
     useAsTitle: 'passenger',
-    defaultColumns: ['bookedBy', 'passenger', 'trip', 'date', 'isPaid', 'bookedSeats'],
+    defaultColumns: ['passenger', 'trip', 'date', 'isPaid', 'bookedSeats', 'bookedBy'],
   },
   fields: [
     {
       name: 'ticketNumber',
       type: 'text',
-      required: true,
       unique: true,
       admin: {
         readOnly: true,
@@ -53,7 +52,6 @@ export const Tickets: CollectionConfig = {
         },
       ],
     },
-
     {
       name: 'pricePerTicket',
       type: 'number',

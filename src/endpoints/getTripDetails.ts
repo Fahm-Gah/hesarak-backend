@@ -7,6 +7,7 @@ import {
 } from '../utils/dateUtils'
 
 interface SeatInfo {
+  id: string
   seatNumber: string
   position: {
     row: number
@@ -24,6 +25,7 @@ interface SeatInfo {
 }
 
 interface BusLayoutElement {
+  id: string
   type: 'seat' | 'wc' | 'driver' | 'door'
   seatNumber?: string
   position: {
@@ -103,11 +105,11 @@ interface TripDetailsResponse {
   userBookingInfo: {
     canBookMoreSeats: boolean
     remainingSeatsAllowed: number
-    currentBookedSeats: string[]
+    currentBookedSeats: Array<{ id: string; seatNumber: string }>
     maxSeatsPerUser: number
     unpaidTickets: Array<{
       ticketNumber: string
-      seats: string[]
+      seats: Array<{ id: string; seatNumber: string }>
       paymentDeadline: string
       totalPrice: number
       hoursUntilDeadline: number
@@ -193,10 +195,10 @@ export const getTripDetails: Endpoint = {
         }
       >()
 
-      const currentUserBookedSeats: string[] = []
+      const currentUserBookedSeats: Array<{ id: string; seatNumber: string }> = []
       const currentUserTickets: Array<{
         ticketNumber: string
-        seats: string[]
+        seats: Array<{ id: string; seatNumber: string }>
         isPaid: boolean
         paymentDeadline?: string
         totalPrice: number
@@ -205,10 +207,13 @@ export const getTripDetails: Endpoint = {
 
       bookedTicketsResult.docs.forEach((ticket: any) => {
         const isCurrentUserTicket = user?.id && ticket.bookedBy?.id === user.id
-        const ticketSeats: string[] = []
+        const ticketSeats: Array<{ id: string; seatNumber: string }> = []
 
         ticket.bookedSeats?.forEach((seatInfo: any) => {
-          bookedSeatsMap.set(seatInfo.seat, {
+          const seatId = seatInfo.seatId || seatInfo.seat
+          const seatNumber = seatInfo.seatNumber || seatInfo.seat
+
+          bookedSeatsMap.set(seatId, {
             ticketNumber: ticket.ticketNumber,
             passengerName: ticket.passenger?.fullName || 'Unknown Passenger',
             userId: ticket.bookedBy?.id,
@@ -217,8 +222,12 @@ export const getTripDetails: Endpoint = {
           })
 
           if (isCurrentUserTicket) {
-            currentUserBookedSeats.push(seatInfo.seat)
-            ticketSeats.push(seatInfo.seat)
+            const seatData = {
+              id: seatId,
+              seatNumber: seatNumber,
+            }
+            currentUserBookedSeats.push(seatData)
+            ticketSeats.push(seatData)
             userBookedSeatCount++
           }
         })
@@ -243,6 +252,7 @@ export const getTripDetails: Endpoint = {
       if (busType?.seats) {
         busType.seats.forEach((element: any) => {
           const layoutElement: BusLayoutElement = {
+            id: element.id,
             type: element.type,
             position: element.position,
           }
@@ -252,8 +262,9 @@ export const getTripDetails: Endpoint = {
           }
 
           if (element.type === 'seat') {
+            const seatId = element.id
             const seatNumber = element.seatNumber
-            const bookedInfo = bookedSeatsMap.get(seatNumber)
+            const bookedInfo = bookedSeatsMap.get(seatId)
             const isBooked = !!bookedInfo
             const isDisabled = element.disabled || false
             const isBookedByCurrentUser = user?.id ? bookedInfo?.userId === user.id : false
@@ -273,6 +284,7 @@ export const getTripDetails: Endpoint = {
             }
 
             const seat: SeatInfo = {
+              id: seatId,
               seatNumber,
               position: element.position,
               isBooked,

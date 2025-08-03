@@ -20,8 +20,7 @@ import { getProvinces } from './endpoints/provinces'
 import { searchTrips } from './endpoints/searchTrips'
 import { getTripDetails } from './endpoints/getTripDetails'
 import { registerUser } from './endpoints/registerUser'
-// import { bookTicketEndpoint } from './endpoints/bookTicket'
-// import { userBookingsEndpoint } from './endpoints/userBookings'
+import { bookTicket } from './endpoints/bookTicket'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -61,12 +60,5 @@ export default buildConfig({
       '*', // Allow all origins
     ],
   },
-  endpoints: [
-    getProvinces,
-    searchTrips,
-    getTripDetails,
-    registerUser,
-    // bookTicketEndpoint,
-    // userBookingsEndpoint,
-  ],
+  endpoints: [getProvinces, searchTrips, getTripDetails, registerUser, bookTicket],
 })
