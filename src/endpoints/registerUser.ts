@@ -60,8 +60,8 @@ export const registerUser: Endpoint = {
 
       const normalizedPhone = parsedPhone.format('E.164')
 
-      // Check for existing users in parallel
-      const [existingEmailUsers, existingPhoneUsers] = await Promise.all([
+      // Check for existing users and existing profiles in parallel
+      const [existingEmailUsers, existingPhoneUsers, existingProfiles] = await Promise.all([
         payload.find({
           collection: 'users',
           where: { email: { equals: email } },
@@ -77,6 +77,11 @@ export const registerUser: Endpoint = {
           },
           limit: 1,
         }),
+        payload.find({
+          collection: 'profiles',
+          where: { phoneNumber: { equals: phone.trim() } },
+          limit: 1,
+        }),
       ])
 
       if (existingEmailUsers.docs.length > 0) {
@@ -87,55 +92,66 @@ export const registerUser: Endpoint = {
         return Response.json({ error: 'Phone number already registered' }, { status: 409 })
       }
 
-      // Create user first, then profile (better atomicity)
-      // If user creation fails, no orphaned profile is created
-      const user = await payload.create({
-        collection: 'users',
-        data: {
-          email: email.toLowerCase().trim(), // Normalize email
-          username: normalizedPhone,
-          normalizedPhone,
-          password,
-          roles: ['customer'],
-          isActive: true,
-          // Profile will be created after user creation succeeds
-        },
-      })
-
+      // Check if profile with this phone number already exists
       let profile
-      try {
-        // Create profile after user creation succeeds
-        profile = await payload.create({
-          collection: 'profiles',
-          data: {
-            fullName: fullName.trim(),
-            fatherName: fatherName?.trim() || '',
-            phoneNumber: phone.trim(),
-            gender: gender || 'male',
-          },
-        })
+      let profileAction = 'created'
 
-        // Link profile to user
-        await payload.update({
+      if (existingProfiles.docs.length > 0) {
+        // Use existing profile
+        profile = existingProfiles.docs[0]
+        profileAction = 'linked'
+
+        console.log(`Linking user to existing profile: ${profile.id} for phone: ${phone}`)
+      } else {
+        // Create new profile
+        try {
+          profile = await payload.create({
+            collection: 'profiles',
+            data: {
+              fullName: fullName.trim(),
+              fatherName: fatherName?.trim() || '',
+              phoneNumber: phone.trim(),
+              gender: gender || 'male',
+            },
+          })
+          console.log(`Created new profile: ${profile.id} for phone: ${phone}`)
+        } catch (profileError) {
+          console.error('Profile creation error:', profileError)
+          return Response.json({ error: 'Failed to create user profile' }, { status: 500 })
+        }
+      }
+
+      // Create user and link to profile
+      let user
+      try {
+        user = await payload.create({
           collection: 'users',
-          id: user.id,
           data: {
-            profile: profile.id,
+            email: email.toLowerCase().trim(),
+            username: normalizedPhone,
+            normalizedPhone,
+            password,
+            roles: ['customer'],
+            isActive: true,
+            profile: profile.id, // Link to existing or new profile
           },
         })
-      } catch (profileError) {
-        // If profile creation fails, clean up the user
-        try {
-          await payload.delete({
-            collection: 'users',
-            id: user.id,
-          })
-        } catch (cleanupError) {
-          console.error('Failed to cleanup user after profile creation error:', cleanupError)
+      } catch (userError) {
+        console.error('User creation error:', userError)
+
+        // If we created a new profile and user creation failed, clean it up
+        if (profileAction === 'created') {
+          try {
+            await payload.delete({
+              collection: 'profiles',
+              id: profile.id,
+            })
+          } catch (cleanupError) {
+            console.error('Failed to cleanup profile after user creation error:', cleanupError)
+          }
         }
 
-        console.error('Profile creation error:', profileError)
-        return Response.json({ error: 'Failed to create user profile' }, { status: 500 })
+        return Response.json({ error: 'Failed to create user account' }, { status: 500 })
       }
 
       // Generate authentication token
@@ -158,7 +174,7 @@ export const registerUser: Endpoint = {
 
       return Response.json(
         {
-          message: 'Registration successful',
+          message: `Registration successful${profileAction === 'linked' ? ' - linked to existing profile' : ''}`,
           token,
           user: {
             id: user.id,
@@ -175,6 +191,7 @@ export const registerUser: Endpoint = {
             },
             isActive: user.isActive,
           },
+          profileAction, // 'created' or 'linked' - useful for debugging/logging
         },
         { status: 201 },
       )

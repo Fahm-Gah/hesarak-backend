@@ -21,6 +21,7 @@ import { searchTrips } from './endpoints/searchTrips'
 import { getTripDetails } from './endpoints/getTripDetails'
 import { registerUser } from './endpoints/registerUser'
 import { bookTicket } from './endpoints/bookTicket'
+import { getUserTickets } from './endpoints/getUserTickets'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -60,5 +61,5 @@ export default buildConfig({
       '*', // Allow all origins
     ],
   },
-  endpoints: [getProvinces, searchTrips, getTripDetails, registerUser, bookTicket],
+  endpoints: [getProvinces, searchTrips, getTripDetails, registerUser, bookTicket, getUserTickets],
 })
