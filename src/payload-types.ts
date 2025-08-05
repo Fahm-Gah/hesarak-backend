@@ -401,16 +401,16 @@ export interface Ticket {
   ticketNumber?: string | null;
   passenger: string | Profile;
   trip: string | TripSchedule;
-  /**
-   * Date of travel
-   */
   date: string;
+  /**
+   * Select seats from the visual seat map
+   */
   bookedSeats: {
     seat: string;
     id?: string | null;
   }[];
   /**
-   * Override price per seat (leave empty to use the trip's fixed price)
+   * Override price per seat (leave empty to use the trip's default price)
    */
   pricePerTicket?: number | null;
   /**
@@ -420,6 +420,9 @@ export interface Ticket {
   isPaid?: boolean | null;
   isCancelled?: boolean | null;
   bookedBy?: (string | null) | User;
+  /**
+   * Payment deadline for unpaid tickets
+   */
   paymentDeadline?: string | null;
   updatedAt: string;
   createdAt: string;

@@ -1,0 +1,157 @@
+@import '~@payloadcms/ui/scss';
+
+@layer payload-default {
+  .seat-cell {
+    position: relative;
+    border: 2px solid;
+    border-radius: var(--style-radius-s);
+    padding: calc(var(--base) * 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--base) * 0.6);
+    font-weight: 500;
+    min-height: 45px;
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+
+    &__icon {
+      width: calc(var(--base) * 0.8);
+      height: calc(var(--base) * 0.8);
+      margin-bottom: calc(var(--base) * 0.15);
+      opacity: 0.8;
+      flex-shrink: 0;
+      // Icon color should adapt to the text color of the cell
+      color: currentColor;
+    }
+
+    &__content {
+      font-size: calc(var(--base) * 0.5);
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.2;
+      // Content color should adapt to the cell's main text color
+      color: currentColor;
+    }
+
+    &--seat {
+      aspect-ratio: 1 / 1;
+    }
+
+    // Status-based styling for actual seats
+    &--available {
+      background-color: var(--theme-success-100);
+      border-color: var(--theme-success-300);
+      color: var(--theme-success-800); /* Text and icon color */
+
+      &:hover:not(.seat-cell--disabled) {
+        background-color: var(--theme-success-150);
+        border-color: var(--theme-success-400);
+        transform: translateY(-1px);
+        @include shadow-sm;
+      }
+    }
+
+    &--selected {
+      // Ensure selected color matches Payload's blue theme
+      background-color: var(--color-blue-200);
+      border-color: var(--color-blue-500);
+      color: var(--color-blue-800); /* Text and icon color */
+      box-shadow: 0 0 0 2px var(--color-blue-300);
+
+      &:hover:not(.seat-cell--disabled) {
+        transform: translateY(-1px);
+        @include shadow-sm;
+      }
+    }
+
+    &--booked {
+      background-color: var(--theme-error-100);
+      border-color: var(--theme-error-300);
+      color: var(--theme-error-800); /* Text and icon color */
+      opacity: 0.8;
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    &--current-ticket {
+      background-color: var(--theme-primary-100);
+      border-color: var(--theme-primary-300);
+      color: var(--theme-primary-800); /* Text and icon color */
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    &--unpaid {
+      background-color: var(--theme-warning-100);
+      border-color: var(--theme-warning-300);
+      color: var(--theme-warning-800); /* Text and icon color */
+
+      &:hover {
+        background-color: var(--theme-warning-150);
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    &--disabled {
+      background-color: var(--theme-elevation-100);
+      border-color: var(--theme-elevation-200);
+      color: var(--theme-elevation-400); /* Text and icon color */
+      opacity: 0.5;
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    // Non-seat elements (WC, Driver, Door) - base styling
+    &--wc,
+    &--driver,
+    &--door {
+      background-color: var(--theme-elevation-100);
+      border-color: var(--theme-elevation-200);
+      color: var(--theme-elevation-600); /* Text color for non-seats */
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+
+      .seat-cell__content {
+        margin-top: 0;
+      }
+    }
+
+    // Focus styles for accessibility
+    &:focus-visible {
+      outline: 2px solid var(--color-blue-500);
+      outline-offset: 2px;
+      z-index: 1;
+    }
+
+    @include small-break {
+      font-size: calc(var(--base) * 0.55);
+      padding: calc(var(--base) * 0.3);
+      min-height: 40px;
+
+      &__icon {
+        width: calc(var(--base) * 0.7);
+        height: calc(var(--base) * 0.7);
+        margin-bottom: calc(var(--base) * 0.1);
+      }
+
+      &__content {
+        font-size: calc(var(--base) * 0.45);
+      }
+    }
+  }
+}

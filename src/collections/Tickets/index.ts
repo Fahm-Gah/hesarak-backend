@@ -6,8 +6,8 @@ import { calculateTotalPrice } from './hooks/calculateTotalPrice'
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
   admin: {
-    useAsTitle: 'passenger',
-    defaultColumns: ['passenger', 'trip', 'date', 'isPaid', 'bookedSeats', 'bookedBy'],
+    useAsTitle: 'ticketNumber',
+    defaultColumns: ['passenger', 'trip', 'date', 'isPaid', 'bookedSeats', 'totalPrice'],
   },
   fields: [
     {
@@ -15,7 +15,7 @@ export const Tickets: CollectionConfig = {
       type: 'text',
       unique: true,
       admin: {
-        readOnly: true,
+        hidden: true,
         position: 'sidebar',
       },
     },
@@ -35,20 +35,26 @@ export const Tickets: CollectionConfig = {
       name: 'date',
       type: 'date',
       required: true,
-      admin: {
-        description: 'Date of travel',
-      },
     },
     {
       name: 'bookedSeats',
       type: 'array',
       required: true,
       minRows: 1,
+      admin: {
+        components: {
+          Field: './components/SeatSelector',
+        },
+        description: 'Select seats from the visual seat map',
+      },
       fields: [
         {
-          name: 'seat',
           type: 'text',
+          name: 'seat',
           required: true,
+          admin: {
+            readOnly: true,
+          },
         },
       ],
     },
@@ -56,7 +62,8 @@ export const Tickets: CollectionConfig = {
       name: 'pricePerTicket',
       type: 'number',
       admin: {
-        description: "Override price per seat (leave empty to use the trip's fixed price)",
+        description: "Override price per seat (leave empty to use the trip's default price)",
+        position: 'sidebar',
       },
     },
     {
@@ -79,18 +86,22 @@ export const Tickets: CollectionConfig = {
       name: 'isCancelled',
       type: 'checkbox',
       defaultValue: false,
-      admin: { position: 'sidebar', readOnly: true },
+      admin: { position: 'sidebar' },
     },
     {
       name: 'bookedBy',
       type: 'relationship',
       relationTo: 'users',
-      admin: { hidden: true },
+      hidden: true,
     },
     {
       name: 'paymentDeadline',
       type: 'date',
-      hidden: true,
+      admin: {
+        position: 'sidebar',
+        condition: (data) => !data.isPaid,
+        description: 'Payment deadline for unpaid tickets',
+      },
     },
   ],
   hooks: {

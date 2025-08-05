@@ -1,0 +1,79 @@
+@import '~@payloadcms/ui/scss';
+
+.state-display {
+  text-align: center;
+  padding: calc(var(--base) * 2.5);
+  border: 1px solid var(--theme-border-color);
+  border-radius: var(--style-radius-m);
+  background-color: var(--theme-elevation-0); // Use elevation-0 for background, should adapt
+  margin: var(--base) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Centers items horizontally in a column flex container
+  justify-content: center;
+  gap: calc(var(--base) * 0.75);
+  box-shadow: var(--base-box-shadow);
+  transition: all 150ms ease-in-out;
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    // Removed 'margin: 0 auto;' as 'align-items: center;' on parent handles horizontal centering
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    p {
+      @extend %body;
+      margin: 0;
+      font-size: calc(var(--base) * 0.75);
+      line-height: 1.4;
+      color: var(--theme-text-color); // Use theme-text-color for content text
+    }
+  }
+
+  &--error {
+    background-color: var(--theme-error-50);
+    border-color: var(--theme-error-200);
+
+    .state-display__icon {
+      color: var(--theme-error-500);
+      opacity: 1; // Full opacity for error icon
+    }
+
+    .state-display__content p {
+      color: var(--theme-error-700);
+    }
+  }
+
+  &--info {
+    // Use neutral theme-aware colors that match PayloadCMS default
+    background-color: var(--theme-elevation-50);
+    border-color: var(--theme-elevation-150);
+
+    .state-display__icon {
+      color: var(--theme-elevation-600);
+      opacity: 1; // Full opacity for info icon
+    }
+
+    .state-display__content p {
+      color: var(--theme-elevation-800);
+    }
+  }
+
+  // Add warning variant for completeness
+  &--warning {
+    background-color: var(--theme-warning-50, #fef3c7);
+    border-color: var(--theme-warning-200, #fde68a);
+
+    .state-display__icon {
+      color: var(--theme-warning-500, #f59e0b);
+      opacity: 1;
+    }
+
+    .state-display__content p {
+      color: var(--theme-warning-700, #b45309);
+    }
+  }
+}

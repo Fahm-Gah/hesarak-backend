@@ -12,7 +12,7 @@ export const getDayOfWeek = (date: string): string => {
 }
 
 /**
- * Format time string to HH:mm format
+ * Format time string to HH:mm format (24-hour)
  * @param timeString - Time string from database
  * @returns Formatted time in 24-hour format
  */
@@ -26,6 +26,42 @@ export const formatTime = (timeString: string): string => {
     })
   } catch {
     return timeString
+  }
+}
+
+/**
+ * Format a time string to a readable 12-hour format with AM/PM.
+ * This function is now more robust and can handle both "HH:MM" strings
+ * and full ISO date-time strings (e.g., "2025-08-03T19:30:00.000Z").
+ * @param timeString - Time string (e.g., "09:00", "14:30", or "2025-08-03T19:30:00.000Z")
+ * @returns Formatted time (e.g., "9:00 AM", "2:30 PM", or "7:30 PM")
+ */
+export const formatDepartureTime = (timeString: string): string => {
+  try {
+    let date: Date
+
+    // Attempt to parse the string directly as a Date object
+    const directDate = new Date(timeString)
+
+    if (!isNaN(directDate.getTime())) {
+      // If direct parsing is successful, use that date
+      date = directDate
+    } else {
+      // If direct parsing fails, assume it's just "HH:MM" and create a dummy date
+      date = new Date(`1970-01-01T${timeString}:00`)
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid time string format.')
+      }
+    }
+
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
+  } catch (e) {
+    console.error('Error formatting departure time:', e)
+    return timeString // Fallback to original string on error
   }
 }
 

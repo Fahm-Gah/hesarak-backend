@@ -6,6 +6,7 @@ export const calculateTotalPrice: CollectionBeforeChangeHook = async ({
   originalDoc,
   req,
 }) => {
+  // Check if we need to recalculate the price
   const tripChanged = data.trip && data.trip !== originalDoc?.trip
   const seatsChanged =
     Array.isArray(data.bookedSeats) &&
@@ -18,19 +19,27 @@ export const calculateTotalPrice: CollectionBeforeChangeHook = async ({
     Array.isArray(data.bookedSeats)
   ) {
     const seatCount = data.bookedSeats.length
+
+    // Use override price if provided
     if (data.pricePerTicket && data.pricePerTicket > 0) {
       data.totalPrice = data.pricePerTicket * seatCount
     } else {
+      // Otherwise, fetch the trip's default price
       try {
         const tripDoc = await req.payload.findByID({
           collection: 'trip-schedules',
-          id: data.trip,
+          id: typeof data.trip === 'string' ? data.trip : data.trip.id,
         })
+
         if (tripDoc?.price) {
           data.totalPrice = tripDoc.price * seatCount
+        } else {
+          // Fallback to 0 if no price is found
+          data.totalPrice = 0
         }
       } catch (err) {
         console.error('Error fetching trip price:', err)
+        data.totalPrice = 0
       }
     }
   }

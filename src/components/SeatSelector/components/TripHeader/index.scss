@@ -1,0 +1,153 @@
+@import '~@payloadcms/ui/scss';
+
+.trip-header {
+  padding: var(--base);
+  // Use elevation-0 for the header background, it should adapt
+  background-color: var(--theme-elevation-0);
+  border-radius: var(--style-radius-m);
+  border: 1px solid var(--theme-border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--base);
+  box-shadow: var(--base-box-shadow); /* Added for consistency */
+
+  &__title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--base);
+
+    @include small-break {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: calc(var(--base) * 0.5);
+    }
+  }
+
+  &__title {
+    @extend %h3;
+    // Use theme-text-color for primary titles
+    color: var(--theme-text-color);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  &__metadata {
+    display: flex;
+    gap: calc(var(--base) * 1.25);
+    font-size: calc(var(--base) * 0.65);
+    // Use theme-text-color-light for metadata text
+    color: var(--theme-text-color-light);
+    align-items: flex-start;
+    flex-wrap: wrap;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--base) * 0.25);
+      min-width: 0;
+      flex-shrink: 0;
+
+      svg {
+        width: calc(var(--base) * 0.8);
+        height: calc(var(--base) * 0.8);
+        flex-shrink: 0;
+        // SVG color should inherit from parent or be explicitly set to adapt
+        color: var(--theme-text-color-light);
+      }
+
+      span {
+        word-break: break-word;
+        line-height: 1.3;
+      }
+
+      @include small-break {
+        font-size: calc(var(--base) * 0.6);
+      }
+    }
+
+    @include mid-break {
+      flex-direction: column;
+      gap: calc(var(--base) * 0.5);
+      align-items: flex-start;
+    }
+  }
+
+  &__amenities {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: calc(var(--base) * 0.25) !important;
+
+    &-label {
+      font-weight: 600;
+      // Amenity label should be slightly stronger
+      color: var(--theme-text-color);
+      margin-bottom: calc(var(--base) * 0.25);
+    }
+
+    &-list {
+      display: flex;
+      gap: calc(var(--base) * 0.75);
+      flex-wrap: wrap;
+    }
+  }
+
+  &__amenity {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--base) * 0.2);
+    font-size: calc(var(--base) * 0.6);
+    padding: calc(var(--base) * 0.15) calc(var(--base) * 0.3);
+    // Amenity text color should adapt
+    color: var(--theme-text-color-light);
+    // Amenity background should be a subtle elevation
+    background-color: var(--theme-elevation-100);
+    border-radius: var(--style-radius-s);
+    border: 1px solid var(--theme-border-color);
+  }
+
+  &__trip-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: calc(var(--base) * 0.75);
+    border-top: 1px solid var(--theme-border-color); /* Use theme-border-color */
+  }
+
+  &__status-badge {
+    display: inline-block;
+    padding: calc(var(--base) * 0.2) calc(var(--base) * 0.5);
+    border-radius: var(--style-radius-s);
+    font-size: calc(var(--base) * 0.55);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &--active {
+      background-color: var(--theme-success-100);
+      color: var(--theme-success-800);
+      border: 1px solid var(--theme-success-200);
+    }
+
+    &--inactive {
+      background-color: var(--theme-error-100);
+      color: var(--theme-error-800);
+      border: 1px solid var(--theme-error-200);
+    }
+  }
+
+  &__price {
+    font-size: calc(var(--base) * 0.75);
+    // Price text color should adapt
+    color: var(--theme-text-color);
+
+    strong {
+      // Strong price color should adapt
+      color: var(
+        --theme-primary-500
+      ); /* Using theme-primary-500 for consistency with Payload's blue */
+      font-size: calc(var(--base) * 0.85);
+      font-weight: 600;
+    }
+  }
+}

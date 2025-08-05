@@ -1,0 +1,200 @@
+@import '~@payloadcms/ui/scss';
+
+// Import component styles
+@import './components/Legend/index.scss';
+@import './components/SeatCell/index.scss';
+@import './components/SelectedSeatsList/index.scss';
+@import './components/TripHeader/index.scss';
+@import './components/StateDisplay/index.scss';
+
+@layer payload-default {
+  .seat-selector {
+    // Wrapper for the entire field
+    &-wrapper {
+      position: relative;
+    }
+
+    // Main container for the field content
+    &__container {
+      padding: var(--base);
+      border: 1px solid var(--theme-border-color);
+      border-radius: var(--style-radius-m);
+      background-color: var(--theme-elevation-0);
+      font-family: var(--font-body);
+      margin-bottom: var(--base);
+      display: flex;
+      flex-direction: column;
+      gap: var(--base);
+    }
+
+    // Grid wrapper and overlay for loading states
+    &__grid-wrapper {
+      position: relative;
+    }
+
+    &__grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(var(--theme-rgb-elevation-1000), 0.8);
+      backdrop-filter: blur(2px);
+      z-index: 10;
+      border-radius: var(--style-radius-m);
+      transition: opacity 0.2s ease-in-out;
+      overflow: hidden;
+
+      // Style the PayloadCMS ShimmerEffect component
+      .shimmer-effect {
+        width: 100%;
+        height: 100%;
+        border-radius: var(--style-radius-m);
+
+        // Override the default background to be more subtle
+        background-color: rgba(var(--theme-rgb-elevation-50), 0.3);
+
+        &__shine {
+          // Make the shine effect more prominent for loading state
+          opacity: 0.9;
+        }
+      }
+    }
+
+    &__grid {
+      display: grid;
+      gap: calc(var(--base) * 0.4);
+      padding: var(--base);
+      border: 1px solid var(--theme-border-color);
+      border-radius: var(--style-radius-m);
+      background-color: var(--theme-elevation-50);
+      min-height: 300px;
+      max-width: 800px;
+      margin: 0 auto;
+      overflow: hidden; // Prevent grid items from overflowing
+
+      // Responsive adjustments
+      @media (max-width: 768px) {
+        max-width: 100%;
+        gap: calc(var(--base) * 0.3);
+        padding: calc(var(--base) * 0.75);
+      }
+    }
+
+    // State display component for errors, info, etc.
+    &__state-display {
+      text-align: center;
+      padding: calc(var(--base) * 2);
+      border: 1px solid var(--theme-border-color);
+      border-radius: var(--style-radius-m);
+      background-color: var(--theme-elevation-0);
+
+      svg {
+        width: calc(var(--base) * 2);
+        height: calc(var(--base) * 2);
+        margin: 0 auto calc(var(--base) * 0.75);
+        display: block;
+        opacity: 0.6;
+      }
+
+      p {
+        @extend %body;
+        margin: 0;
+        color: var(--theme-elevation-600);
+      }
+
+      &--error {
+        background-color: var(--theme-error-50);
+        border-color: var(--theme-error-200);
+
+        svg {
+          color: var(--theme-error-500);
+          opacity: 1;
+        }
+
+        p {
+          color: var(--theme-error-700);
+        }
+      }
+
+      &--info {
+        background-color: var(--theme-primary-50);
+        border-color: var(--theme-primary-200);
+
+        svg {
+          color: var(--theme-primary-500);
+        }
+
+        p {
+          color: var(--theme-primary-700);
+        }
+      }
+
+      &--warning {
+        background-color: var(--theme-warning-50, #fef3c7);
+        border-color: var(--theme-warning-200, #fde68a);
+
+        svg {
+          color: var(--theme-warning-500, #f59e0b);
+        }
+
+        p {
+          color: var(--theme-warning-700, #b45309);
+        }
+      }
+    }
+
+    // Instructions text
+    &__instructions {
+      text-align: center;
+      padding: calc(var(--base) * 1.5);
+      color: var(--theme-elevation-600);
+      border: 1px dashed var(--theme-border-color);
+      border-radius: var(--style-radius-s);
+      background-color: var(--theme-elevation-25, var(--theme-elevation-50));
+
+      p {
+        @extend %body;
+        margin: 0;
+        font-size: calc(var(--base) * 0.7);
+        font-style: italic;
+      }
+    }
+
+    // Focus management for accessibility
+    &__grid:focus-within {
+      outline: 2px solid var(--theme-primary-500);
+      outline-offset: 2px;
+    }
+
+    // High contrast mode support
+    @media (prefers-contrast: high) {
+      &__container {
+        border-width: 2px;
+      }
+
+      &__grid {
+        border-width: 2px;
+      }
+
+      &__state-display {
+        border-width: 2px;
+      }
+    }
+
+    // Reduced motion preferences
+    @media (prefers-reduced-motion: reduce) {
+      &__grid-overlay {
+        transition: none;
+      }
+
+      &__spinner {
+        animation: none !important;
+
+        // Show a static indicator instead
+        &::after {
+          content: '⟳';
+          font-size: calc(var(--base) * 1.5);
+          line-height: 1;
+        }
+      }
+    }
+  }
+}
