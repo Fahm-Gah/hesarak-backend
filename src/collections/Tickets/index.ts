@@ -2,13 +2,15 @@ import type { CollectionConfig } from 'payload'
 import { generateUniqueTicket } from './hooks/generateUniqueTicket'
 import { populateBookedBy } from './hooks/populateBookedBy'
 import { calculateTotalPrice } from './hooks/calculateTotalPrice'
+import { validateBookedSeats } from './hooks/validateBookedSeats'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
   admin: {
     useAsTitle: 'ticketNumber',
-    defaultColumns: ['passenger', 'trip', 'date', 'isPaid', 'bookedSeats', 'totalPrice'],
+    defaultColumns: ['passenger', 'trip', 'date', 'isPaid', 'totalPrice'],
   },
+  disableDuplicate: true,
   fields: [
     {
       name: 'ticketNumber',
@@ -38,25 +40,14 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: 'bookedSeats',
-      type: 'array',
+      type: 'json',
       required: true,
-      minRows: 1,
       admin: {
         components: {
           Field: './components/SeatSelector',
         },
-        description: 'Select seats from the visual seat map',
+        readOnly: true,
       },
-      fields: [
-        {
-          type: 'text',
-          name: 'seat',
-          required: true,
-          admin: {
-            readOnly: true,
-          },
-        },
-      ],
     },
     {
       name: 'pricePerTicket',
@@ -69,7 +60,6 @@ export const Tickets: CollectionConfig = {
     {
       name: 'totalPrice',
       type: 'number',
-      required: true,
       admin: {
         readOnly: true,
         description: 'Automatically calculated based on seats and price',
@@ -86,7 +76,7 @@ export const Tickets: CollectionConfig = {
       name: 'isCancelled',
       type: 'checkbox',
       defaultValue: false,
-      admin: { position: 'sidebar' },
+      admin: { position: 'sidebar', hidden: true },
     },
     {
       name: 'bookedBy',
@@ -101,10 +91,16 @@ export const Tickets: CollectionConfig = {
         position: 'sidebar',
         condition: (data) => !data.isPaid,
         description: 'Payment deadline for unpaid tickets',
+        hidden: true,
       },
     },
   ],
   hooks: {
-    beforeChange: [generateUniqueTicket, populateBookedBy, calculateTotalPrice],
+    beforeChange: [
+      validateBookedSeats,
+      generateUniqueTicket,
+      populateBookedBy,
+      calculateTotalPrice,
+    ],
   },
 }

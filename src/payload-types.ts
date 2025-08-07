@@ -402,13 +402,15 @@ export interface Ticket {
   passenger: string | Profile;
   trip: string | TripSchedule;
   date: string;
-  /**
-   * Select seats from the visual seat map
-   */
-  bookedSeats: {
-    seat: string;
-    id?: string | null;
-  }[];
+  bookedSeats:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   /**
    * Override price per seat (leave empty to use the trip's default price)
    */
@@ -416,7 +418,7 @@ export interface Ticket {
   /**
    * Automatically calculated based on seats and price
    */
-  totalPrice: number;
+  totalPrice?: number | null;
   isPaid?: boolean | null;
   isCancelled?: boolean | null;
   bookedBy?: (string | null) | User;
@@ -777,12 +779,7 @@ export interface TicketsSelect<T extends boolean = true> {
   passenger?: T;
   trip?: T;
   date?: T;
-  bookedSeats?:
-    | T
-    | {
-        seat?: T;
-        id?: T;
-      };
+  bookedSeats?: T;
   pricePerTicket?: T;
   totalPrice?: T;
   isPaid?: T;

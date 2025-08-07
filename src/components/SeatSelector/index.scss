@@ -1,6 +1,5 @@
 @import '~@payloadcms/ui/scss';
 
-// Import component styles
 @import './components/Legend/index.scss';
 @import './components/SeatCell/index.scss';
 @import './components/SelectedSeatsList/index.scss';
@@ -12,9 +11,10 @@
     // Wrapper for the entire field
     &-wrapper {
       position: relative;
+      width: 100%;
     }
 
-    // Main container for the field content
+    // Main container
     &__container {
       padding: var(--base);
       border: 1px solid var(--theme-border-color);
@@ -27,34 +27,34 @@
       gap: var(--base);
     }
 
-    // Grid wrapper and overlay for loading states
+    // Grid wrapper for loading overlay
     &__grid-wrapper {
       position: relative;
+      min-height: 300px;
     }
 
     &__grid-overlay {
       position: absolute;
       inset: 0;
-      background-color: rgba(var(--theme-rgb-elevation-1000), 0.8);
+      background-color: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(2px);
       z-index: 10;
       border-radius: var(--style-radius-m);
-      transition: opacity 0.2s ease-in-out;
-      overflow: hidden;
+      transition: opacity 200ms ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-      // Style the PayloadCMS ShimmerEffect component
+      // Dark mode support
+      @media (prefers-color-scheme: dark) {
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+
+      // Style the PayloadCMS ShimmerEffect
       .shimmer-effect {
         width: 100%;
         height: 100%;
         border-radius: var(--style-radius-m);
-
-        // Override the default background to be more subtle
-        background-color: rgba(var(--theme-rgb-elevation-50), 0.3);
-
-        &__shine {
-          // Make the shine effect more prominent for loading state
-          opacity: 0.9;
-        }
       }
     }
 
@@ -68,76 +68,24 @@
       min-height: 300px;
       max-width: 800px;
       margin: 0 auto;
-      overflow: hidden; // Prevent grid items from overflowing
+      width: 100%;
+
+      // Fix: Cap the maximum row height to prevent excessive stretching
+      // Still fills space but with reasonable limits
+      align-items: stretch;
+      justify-items: stretch;
 
       // Responsive adjustments
       @media (max-width: 768px) {
-        max-width: 100%;
         gap: calc(var(--base) * 0.3);
         padding: calc(var(--base) * 0.75);
-      }
-    }
-
-    // State display component for errors, info, etc.
-    &__state-display {
-      text-align: center;
-      padding: calc(var(--base) * 2);
-      border: 1px solid var(--theme-border-color);
-      border-radius: var(--style-radius-m);
-      background-color: var(--theme-elevation-0);
-
-      svg {
-        width: calc(var(--base) * 2);
-        height: calc(var(--base) * 2);
-        margin: 0 auto calc(var(--base) * 0.75);
-        display: block;
-        opacity: 0.6;
+        min-height: 200px;
       }
 
-      p {
-        @extend %body;
-        margin: 0;
-        color: var(--theme-elevation-600);
-      }
-
-      &--error {
-        background-color: var(--theme-error-50);
-        border-color: var(--theme-error-200);
-
-        svg {
-          color: var(--theme-error-500);
-          opacity: 1;
-        }
-
-        p {
-          color: var(--theme-error-700);
-        }
-      }
-
-      &--info {
-        background-color: var(--theme-primary-50);
-        border-color: var(--theme-primary-200);
-
-        svg {
-          color: var(--theme-primary-500);
-        }
-
-        p {
-          color: var(--theme-primary-700);
-        }
-      }
-
-      &--warning {
-        background-color: var(--theme-warning-50, #fef3c7);
-        border-color: var(--theme-warning-200, #fde68a);
-
-        svg {
-          color: var(--theme-warning-500, #f59e0b);
-        }
-
-        p {
-          color: var(--theme-warning-700, #b45309);
-        }
+      @media (max-width: 480px) {
+        gap: calc(var(--base) * 0.25);
+        padding: calc(var(--base) * 0.5);
+        min-height: 100px;
       }
     }
 
@@ -148,7 +96,7 @@
       color: var(--theme-elevation-600);
       border: 1px dashed var(--theme-border-color);
       border-radius: var(--style-radius-s);
-      background-color: var(--theme-elevation-25, var(--theme-elevation-50));
+      background-color: var(--theme-elevation-25);
 
       p {
         @extend %body;
@@ -166,15 +114,9 @@
 
     // High contrast mode support
     @media (prefers-contrast: high) {
-      &__container {
-        border-width: 2px;
-      }
-
-      &__grid {
-        border-width: 2px;
-      }
-
-      &__state-display {
+      &__container,
+      &__grid,
+      &__instructions {
         border-width: 2px;
       }
     }
@@ -183,17 +125,6 @@
     @media (prefers-reduced-motion: reduce) {
       &__grid-overlay {
         transition: none;
-      }
-
-      &__spinner {
-        animation: none !important;
-
-        // Show a static indicator instead
-        &::after {
-          content: '⟳';
-          font-size: calc(var(--base) * 1.5);
-          line-height: 1;
-        }
       }
     }
   }

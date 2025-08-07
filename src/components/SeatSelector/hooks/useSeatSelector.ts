@@ -1,17 +1,12 @@
-// useSeatSelector.ts - A custom hook for managing seat selection logic
 'use client'
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import { useDocumentInfo, useField } from '@payloadcms/ui'
-import type { BookedTicket, Trip, SeatStatus, Seat } from '../types'
+import { useDocumentInfo, useField, useFormModified, useFormSubmitted } from '@payloadcms/ui'
+import type { BookedTicket, Trip, SeatStatus, Seat, SeatFieldValue } from '../types'
 import useSWR from 'swr'
 
 /**
- * A generic authenticated fetcher using standard `fetch` API.
- * It's configured to send cookies with the request.
- * @param url - The URL to fetch data from.
- * @returns A Promise that resolves with the parsed JSON data.
- * @throws An error if the response is not OK.
+ * Generic authenticated fetcher for Payload API
  */
 const fetcher = async (url: string): Promise<any> => {
   const response = await fetch(url, {
@@ -21,261 +16,408 @@ const fetcher = async (url: string): Promise<any> => {
   })
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    const errorText = await response.text()
+    throw new Error(errorText || `HTTP ${response.status}: ${response.statusText}`)
   }
 
   return response.json()
 }
 
 /**
- * Safely extracts a seat ID from various Payload data formats.
- * This handles nested objects and string IDs consistently.
- * @param seatData - The data item representing a seat.
- * @returns The extracted seat ID as a string, or null if not found.
+ * Safely extracts a seat ID from various Payload data formats
  */
 const extractSeatId = (seatData: any): string | null => {
   if (!seatData) return null
   if (typeof seatData === 'string') return seatData
-  if (typeof seatData.seat === 'string') return seatData.seat
-  if (typeof seatData.seat === 'object' && seatData.seat !== null) {
-    return seatData.seat.id || seatData.seat._id || null
+
+  if (typeof seatData === 'object') {
+    if (seatData.seat) {
+      if (typeof seatData.seat === 'string') return seatData.seat
+      if (typeof seatData.seat === 'object') {
+        return seatData.seat.id || seatData.seat._id || null
+      }
+    }
+    return seatData.id || seatData._id || seatData.seatId || null
   }
-  return seatData.id || seatData._id || seatData.seatId || null
+
+  return null
 }
 
-/**
- * Defines the props for the useSeatSelector hook.
- */
+type BookingStatus = 'available' | 'booked' | 'unpaid' | 'current-ticket'
+
 interface UseSeatSelectorProps {
-  /** The path to the array field in the Payload form. */
   path: string
-  /** The ID of the selected trip. */
   tripId?: string
-  /** The selected travel date. */
   travelDate?: string
 }
 
+interface UseSeatSelectorReturn {
+  trip: Trip | null
+  loading: boolean
+  error: string | undefined
+  gridDimensions: { rows: number; cols: number }
+  selectedSeats: string[]
+  getSeatStatus: (seatId: string) => SeatStatus
+  getBookingStatus: (seatId: string) => BookingStatus
+  getIsSelected: (seatId: string) => boolean
+  getJustUpdated: (seatId: string) => boolean
+  getBookingForSeat: (seatId: string) => BookedTicket | undefined
+  toggleSeat: (seatId: string) => void
+  removeSeat: (seatId: string) => void
+  clearAll: () => void
+}
+
 /**
- * A custom hook to manage all state, data fetching, and business logic
- * for a seat selection UI component within Payload CMS.
- * It handles fetching trip data, existing bookings, and syncing
- * the user's selected seats with the form field value.
- *
- * @param {UseSeatSelectorProps} props - The hook's configuration.
- * @returns An object containing all necessary state and functions for the UI.
+ * Custom hook to manage seat selection state and business logic
  */
-export const useSeatSelector = ({ path, tripId, travelDate }: UseSeatSelectorProps) => {
-  // --- 1. Core Hooks & Payload Form State ---
-  // Get the ID of the document currently being edited.
-  const { id: currentTicketId } = useDocumentInfo()
-  // Use the useField hook for robust array field management.
-  const { value: fieldValue, setValue: setFieldValue } = useField<any[]>({ path })
+export const useSeatSelector = ({
+  path,
+  tripId,
+  travelDate,
+}: UseSeatSelectorProps): UseSeatSelectorReturn => {
+  // Core Payload hooks
+  const { id: currentTicketId, lastUpdateTime, savedDocumentData } = useDocumentInfo()
+  const { value: fieldValue, setValue: setFieldValue } = useField<any>({ path })
+  const isModified = useFormModified()
+  const isSubmitted = useFormSubmitted()
 
-  // Ref to track if we're currently syncing to prevent infinite loops.
-  const isSyncing = useRef(false)
+  // Track recently updated seats for visual feedback
+  const [recentlyUpdatedSeats, setRecentlyUpdatedSeats] = useState<Set<string>>(new Set())
+  const updateTimeoutRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
-  // --- 2. Local UI State ---
-  const [localSelectedSeats, setLocalSelectedSeats] = useState<Set<string>>(new Set())
+  // Track the last saved state to detect changes
+  const lastSavedStateRef = useRef<{
+    lastUpdateTime?: number
+    savedSeats?: string[]
+    isSubmitted?: boolean
+  }>({})
 
-  // --- 3. Derived State from Form ---
-  // Memoize the seat IDs from the form field to avoid recomputing on every render.
+  // Extract seat IDs from current form field value
   const currentFormSeatIds = useMemo(() => {
-    if (!fieldValue || !Array.isArray(fieldValue)) {
-      return []
+    const fieldValueTyped = fieldValue as SeatFieldValue
+    if (!fieldValueTyped) return []
+
+    let seatsArray: any[] = []
+
+    if (Array.isArray(fieldValueTyped)) {
+      seatsArray = fieldValueTyped
+    } else if (fieldValueTyped?.seats && Array.isArray(fieldValueTyped.seats)) {
+      seatsArray = fieldValueTyped.seats
+    } else if (typeof fieldValueTyped === 'object') {
+      const arrayProps = Object.values(fieldValueTyped).filter(Array.isArray)
+      if (arrayProps.length > 0) {
+        seatsArray = arrayProps[0] as any[]
+      }
     }
-    return fieldValue.map(extractSeatId).filter((id): id is string => id !== null)
+
+    return seatsArray.map(extractSeatId).filter((id): id is string => id !== null)
   }, [fieldValue])
 
-  // --- 4. Data Fetching with SWR ---
-  // Fetch trip details. SWR key is null if tripId is not available.
-  const tripSWR = useSWR(tripId ? `/api/trip-schedules/${tripId}?depth=2` : null, fetcher)
-
-  // Memoize the date filter query for SWR.
+  // Build date filter query for API
   const dateFilterQuery = useMemo(() => {
     if (!travelDate) return null
+
     try {
-      const startOfDay = new Date(travelDate)
-      if (isNaN(startOfDay.getTime())) return null
-      const endOfDay = new Date(travelDate)
-      endOfDay.setDate(endOfDay.getDate() + 1)
-      const startISO = startOfDay.toISOString()
-      const endISO = endOfDay.toISOString()
-      return `&where[date][greater_than_equal]=${startISO}&where[date][less_than]=${endISO}`
+      const date = new Date(travelDate)
+      if (isNaN(date.getTime())) return null
+
+      const startOfDay = new Date(date)
+      startOfDay.setUTCHours(0, 0, 0, 0)
+
+      const endOfDay = new Date(date)
+      endOfDay.setUTCHours(23, 59, 59, 999)
+
+      return `&where[date][greater_than_equal]=${startOfDay.toISOString()}&where[date][less_than]=${endOfDay.toISOString()}`
     } catch (e) {
-      console.error('Failed to create date range query:', e)
+      console.error('Failed to create date filter:', e)
       return null
     }
   }, [travelDate])
 
-  // Fetch existing bookings for the selected trip and date.
-  const bookingsSWR = useSWR(
+  // Data fetching
+  const {
+    data: tripData,
+    error: tripError,
+    isLoading: tripLoading,
+  } = useSWR<Trip>(tripId ? `/api/trip-schedules/${tripId}?depth=2` : null, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
+
+  const {
+    data: bookingsData,
+    error: bookingsError,
+    isLoading: bookingsLoading,
+    mutate: mutateBookings,
+  } = useSWR(
     tripId && travelDate && dateFilterQuery
       ? `/api/tickets?where[trip][equals]=${tripId}${dateFilterQuery}&where[isCancelled][not_equals]=true&limit=1000&depth=2`
       : null,
     fetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 30000,
+    },
   )
 
-  // --- 5. Synchronization Logic ---
-  // Effect to initialize the local state when the form field value changes.
-  useEffect(() => {
-    // Only initialize if we are not currently syncing from local state to the form.
-    if (!isSyncing.current) {
-      console.log('Initializing local state from form:', currentFormSeatIds)
-      setLocalSelectedSeats(new Set(currentFormSeatIds))
+  // Helper function to mark seat as recently updated
+  const markSeatAsUpdated = useCallback((seatId: string) => {
+    setRecentlyUpdatedSeats((prev) => new Set(prev).add(seatId))
+
+    // Clear any existing timeout for this seat
+    const existingTimeout = updateTimeoutRef.current.get(seatId)
+    if (existingTimeout) {
+      clearTimeout(existingTimeout)
     }
-  }, [currentFormSeatIds])
 
-  // Effect to sync local state back to the form field with a debounce.
+    // Set new timeout to remove the update indicator
+    const newTimeout = setTimeout(() => {
+      setRecentlyUpdatedSeats((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(seatId)
+        return newSet
+      })
+      updateTimeoutRef.current.delete(seatId)
+    }, 600) // Match animation duration
+
+    updateTimeoutRef.current.set(seatId, newTimeout)
+  }, [])
+
+  // Extract saved seats from savedDocumentData
+  const savedSeatIds = useMemo(() => {
+    if (!savedDocumentData?.bookedSeats) return []
+
+    const bookedSeats = savedDocumentData.bookedSeats
+    if (!Array.isArray(bookedSeats)) return []
+
+    return bookedSeats.map(extractSeatId).filter((id): id is string => id !== null)
+  }, [savedDocumentData])
+
+  // Detect when document has been saved and refresh bookings
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      const localSeatIds = Array.from(localSelectedSeats)
-      const formSeatIds = currentFormSeatIds
+    const hasDocumentChanged =
+      // Check if lastUpdateTime has changed
+      (lastUpdateTime && lastUpdateTime !== lastSavedStateRef.current.lastUpdateTime) ||
+      // Check if saved seats have changed
+      JSON.stringify(savedSeatIds) !== JSON.stringify(lastSavedStateRef.current.savedSeats) ||
+      // Check if form was just submitted (saved)
+      (isSubmitted && !lastSavedStateRef.current.isSubmitted && !isModified)
 
-      // Check if the local state and form field value are different.
-      const isDifferent =
-        localSeatIds.length !== formSeatIds.length ||
-        !localSeatIds.every((id) => formSeatIds.includes(id))
+    if (hasDocumentChanged) {
+      console.log('Document save detected. Refreshing booking data...')
 
-      if (isDifferent && !isSyncing.current) {
-        console.log('Syncing local state to form:', localSeatIds)
-        isSyncing.current = true
-
-        // Format the value as expected by the array field.
-        const newValue = localSeatIds.map((seatId) => ({ seat: seatId }))
-
-        // Update the form field via the useField hook.
-        setFieldValue(newValue)
-
-        // Reset sync state after a small delay.
-        setTimeout(() => (isSyncing.current = false), 100)
+      // Update our tracking ref
+      lastSavedStateRef.current = {
+        lastUpdateTime,
+        savedSeats: savedSeatIds,
+        isSubmitted,
       }
-    }, 200) // Debounce for 200ms
 
-    // Cleanup function to clear the timeout.
-    return () => clearTimeout(timeout)
-  }, [localSelectedSeats, currentFormSeatIds, setFieldValue])
+      // Force a re-fetch of the bookings data
+      mutateBookings()
+        .then(() => {
+          console.log('Booking data refreshed successfully.')
+          // Mark all currently selected seats for visual feedback
+          currentFormSeatIds.forEach((seatId) => markSeatAsUpdated(seatId))
+        })
+        .catch((err) => {
+          console.error('Failed to refresh booking data after save:', err)
+        })
+    }
+  }, [
+    lastUpdateTime,
+    savedSeatIds,
+    isSubmitted,
+    isModified,
+    mutateBookings,
+    currentFormSeatIds,
+    markSeatAsUpdated,
+  ])
 
-  // --- 6. Reset State on Dependency Change ---
-  // Reset selected seats when the trip or date changes.
+  // Also refresh when the form transitions from modified to unmodified (indicates a save)
+  const wasModifiedRef = useRef(isModified)
   useEffect(() => {
-    console.log('Trip or date changed, resetting local state')
-    setLocalSelectedSeats(new Set())
-  }, [tripId, travelDate])
+    if (wasModifiedRef.current && !isModified) {
+      console.log('Form transitioned from modified to unmodified. Refreshing booking data...')
+      mutateBookings()
+        .then(() => {
+          currentFormSeatIds.forEach((seatId) => markSeatAsUpdated(seatId))
+        })
+        .catch((err) => {
+          console.error('Failed to refresh booking data:', err)
+        })
+    }
+    wasModifiedRef.current = isModified
+  }, [isModified, mutateBookings, currentFormSeatIds, markSeatAsUpdated])
 
-  // --- 7. Memoized Data Processing ---
-  // Create a map of booked seats for quick lookup.
-  const allBookedSeatsMap = useMemo(() => {
+  // Process booked seats and identify current ticket seats
+  const { allBookedSeatsMap, currentTicketOriginalSeats } = useMemo(() => {
     const map = new Map<string, BookedTicket>()
-    if (!bookingsSWR.data?.docs || !Array.isArray(bookingsSWR.data.docs)) {
-      return map
+    const originalSeats = new Set<string>()
+
+    if (!bookingsData?.docs || !Array.isArray(bookingsData.docs)) {
+      return { allBookedSeatsMap: map, currentTicketOriginalSeats: originalSeats }
     }
-    bookingsSWR.data.docs.forEach((ticket: BookedTicket) => {
-      if (ticket.id === currentTicketId || ticket.isCancelled) {
-        return
-      }
+
+    bookingsData.docs.forEach((ticket: BookedTicket) => {
       const bookedSeats = ticket.bookedSeats || []
       if (!Array.isArray(bookedSeats)) return
+
       bookedSeats.forEach((seatData) => {
         const seatId = extractSeatId(seatData)
-        if (seatId) {
+        if (!seatId) return
+
+        if (ticket.id === currentTicketId) {
+          originalSeats.add(seatId)
+        } else if (!ticket.isCancelled) {
           map.set(seatId, ticket)
         }
       })
     })
-    return map
-  }, [bookingsSWR.data, currentTicketId])
 
-  // Create a set of seats already part of the current ticket.
-  const currentTicketSeatSet = useMemo(() => {
-    const set = new Set<string>()
-    const ticket = bookingsSWR.data?.docs?.find((t: BookedTicket) => t.id === currentTicketId)
-    if (ticket?.bookedSeats) {
-      ticket.bookedSeats.forEach((seatData: Seat) => {
-        const seatId = extractSeatId(seatData)
-        if (seatId) {
-          set.add(seatId)
-        }
-      })
+    return { allBookedSeatsMap: map, currentTicketOriginalSeats: originalSeats }
+  }, [bookingsData, currentTicketId])
+
+  // Calculate grid dimensions
+  const gridDimensions = useMemo(() => {
+    const seats = tripData?.bus?.type?.seats
+    if (!seats || seats.length === 0) return { rows: 1, cols: 1 }
+
+    try {
+      const maxRow = Math.max(
+        ...seats.map((s: Seat) => s.position.row + (s.size?.rowSpan || 1) - 1),
+      )
+      const maxCol = Math.max(
+        ...seats.map((s: Seat) => s.position.col + (s.size?.colSpan || 1) - 1),
+      )
+
+      return { rows: maxRow, cols: maxCol }
+    } catch (error) {
+      console.error('Error calculating grid dimensions:', error)
+      return { rows: 10, cols: 4 }
     }
-    return set
-  }, [bookingsSWR.data, currentTicketId])
+  }, [tripData])
 
-  // --- 8. Business Logic & Callbacks ---
-  const getSeatStatus = useCallback(
-    (seatId: string): SeatStatus => {
-      if (localSelectedSeats.has(seatId)) return 'selected'
-      if (currentTicketSeatSet.has(seatId)) return 'current-ticket'
+  // SEPARATED: Booking status (for icons/punch holes) - NEVER CHANGES
+  const getBookingStatus = useCallback(
+    (seatId: string): BookingStatus => {
       const booking = allBookedSeatsMap.get(seatId)
       if (booking) {
         return booking.isPaid ? 'booked' : 'unpaid'
       }
+
+      if (currentTicketId && currentTicketOriginalSeats.has(seatId)) {
+        return 'current-ticket'
+      }
+
       return 'available'
     },
-    [localSelectedSeats, currentTicketSeatSet, allBookedSeatsMap],
+    [allBookedSeatsMap, currentTicketOriginalSeats, currentTicketId],
+  )
+
+  // SEPARATED: Selection status (for colors only)
+  const getIsSelected = useCallback(
+    (seatId: string): boolean => {
+      return currentFormSeatIds.includes(seatId)
+    },
+    [currentFormSeatIds],
+  )
+
+  // SEPARATED: Recently updated status (for visual feedback)
+  const getJustUpdated = useCallback(
+    (seatId: string): boolean => {
+      return recentlyUpdatedSeats.has(seatId)
+    },
+    [recentlyUpdatedSeats],
+  )
+
+  // SEPARATED: Combined status (for styling/colors)
+  const getSeatStatus = useCallback(
+    (seatId: string): SeatStatus => {
+      const bookingStatus = getBookingStatus(seatId)
+      const isSelected = getIsSelected(seatId)
+
+      if (bookingStatus === 'booked' || bookingStatus === 'unpaid') {
+        return bookingStatus
+      }
+
+      if (isSelected) {
+        return 'selected'
+      }
+
+      if (bookingStatus === 'current-ticket') {
+        return 'current-ticket'
+      }
+
+      return 'available'
+    },
+    [getBookingStatus, getIsSelected],
   )
 
   const getBookingForSeat = useCallback(
-    (seatId: string): BookedTicket | undefined => allBookedSeatsMap.get(seatId),
+    (seatId: string): BookedTicket | undefined => {
+      return allBookedSeatsMap.get(seatId)
+    },
     [allBookedSeatsMap],
   )
 
-  const toggleSeat = useCallback((seatId: string) => {
-    setLocalSelectedSeats((prev) => {
-      const newSet = new Set(prev)
-      newSet.has(seatId) ? newSet.delete(seatId) : newSet.add(seatId)
-      return newSet
-    })
-  }, [])
-
-  const removeSeat = useCallback((seatId: string) => {
-    setLocalSelectedSeats((prev) => {
-      const newSet = new Set(prev)
-      newSet.delete(seatId)
-      return newSet
-    })
-  }, [])
-
-  const clearAll = useCallback(() => setLocalSelectedSeats(new Set()), [])
-
-  const gridDimensions = useMemo(() => {
-    const seats = tripSWR.data?.bus?.type?.seats
-    if (!seats || seats.length === 0) return { rows: 1, cols: 1 }
-
-    try {
-      // Calculate the maximum row index (row + rowSpan - 1)
-      const maxRowIndex = Math.max(
-        1,
-        ...seats.map((s: Seat) => s.position.row + (s.size?.rowSpan || 1)),
-      )
-      // Calculate the maximum column index (col + colSpan - 1)
-      const maxColIndex = Math.max(
-        1,
-        ...seats.map((s: Seat) => s.position.col + (s.size?.colSpan || 1)),
-      )
-
-      return {
-        // The number of rows is the max grid line reached, minus 1.
-        // E.g., if max line is 5, it means rows 1, 2, 3, 4 (4 rows).
-        rows: maxRowIndex - 1, // Corrected line
-        cols: maxColIndex - 1,
+  const toggleSeat = useCallback(
+    (seatId: string) => {
+      const newSelectedSeats = new Set(currentFormSeatIds)
+      if (newSelectedSeats.has(seatId)) {
+        newSelectedSeats.delete(seatId)
+      } else {
+        newSelectedSeats.add(seatId)
       }
-    } catch (error) {
-      console.error('Error calculating grid dimensions:', error)
-      return { rows: 1, cols: 1 }
+
+      const newValue = Array.from(newSelectedSeats).map((id) => ({ seat: id }))
+      setFieldValue(newValue)
+
+      markSeatAsUpdated(seatId)
+    },
+    [currentFormSeatIds, setFieldValue, markSeatAsUpdated],
+  )
+
+  const removeSeat = useCallback(
+    (seatId: string) => {
+      const newSelectedSeats = new Set(currentFormSeatIds)
+      newSelectedSeats.delete(seatId)
+
+      const newValue = Array.from(newSelectedSeats).map((id) => ({ seat: id }))
+      setFieldValue(newValue)
+
+      markSeatAsUpdated(seatId)
+    },
+    [currentFormSeatIds, setFieldValue, markSeatAsUpdated],
+  )
+
+  const clearAll = useCallback(() => {
+    currentFormSeatIds.forEach((seatId) => markSeatAsUpdated(seatId))
+    setFieldValue([])
+  }, [currentFormSeatIds, setFieldValue, markSeatAsUpdated])
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      updateTimeoutRef.current.forEach((timeout) => clearTimeout(timeout))
+      updateTimeoutRef.current.clear()
     }
-  }, [tripSWR.data])
+  }, [])
 
-  const isLoading = tripSWR.isLoading || (bookingsSWR.isLoading && !!(tripId && travelDate))
-  const error = tripSWR.error || bookingsSWR.error
+  // Determine loading and error states
+  const isLoading = tripLoading || (bookingsLoading && !!(tripId && travelDate))
+  const error = tripError?.message || bookingsError?.message
 
-  // --- 10. Return Value ---
   return {
-    trip: tripSWR.data as Trip,
+    trip: tripData || null,
     loading: isLoading,
-    error: error ? error.message || 'An unknown error occurred' : undefined,
+    error,
     gridDimensions,
-    selectedSeats: Array.from(localSelectedSeats),
+    selectedSeats: currentFormSeatIds,
     getSeatStatus,
+    getBookingStatus,
+    getIsSelected,
+    getJustUpdated,
     getBookingForSeat,
     toggleSeat,
     removeSeat,

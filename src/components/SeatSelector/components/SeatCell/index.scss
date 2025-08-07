@@ -3,155 +3,243 @@
 @layer payload-default {
   .seat-cell {
     position: relative;
-    border: 2px solid;
-    border-radius: var(--style-radius-s);
-    padding: calc(var(--base) * 0.4);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: calc(var(--base) * 0.6);
-    font-weight: 500;
-    min-height: 45px;
-    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100px;
+    min-width: 100px;
+    border: 2px solid;
+    border-radius: var(--style-radius-s);
+    font-size: calc(var(--base) * 0.5);
+    font-weight: 600;
+    transition: all 150ms ease-in-out;
     user-select: none;
+    overflow: hidden;
 
-    &__icon {
-      width: calc(var(--base) * 0.8);
-      height: calc(var(--base) * 0.8);
-      margin-bottom: calc(var(--base) * 0.15);
-      opacity: 0.8;
-      flex-shrink: 0;
-      // Icon color should adapt to the text color of the cell
-      color: currentColor;
-    }
-
-    &__content {
-      font-size: calc(var(--base) * 0.5);
-      font-weight: 600;
-      text-align: center;
-      line-height: 1.2;
-      // Content color should adapt to the cell's main text color
-      color: currentColor;
-    }
-
+    // Base styles for all seat types
     &--seat {
-      aspect-ratio: 1 / 1;
-    }
+      background-color: var(--theme-elevation-0);
+      border-color: var(--theme-border-color);
+      color: var(--theme-text-color);
 
-    // Status-based styling for actual seats
-    &--available {
-      background-color: var(--theme-success-100);
-      border-color: var(--theme-success-300);
-      color: var(--theme-success-800); /* Text and icon color */
+      // Add subtle animation for state changes
+      transition: all 200ms ease-in-out;
 
-      &:hover:not(.seat-cell--disabled) {
-        background-color: var(--theme-success-150);
-        border-color: var(--theme-success-400);
-        transform: translateY(-1px);
-        @include shadow-sm;
+      &:focus {
+        outline: 2px solid var(--theme-primary-500);
+        outline-offset: 2px;
+      }
+
+      // Available seats - Green
+      &.seat-cell--available {
+        background-color: var(--theme-success-100);
+        border-color: var(--theme-success-300);
+        color: var(--theme-success-700);
+
+        &:hover:not(.seat-cell--disabled) {
+          background-color: var(--theme-success-200);
+          border-color: var(--theme-success-400);
+          transform: scale(1.05);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+      }
+
+      // Selected seats - Blue with subtle glow effect for better feedback
+      &.seat-cell--selected {
+        background-color: var(--color-blue-200);
+        border-color: var(--color-blue-500);
+        color: var(--color-blue-800);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+
+        &:hover:not(.seat-cell--disabled) {
+          background-color: var(--color-blue-300);
+          border-color: var(--color-blue-600);
+          transform: scale(1.05);
+          box-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.15),
+            0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+      }
+
+      // Current ticket seats - Green when deselected, blue when selected
+      // Add visual indicator that these are special (existing bookings)
+      &.seat-cell--current-ticket {
+        background-color: var(--theme-success-100);
+        border-color: var(--theme-success-300);
+        color: var(--theme-success-700);
+        position: relative;
+
+        // Subtle border glow to indicate these are existing bookings
+        box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2);
+
+        &:hover:not(.seat-cell--disabled) {
+          background-color: var(--theme-success-200);
+          border-color: var(--theme-success-400);
+          transform: scale(1.05);
+          box-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.15),
+            0 0 0 1px rgba(34, 197, 94, 0.3);
+        }
+      }
+
+      // Booked seats - Red (NO hover color effects)
+      &.seat-cell--booked {
+        background-color: var(--theme-error-100);
+        border-color: var(--theme-error-300);
+        color: var(--theme-error-700);
+
+        &:hover:not(.seat-cell--disabled) {
+          // Only transform and shadow, NO color changes
+          transform: scale(1.05);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+      }
+
+      // Unpaid seats - Yellow (NO hover color effects)
+      &.seat-cell--unpaid {
+        background-color: var(--theme-warning-100);
+        border-color: var(--theme-warning-300);
+        color: var(--theme-warning-700);
+
+        &:hover:not(.seat-cell--disabled) {
+          // Only transform and shadow, NO color changes
+          transform: scale(1.05);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+      }
+
+      // Disabled state - overrides all hover effects
+      &.seat-cell--disabled {
+        opacity: 0.6;
+        cursor: not-allowed !important;
+
+        &:hover {
+          transform: none !important;
+          box-shadow: none !important;
+        }
+      }
+
+      // Just updated state - brief visual feedback
+      &.seat-cell--just-updated {
+        animation: seatUpdate 600ms ease-out;
       }
     }
 
-    &--selected {
-      // Ensure selected color matches Payload's blue theme
-      background-color: var(--color-blue-200);
-      border-color: var(--color-blue-500);
-      color: var(--color-blue-800); /* Text and icon color */
-      box-shadow: 0 0 0 2px var(--color-blue-300);
-
-      &:hover:not(.seat-cell--disabled) {
-        transform: translateY(-1px);
-        @include shadow-sm;
-      }
-    }
-
-    &--booked {
-      background-color: var(--theme-error-100);
-      border-color: var(--theme-error-300);
-      color: var(--theme-error-800); /* Text and icon color */
-      opacity: 0.8;
-
-      &:hover {
-        transform: none;
-        box-shadow: none;
-      }
-    }
-
-    &--current-ticket {
-      background-color: var(--theme-primary-100);
-      border-color: var(--theme-primary-300);
-      color: var(--theme-primary-800); /* Text and icon color */
-
-      &:hover {
-        transform: none;
-        box-shadow: none;
-      }
-    }
-
-    &--unpaid {
-      background-color: var(--theme-warning-100);
-      border-color: var(--theme-warning-300);
-      color: var(--theme-warning-800); /* Text and icon color */
-
-      &:hover {
-        background-color: var(--theme-warning-150);
-        transform: none;
-        box-shadow: none;
-      }
-    }
-
-    &--disabled {
-      background-color: var(--theme-elevation-100);
-      border-color: var(--theme-elevation-200);
-      color: var(--theme-elevation-400); /* Text and icon color */
-      opacity: 0.5;
-
-      &:hover {
-        transform: none;
-        box-shadow: none;
-      }
-    }
-
-    // Non-seat elements (WC, Driver, Door) - base styling
-    &--wc,
+    // Non-seat elements (driver, WC, door)
     &--driver,
+    &--wc,
     &--door {
       background-color: var(--theme-elevation-100);
-      border-color: var(--theme-elevation-200);
-      color: var(--theme-elevation-600); /* Text color for non-seats */
-
-      &:hover {
-        transform: none;
-        box-shadow: none;
-      }
-
-      .seat-cell__content {
-        margin-top: 0;
-      }
+      border-color: var(--theme-elevation-300);
+      color: var(--theme-elevation-600);
+      cursor: default;
+      font-size: calc(var(--base) * 0.5);
+      font-weight: 500;
     }
 
-    // Focus styles for accessibility
-    &:focus-visible {
-      outline: 2px solid var(--color-blue-500);
-      outline-offset: 2px;
+    // Icon styles
+    &__icon {
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+
+    // Content (seat number or label)
+    &__content {
+      font-size: inherit;
+      font-weight: inherit;
+      text-align: center;
+      line-height: 1;
+    }
+
+    // Punch hole - Simple inset style in top right corner
+    &__punch-hole {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background-color: var(--theme-elevation-0);
+      border: 1px solid var(--theme-elevation-400);
+      border-radius: 50%;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
       z-index: 1;
     }
 
-    @include small-break {
-      font-size: calc(var(--base) * 0.55);
-      padding: calc(var(--base) * 0.3);
-      min-height: 40px;
+    // Responsive adjustments
+    @media (max-width: 768px) {
+      min-height: 60px;
+      min-width: 60px;
+      font-size: calc(var(--base) * 0.35);
 
       &__icon {
-        width: calc(var(--base) * 0.7);
-        height: calc(var(--base) * 0.7);
-        margin-bottom: calc(var(--base) * 0.1);
+        width: 14px;
+        height: 14px;
       }
 
-      &__content {
-        font-size: calc(var(--base) * 0.45);
+      &__punch-hole {
+        top: 4px;
+        right: 4px;
+        width: 6px;
+        height: 6px;
       }
+    }
+
+    @media (max-width: 480px) {
+      min-height: 50;
+      min-width: 36px;
+      font-size: calc(var(--base) * 0.3);
+
+      &__icon {
+        width: 12px;
+        height: 12px;
+      }
+
+      &__punch-hole {
+        top: 3px;
+        right: 3px;
+        width: 5px;
+        height: 5px;
+      }
+    }
+
+    // High contrast mode
+    @media (prefers-contrast: high) {
+      border-width: 3px;
+
+      &:focus {
+        outline-width: 3px;
+      }
+    }
+
+    // Reduced motion
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+
+      &:hover {
+        transform: none !important;
+      }
+
+      // Disable update animation for reduced motion
+      &.seat-cell--just-updated {
+        animation: none;
+      }
+    }
+  }
+
+  // Keyframe animation for seat updates
+  @keyframes seatUpdate {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    50% {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.3);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
     }
   }
 }

@@ -1,26 +1,41 @@
-import React from 'react'
-import { AlertCircle, Info } from 'lucide-react'
-import './index.scss' // Import the component's own SCSS file
+import React, { memo } from 'react'
+import { AlertCircle, Info, Loader2 } from 'lucide-react'
+import './index.scss'
 
 interface StateDisplayProps {
-  type: 'info' | 'error'
-  children: React.ReactNode
+  type: 'info' | 'error' | 'loading' | 'warning'
+  children?: React.ReactNode
 }
 
-/**
- * A reusable component to display different states like info or errors.
- * It provides a consistent look and feel with a dedicated icon and styling,
- * making messages clear and visually distinct.
- */
-export const StateDisplay: React.FC<StateDisplayProps> = ({ type, children }) => {
-  const Icon = type === 'error' ? AlertCircle : Info
+export const StateDisplay = memo<StateDisplayProps>(({ type, children }) => {
+  const getIcon = () => {
+    switch (type) {
+      case 'error':
+        return <AlertCircle size={32} className="state-display__icon" aria-hidden="true" />
+      case 'loading':
+        return (
+          <Loader2
+            size={32}
+            className="state-display__icon state-display__icon--spinning"
+            aria-hidden="true"
+          />
+        )
+      case 'warning':
+        return <AlertCircle size={32} className="state-display__icon" aria-hidden="true" />
+      default:
+        return <Info size={32} className="state-display__icon" aria-hidden="true" />
+    }
+  }
 
   return (
-    <div className={`state-display state-display--${type}`}>
-      {/* Explicitly set icon size and add a class for SCSS targeting */}
-      <Icon size={32} className="state-display__icon" aria-hidden="true" />
-      <div className="state-display__content">{children}</div>{' '}
-      {/* Wrap children for flex control */}
+    <div
+      className={`state-display state-display--${type}`}
+      role={type === 'error' ? 'alert' : 'status'}
+    >
+      {getIcon()}
+      <div className="state-display__content">{children}</div>
     </div>
   )
-}
+})
+
+StateDisplay.displayName = 'StateDisplay'

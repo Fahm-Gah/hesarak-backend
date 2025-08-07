@@ -1,37 +1,33 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, memo } from 'react'
 import { MapPin, Clock, Bus } from 'lucide-react'
 import type { Trip } from '../../types'
-import { formatDepartureTime } from '@/utils/dateUtils' // Assuming '@/utils/dateUtils' is your alias
+import './index.scss'
+import { formatDepartureTime } from '@/utils/dateUtils'
 
 interface TripHeaderProps {
   trip: Trip
 }
 
-/**
- * Displays comprehensive trip information including route, timing, bus details,
- * and amenities. This component is designed to be highly readable and informative at a glance.
- */
-export const TripHeader: React.FC<TripHeaderProps> = ({ trip }) => {
-  // Memoize the formatted route string to prevent unnecessary recalculations
+export const TripHeader = memo<TripHeaderProps>(({ trip }) => {
+  // Format route string
   const formattedRoute = useMemo(() => {
     const origin = trip.from.name
-    const destination = trip.stops[trip.stops.length - 1]?.terminal.name || origin
+    const stops = trip.stops || []
 
-    const intermediateStops = trip.stops
+    if (stops.length === 0) return origin
+
+    const destination = stops[stops.length - 1]?.terminal.name || origin
+    const intermediateStops = stops
       .slice(0, -1)
-      .filter(
-        (stop) =>
-          stop.terminal.name !== origin &&
-          (destination === origin || stop.terminal.name !== destination),
-      )
       .map((stop) => stop.terminal.name)
+      .filter((name) => name !== origin && name !== destination)
 
     if (intermediateStops.length === 0) {
       return `${origin} → ${destination}`
     }
 
     return `${origin} → ${intermediateStops.join(', ')} → ${destination}`
-  }, [trip.from.name, trip.stops])
+  }, [trip])
 
   return (
     <div className="trip-header">
@@ -47,7 +43,7 @@ export const TripHeader: React.FC<TripHeaderProps> = ({ trip }) => {
 
         <div className="trip-header__metadata-item">
           <Clock size={16} />
-          <span>{formatDepartureTime(trip.timeOfDay)}</span> {/* Using the improved function */}
+          <span>{formatDepartureTime(trip.timeOfDay)}</span>
         </div>
 
         <div className="trip-header__metadata-item">
@@ -58,28 +54,33 @@ export const TripHeader: React.FC<TripHeaderProps> = ({ trip }) => {
         </div>
       </div>
 
-      {/* Moved amenities section below trip-status */}
-      <div className="trip-header__metadata-item trip-header__amenities">
-        <span className="trip-header__amenities-label">Amenities:</span>
-        <div className="trip-header__amenities-list">
-          {trip.bus.type.amenities.map((amenity, index) => (
-            <span key={amenity.name || index} className="trip-header__amenity">
-              {amenity.name}
-            </span>
-          ))}
+      {trip.bus.type.amenities && trip.bus.type.amenities.length > 0 && (
+        <div className="trip-header__metadata-item trip-header__amenities">
+          <span className="trip-header__amenities-label">Amenities:</span>
+          <div className="trip-header__amenities-list">
+            {trip.bus.type.amenities.map((amenity, index) => (
+              <span key={`${amenity.name}-${index}`} className="trip-header__amenity">
+                {amenity.name}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="trip-header__trip-status">
         <span
-          className={`trip-header__status-badge trip-header__status-badge--${trip.isActive ? 'active' : 'inactive'}`}
+          className={`trip-header__status-badge trip-header__status-badge--${
+            trip.isActive ? 'active' : 'inactive'
+          }`}
         >
           {trip.isActive ? 'Active' : 'Inactive'}
         </span>
         <span className="trip-header__price">
-          <strong>AFN {trip.price.toLocaleString()} per seat</strong>
+          Price per seat: <strong>AFN {trip.price.toLocaleString()}</strong>
         </span>
       </div>
     </div>
   )
-}
+})
+
+TripHeader.displayName = 'TripHeader'

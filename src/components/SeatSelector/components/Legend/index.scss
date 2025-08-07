@@ -8,26 +8,17 @@
     font-size: calc(var(--base) * 0.6);
     flex-wrap: wrap;
     padding: calc(var(--base) * 0.75);
-    // Use elevation-0 for background, should adapt
     background-color: var(--theme-elevation-0);
     border-radius: var(--style-radius-s);
     justify-content: center;
-    border: 1px solid var(--theme-border-color); /* Added border for consistency */
-    box-shadow: var(--base-box-shadow); /* Added for consistency */
-
-    @include small-break {
-      font-size: calc(var(--base) * 0.55);
-      gap: calc(var(--base) * 0.75);
-      padding: calc(var(--base) * 0.5);
-    }
+    border: 1px solid var(--theme-border-color);
 
     &__item {
       display: flex;
       align-items: center;
       gap: calc(var(--base) * 0.25);
       flex-shrink: 0;
-      // Text color for legend items should adapt
-      color: var(--theme-text-color-light);
+      color: var(--theme-text-color);
     }
 
     &__box {
@@ -43,7 +34,6 @@
       }
 
       &--selected {
-        // Use Payload's blue for selected, consistent with SeatCell and Stats
         background-color: var(--color-blue-200);
         border-color: var(--color-blue-500);
       }
@@ -57,11 +47,12 @@
         background-color: var(--theme-warning-100);
         border-color: var(--theme-warning-300);
       }
+    }
 
-      &--current-ticket {
-        background-color: var(--theme-primary-100);
-        border-color: var(--theme-primary-300);
-      }
+    @media (max-width: 768px) {
+      font-size: calc(var(--base) * 0.55);
+      gap: calc(var(--base) * 0.75);
+      padding: calc(var(--base) * 0.5);
     }
   }
 }

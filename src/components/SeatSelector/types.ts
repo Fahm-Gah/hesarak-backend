@@ -1,58 +1,177 @@
-// src/components/SeatSelector/types.ts
+// types.ts - Complete type definitions for the seat selector
 
 /**
- * Defines the status of a single seat in the UI.
- * - available: The seat is open for booking.
- * - selected: The seat has been clicked by the user in the current session.
- * - booked: The seat is paid for and confirmed in another ticket.
- * - unpaid: The seat is reserved in another ticket but not yet paid for.
- * - current-ticket: The seat is already part of the ticket being edited.
+ * Seat status enumeration for type safety
  */
-export type SeatStatus = 'available' | 'selected' | 'booked' | 'unpaid' | 'current-ticket'
+export type SeatStatus =
+  | 'available' // Seat is open for booking
+  | 'selected' // Seat is selected in current session (new selection)
+  | 'current-ticket' // Seat belongs to the ticket being edited (editable)
+  | 'booked' // Seat is paid and confirmed by others
+  | 'unpaid' // Seat is reserved but unpaid by others
 
 /**
- * Represents a physical or logical item in the bus layout grid.
+ * Seat types in the bus layout
  */
-export interface Seat {
-  id: string
-  type: 'seat' | 'wc' | 'driver' | 'door'
-  seatNumber?: string
-  position: { row: number; col: number }
-  size?: { rowSpan: number; colSpan: number }
+export type SeatType = 'seat' | 'wc' | 'driver' | 'door'
+
+/**
+ * Position in the grid
+ */
+export interface GridPosition {
+  row: number
+  col: number
 }
 
 /**
- * Represents the full trip schedule, including its route, bus, and pricing.
+ * Size span for grid items
+ */
+export interface GridSize {
+  rowSpan: number
+  colSpan: number
+}
+
+/**
+ * Individual seat or bus element
+ */
+export interface Seat {
+  id: string
+  type: SeatType
+  seatNumber?: string
+  position: GridPosition
+  size?: GridSize
+}
+
+/**
+ * Terminal/Stop information
+ */
+export interface Terminal {
+  id: string
+  name: string
+  province?: string
+}
+
+/**
+ * Stop along a trip route
+ */
+export interface TripStop {
+  terminal: Terminal
+  time: string
+}
+
+/**
+ * Bus amenity
+ */
+export interface Amenity {
+  name: string
+  icon?: string
+}
+
+/**
+ * Bus type configuration
+ */
+export interface BusType {
+  id: string
+  name: string
+  seats: Seat[]
+  amenities: Amenity[]
+  capacity?: number
+}
+
+/**
+ * Bus information
+ */
+export interface Bus {
+  id: string
+  number: string
+  type: BusType
+}
+
+/**
+ * Trip schedule information
  */
 export interface Trip {
   id: string
   name: string
-  from: { id: string; name: string; province?: string }
-  stops: Array<{ terminal: { id: string; name: string; province?: string }; time: string }>
-  timeOfDay: string
-  bus: {
-    id: string
-    number: string
-    type: {
-      id: string
-      name: string
-      seats: Seat[]
-      amenities: { name: string }[]
-    }
-  }
+  from: Terminal
+  stops: TripStop[]
+  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night'
+  bus: Bus
   price: number
   isActive: boolean
+  departureTime?: string
+  arrivalTime?: string
 }
 
 /**
- * Represents a ticket document as returned by the Payload API.
- * This is the data structure for a single booking, which may contain multiple seats.
+ * Passenger information
+ */
+export interface Passenger {
+  id: string
+  fullName: string
+  phoneNumber: string
+  gender: 'male' | 'female' | 'other'
+  email?: string
+}
+
+/**
+ * Booked seat reference
+ */
+export interface BookedSeat {
+  seat: string | Seat
+  id?: string
+}
+
+/**
+ * Ticket document from API
  */
 export interface BookedTicket {
   id: string
   ticketNumber: string
-  passenger: { id: string; fullName: string; phoneNumber: string; gender: string }
-  bookedSeats: Array<{ seat: string; id?: string }>
+  passenger: Passenger
+  trip?: Trip | string
+  bookedSeats: BookedSeat[]
   isPaid: boolean
   isCancelled: boolean
+  totalPrice?: number
+  pricePerTicket?: number
+  date?: string
+  paymentDeadline?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+/**
+ * API response wrapper
+ */
+export interface ApiResponse<T> {
+  docs: T[]
+  totalDocs: number
+  limit: number
+  page: number
+  totalPages: number
+  hasPrevPage: boolean
+  hasNextPage: boolean
+  prevPage: number | null
+  nextPage: number | null
+}
+
+/**
+ * Form field value for seat selection
+ */
+export interface SeatFieldValue {
+  seats?: BookedSeat[]
+  [key: string]: any
+}
+
+/**
+ * Error response from API
+ */
+export interface ApiError {
+  message: string
+  status?: number
+  errors?: Array<{
+    field?: string
+    message: string
+  }>
 }
