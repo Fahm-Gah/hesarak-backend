@@ -1,11 +1,11 @@
+// src/components/SeatSelector/index.tsx
 'use client'
 
 import React, { useCallback, useMemo } from 'react'
 import { useFormFields, toast } from '@payloadcms/ui'
-import type { ArrayFieldClientComponent } from 'payload'
+import type { FieldClientComponent } from 'payload'
 import { useSeatSelector } from './hooks/useSeatSelector'
 
-// Import all components
 import { Legend } from './components/Legend'
 import { SelectedSeatsList } from './components/SelectedSeatsList'
 import { SeatCell } from './components/SeatCell'
@@ -14,14 +14,13 @@ import { StateDisplay } from './components/StateDisplay'
 
 import './index.scss'
 
-export const SeatSelectorField: ArrayFieldClientComponent = ({ field, path, readOnly = false }) => {
-  // Extract trip and date from form fields
-  const { tripId, travelDate } = useFormFields(([fields]) => ({
-    tripId: fields.trip?.value as string | undefined,
-    travelDate: fields.date?.value as string | undefined,
+export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false }) => {
+  // Payload still gives you `path` of type unknown, but hook coerces it
+  const { tripId, travelDate } = useFormFields(([f]) => ({
+    tripId: f.trip?.value as string | undefined,
+    travelDate: f.date?.value as string | undefined,
   }))
 
-  // Use the hook to manage state and logic
   const {
     trip,
     loading,
@@ -38,69 +37,48 @@ export const SeatSelectorField: ArrayFieldClientComponent = ({ field, path, read
     clearAll,
   } = useSeatSelector({ path, tripId, travelDate })
 
-  // Handle seat click with proper toast notifications
   const handleSeatClick = useCallback(
     (seatId: string) => {
       if (readOnly) return
-
       const status = getSeatStatus(seatId)
-
-      // Handle toggling for available/selected seats and current-ticket seats
       if (status === 'available' || status === 'selected' || status === 'current-ticket') {
         toggleSeat(seatId)
         return
       }
-
-      // Handle notifications for occupied seats
       const booking = getBookingForSeat(seatId)
       if (!booking) return
-
-      const passengerName = booking.passenger?.fullName || 'another passenger'
-
-      switch (status) {
-        case 'booked':
-          toast.error(
-            <div>
-              Seat booked by <strong>{passengerName}</strong>
-              <br />
-              Ticket: {booking.ticketNumber}
-            </div>,
-          )
-          break
-
-        case 'unpaid':
-          toast.warning(
-            <div>
-              Seat reserved by <strong>{passengerName}</strong>
-              <br />
-              Ticket: {booking.ticketNumber}
-            </div>,
-          )
-          break
-      }
+      const name = booking.passenger?.fullName || 'another passenger'
+      const msg = (
+        <div>
+          Seat {status === 'booked' ? 'booked' : 'reserved'} by <strong>{name}</strong>
+          <br />
+          Ticket: {booking.ticketNumber}
+        </div>
+      )
+      status === 'booked' ? toast.error(msg) : toast.warning(msg)
     },
     [getSeatStatus, toggleSeat, getBookingForSeat, readOnly],
   )
 
-  // Memoize the seat map for optimal performance
   const seatMap = useMemo(() => {
-    if (!trip?.bus?.type?.seats) return null
+    const seats = trip?.bus?.type?.seats
+    if (!Array.isArray(seats)) return null
 
-    return trip.bus.type.seats.map((seat) => {
-      const status = getSeatStatus(seat.id)
-      const bookingStatus = getBookingStatus(seat.id)
-      const isSelected = getIsSelected(seat.id)
-      const justUpdated = getJustUpdated(seat.id)
+    return seats.map((seat: any, idx: number) => {
+      const seatId =
+        (typeof seat.id === 'string' && seat.id) ||
+        (typeof seat._id === 'string' && seat._id) ||
+        `${seat.position.row}-${seat.position.col}-${idx}`
 
       return (
         <SeatCell
-          key={seat.id}
-          seat={seat}
-          status={status}
-          bookingStatus={bookingStatus}
-          isSelected={isSelected}
-          justUpdated={justUpdated}
-          onClick={() => handleSeatClick(seat.id)}
+          key={seatId}
+          seat={{ ...seat, id: seatId }}
+          status={getSeatStatus(seatId)}
+          bookingStatus={getBookingStatus(seatId)}
+          isSelected={getIsSelected(seatId)}
+          justUpdated={getJustUpdated(seatId)}
+          onClick={() => handleSeatClick(seatId)}
           isDisabled={loading || readOnly}
         />
       )
@@ -116,7 +94,6 @@ export const SeatSelectorField: ArrayFieldClientComponent = ({ field, path, read
     readOnly,
   ])
 
-  // Error state
   if (error) {
     return (
       <StateDisplay type="error">
@@ -125,7 +102,6 @@ export const SeatSelectorField: ArrayFieldClientComponent = ({ field, path, read
     )
   }
 
-  // Empty state
   if (!tripId || !travelDate) {
     return (
       <StateDisplay type="info">
@@ -134,41 +110,34 @@ export const SeatSelectorField: ArrayFieldClientComponent = ({ field, path, read
     )
   }
 
-  // Loading state (initial load only)
   if (loading && !trip) {
     return (
       <StateDisplay type="loading">
-        <p>Loading seat map...</p>
+        <p>Loading seat map…</p>
       </StateDisplay>
     )
   }
 
-  // Main render
   return (
     <div className="seat-selector-wrapper">
       <div className="seat-selector__container">
-        {/* Header */}
         {trip && <TripHeader trip={trip} />}
-
-        {/* Legend */}
         <Legend />
 
-        {/* Seat Grid */}
         <div className="seat-selector__grid-wrapper">
-          {/* Loading overlay for data refresh */}
           {loading && trip && (
             <div className="seat-selector__grid-overlay">
               <div className="seat-selector__loading-shimmer">
-                <div className="seat-selector__shimmer-bar seat-selector__shimmer-bar--1" />
-                <div className="seat-selector__shimmer-bar seat-selector__shimmer-bar--2" />
-                <div className="seat-selector__shimmer-bar seat-selector__shimmer-bar--3" />
-                <div className="seat-selector__shimmer-bar seat-selector__shimmer-bar--4" />
-                <div className="seat-selector__shimmer-bar seat-selector__shimmer-bar--5" />
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <div
+                    key={n}
+                    className={`seat-selector__shimmer-bar seat-selector__shimmer-bar--${n}`}
+                  />
+                ))}
               </div>
             </div>
           )}
 
-          {/* Main seat grid */}
           {seatMap && (
             <div
               className="seat-selector__grid"
@@ -185,7 +154,6 @@ export const SeatSelectorField: ArrayFieldClientComponent = ({ field, path, read
           )}
         </div>
 
-        {/* Footer Section */}
         {selectedSeats.length > 0 ? (
           <SelectedSeatsList
             selectedSeatIds={selectedSeats}

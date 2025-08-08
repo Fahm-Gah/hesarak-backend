@@ -309,48 +309,25 @@ export interface BusType {
    * Name of the bus type (e.g., "VIP 2+1", "Standard 2+2")
    */
   name: string;
+  /**
+   * List of amenities (AC, WiFi, etc.)
+   */
   amenities?:
     | {
         name: string;
         id?: string | null;
       }[]
     | null;
-  /**
-   * Define the complete bus layout including seats, WC, doors, etc.
-   */
-  seats: {
-    type: 'seat' | 'wc' | 'driver' | 'door';
-    seatNumber?: string | null;
-    position: {
-      /**
-       * Grid row position LTR
-       */
-      row: number;
-      /**
-       * Grid column position TTB
-       */
-      col: number;
-    };
-    /**
-     * Size of the element in grid cells
-     */
-    size?: {
-      /**
-       * Number of rows this element spans
-       */
-      rowSpan?: number | null;
-      /**
-       * Number of columns this element spans
-       */
-      colSpan?: number | null;
-    };
-    /**
-     * If checked, this seat will not be bookable by end users through the website
-     */
-    disabled?: boolean | null;
-    id?: string | null;
-  }[];
-  capacity: number;
+  seats:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  capacity?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -707,26 +684,7 @@ export interface BusTypesSelect<T extends boolean = true> {
         name?: T;
         id?: T;
       };
-  seats?:
-    | T
-    | {
-        type?: T;
-        seatNumber?: T;
-        position?:
-          | T
-          | {
-              row?: T;
-              col?: T;
-            };
-        size?:
-          | T
-          | {
-              rowSpan?: T;
-              colSpan?: T;
-            };
-        disabled?: T;
-        id?: T;
-      };
+  seats?: T;
   capacity?: T;
   updatedAt?: T;
   createdAt?: T;

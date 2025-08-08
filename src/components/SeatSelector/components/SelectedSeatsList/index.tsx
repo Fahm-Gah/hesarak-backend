@@ -13,10 +13,20 @@ interface SelectedSeatsListProps {
 
 export const SelectedSeatsList = memo<SelectedSeatsListProps>(
   ({ selectedSeatIds, trip, removeSeat, clearAll, readOnly = false }) => {
-    // Create seat number lookup map
     const seatNumberMap = useMemo(() => {
-      if (!trip?.bus?.type?.seats) return new Map()
-      return new Map(trip.bus.type.seats.map((s) => [s.id, s.seatNumber]))
+      if (!trip?.bus?.type?.seats || !Array.isArray(trip.bus.type.seats)) {
+        return new Map<string, string>()
+      }
+      return new Map(
+        trip.bus.type.seats.map((seat: any, idx: number) => {
+          const seatId =
+            (typeof seat.id === 'string' && seat.id) ||
+            (typeof seat._id === 'string' && seat._id) ||
+            `${seat.position.row}-${seat.position.col}-${idx}`
+
+          return [seatId, seat.seatNumber || 'N/A']
+        }),
+      )
     }, [trip])
 
     const getSeatNumber = (id: string) => seatNumberMap.get(id) || 'N/A'

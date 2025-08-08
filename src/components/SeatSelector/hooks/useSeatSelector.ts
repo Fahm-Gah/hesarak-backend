@@ -46,7 +46,7 @@ const extractSeatId = (seatData: any): string | null => {
 type BookingStatus = 'available' | 'booked' | 'unpaid' | 'current-ticket'
 
 interface UseSeatSelectorProps {
-  path: string
+  path: unknown
   tripId?: string
   travelDate?: string
 }
@@ -71,10 +71,12 @@ interface UseSeatSelectorReturn {
  * Custom hook to manage seat selection state and business logic
  */
 export const useSeatSelector = ({
-  path,
+  path: rawPath,
   tripId,
   travelDate,
 }: UseSeatSelectorProps): UseSeatSelectorReturn => {
+  const path = String(rawPath)
+
   // Core Payload hooks
   const { id: currentTicketId, lastUpdateTime, savedDocumentData } = useDocumentInfo()
   const { value: fieldValue, setValue: setFieldValue } = useField<any>({ path })
