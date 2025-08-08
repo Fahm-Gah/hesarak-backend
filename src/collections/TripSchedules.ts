@@ -4,7 +4,7 @@ export const TripSchedules: CollectionConfig = {
   slug: 'trip-schedules',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'bus', 'timeOfDay', 'from', 'to', 'price', 'frequency'],
+    defaultColumns: ['name', 'bus', 'departureTime', 'from', 'to', 'price', 'frequency'],
   },
   fields: [
     {
@@ -33,7 +33,7 @@ export const TripSchedules: CollectionConfig = {
       required: true,
     },
     {
-      name: 'timeOfDay',
+      name: 'departureTime',
       type: 'date',
       admin: { date: { pickerAppearance: 'timeOnly' }, description: 'Departure time (recurring)' },
       required: true,

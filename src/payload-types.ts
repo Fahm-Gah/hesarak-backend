@@ -312,12 +312,7 @@ export interface BusType {
   /**
    * List of amenities (AC, WiFi, etc.)
    */
-  amenities?:
-    | {
-        name: string;
-        id?: string | null;
-      }[]
-    | null;
+  amenities?: string[] | null;
   seats:
     | {
         [k: string]: unknown;
@@ -349,7 +344,7 @@ export interface TripSchedule {
   /**
    * Departure time (recurring)
    */
-  timeOfDay: string;
+  departureTime: string;
   from: string | Terminal;
   stops?:
     | {
@@ -678,12 +673,7 @@ export interface BusesSelect<T extends boolean = true> {
  */
 export interface BusTypesSelect<T extends boolean = true> {
   name?: T;
-  amenities?:
-    | T
-    | {
-        name?: T;
-        id?: T;
-      };
+  amenities?: T;
   seats?: T;
   capacity?: T;
   updatedAt?: T;
@@ -708,7 +698,7 @@ export interface TripSchedulesSelect<T extends boolean = true> {
   name?: T;
   price?: T;
   bus?: T;
-  timeOfDay?: T;
+  departureTime?: T;
   from?: T;
   stops?:
     | T

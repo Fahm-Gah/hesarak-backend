@@ -3,6 +3,7 @@ import { generateUniqueTicket } from './hooks/generateUniqueTicket'
 import { populateBookedBy } from './hooks/populateBookedBy'
 import { calculateTotalPrice } from './hooks/calculateTotalPrice'
 import { validateBookedSeats } from './hooks/validateBookedSeats'
+import { normalizeDateToMidnight } from './hooks/normalizeDateToMidnight'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -101,6 +102,7 @@ export const Tickets: CollectionConfig = {
       generateUniqueTicket,
       populateBookedBy,
       calculateTotalPrice,
+      normalizeDateToMidnight,
     ],
   },
 }

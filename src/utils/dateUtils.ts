@@ -13,45 +13,64 @@ export const getDayOfWeek = (date: string): string => {
 
 /**
  * Format time string to HH:mm format (24-hour)
- * @param timeString - Time string from database
+ * @param timeInput - Time string or Date object from database
  * @returns Formatted time in 24-hour format
  */
-export const formatTime = (timeString: string): string => {
+export const formatTime = (timeInput: string | Date): string => {
   try {
-    const date = new Date(timeString)
+    let date: Date
+
+    if (timeInput instanceof Date) {
+      date = timeInput
+    } else if (typeof timeInput === 'string') {
+      // Handle both ISO strings and time-only strings
+      if (timeInput.includes('T') || timeInput.includes('Z')) {
+        date = new Date(timeInput)
+      } else {
+        date = new Date(`1970-01-01T${timeInput}:00`)
+      }
+    } else {
+      return String(timeInput)
+    }
+
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
     })
   } catch {
-    return timeString
+    return String(timeInput)
   }
 }
 
 /**
- * Format a time string to a readable 12-hour format with AM/PM.
- * This function is now more robust and can handle both "HH:MM" strings
- * and full ISO date-time strings (e.g., "2025-08-03T19:30:00.000Z").
- * @param timeString - Time string (e.g., "09:00", "14:30", or "2025-08-03T19:30:00.000Z")
+ * Format a time to a readable 12-hour format with AM/PM.
+ * This function can handle Date objects, ISO strings, and "HH:MM" strings.
+ * @param timeInput - Time input (Date object, ISO string, or "HH:MM" string)
  * @returns Formatted time (e.g., "9:00 AM", "2:30 PM", or "7:30 PM")
  */
-export const formatDepartureTime = (timeString: string): string => {
+export const formatDepartureTime = (timeInput: string | Date): string => {
   try {
     let date: Date
 
-    // Attempt to parse the string directly as a Date object
-    const directDate = new Date(timeString)
-
-    if (!isNaN(directDate.getTime())) {
-      // If direct parsing is successful, use that date
-      date = directDate
-    } else {
-      // If direct parsing fails, assume it's just "HH:MM" and create a dummy date
-      date = new Date(`1970-01-01T${timeString}:00`)
-      if (isNaN(date.getTime())) {
-        throw new Error('Invalid time string format.')
+    if (timeInput instanceof Date) {
+      // Direct Date object
+      date = timeInput
+    } else if (typeof timeInput === 'string') {
+      // Handle both ISO strings and time-only strings
+      if (timeInput.includes('T') || timeInput.includes('Z')) {
+        // ISO string
+        date = new Date(timeInput)
+      } else {
+        // Time-only string like "14:30"
+        date = new Date(`1970-01-01T${timeInput}:00`)
       }
+    } else {
+      return String(timeInput)
+    }
+
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date/time')
     }
 
     return date.toLocaleTimeString('en-US', {
@@ -60,21 +79,68 @@ export const formatDepartureTime = (timeString: string): string => {
       hour12: true,
     })
   } catch (e) {
-    console.error('Error formatting departure time:', e)
-    return timeString // Fallback to original string on error
+    console.error('Error formatting departure time:', e, 'Input:', timeInput)
+    return String(timeInput) // Fallback to original string on error
   }
 }
 
 /**
  * Calculate duration between two times
- * @param startTime - Start time in HH:mm format
- * @param endTime - End time in HH:mm format
+ * @param startTime - Start time in HH:mm format or formatted time string
+ * @param endTime - End time in HH:mm format or formatted time string
  * @returns Duration string like "9h 30m"
  */
 export const calculateDuration = (startTime: string, endTime: string): string => {
   try {
-    const start = new Date(`1970-01-01T${startTime}`)
-    const end = new Date(`1970-01-01T${endTime}`)
+    // Validate inputs
+    if (
+      !startTime ||
+      !endTime ||
+      typeof startTime !== 'string' ||
+      typeof endTime !== 'string' ||
+      startTime === 'Invalid Date' ||
+      endTime === 'Invalid Date'
+    ) {
+      return 'Unknown'
+    }
+
+    // Extract time from potential full datetime strings
+    let startTimeOnly = startTime
+    let endTimeOnly = endTime
+
+    // If it's a full datetime string, extract just the time part
+    if (startTime.includes('T')) {
+      startTimeOnly = new Date(startTime).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+    }
+
+    if (endTime.includes('T')) {
+      endTimeOnly = new Date(endTime).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+    }
+
+    // Validate time format (should be HH:MM or similar)
+    const timeRegex = /^\d{1,2}:\d{2}$/
+    if (!timeRegex.test(startTimeOnly) || !timeRegex.test(endTimeOnly)) {
+      console.warn('Invalid time format for duration calculation:', { startTime, endTime })
+      return 'Unknown'
+    }
+
+    const start = new Date(`1970-01-01T${startTimeOnly}`)
+    const end = new Date(`1970-01-01T${endTimeOnly}`)
+
+    // Check if dates are valid
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      console.warn('Invalid dates in duration calculation:', { startTimeOnly, endTimeOnly })
+      return 'Unknown'
+    }
+
     let durationMs = end.getTime() - start.getTime()
 
     // Handle overnight trips
@@ -84,8 +150,16 @@ export const calculateDuration = (startTime: string, endTime: string): string =>
 
     const hours = Math.floor(durationMs / (1000 * 60 * 60))
     const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60))
+
+    // Validate calculated values
+    if (isNaN(hours) || isNaN(minutes)) {
+      console.warn('NaN values in duration calculation:', { hours, minutes, durationMs })
+      return 'Unknown'
+    }
+
     return `${hours}h ${minutes}m`
-  } catch {
+  } catch (error) {
+    console.error('Error calculating duration:', error, { startTime, endTime })
     return 'Unknown'
   }
 }

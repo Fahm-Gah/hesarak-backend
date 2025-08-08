@@ -1,7 +1,8 @@
 import type { Endpoint } from 'payload'
+import { formatTime, calculateDuration } from '../utils/dateUtils'
 
 interface UserTicket {
-  ticketId: string
+  id: string
   ticketNumber: string
   trip: {
     id: string
@@ -9,17 +10,21 @@ interface UserTicket {
     from: {
       name: string
       province: string
+      address: string
     }
     to: {
       name: string
       province: string
-    }
-    timeOfDay: string
+      address: string
+    } | null
+    departureTime: string
+    arrivalTime: string | null
+    duration: string | null
     bus: {
       number: string
       type: {
         name: string
-        amenities?: Array<{ name: string }>
+        amenities?: string[] | null
       }
     }
   }
@@ -33,22 +38,11 @@ interface UserTicket {
     pricePerSeat: number
   }
   status: {
-    isPaid: boolean
-    isCancelled: boolean
+    isPaid?: boolean
+    isCancelled?: boolean
     paymentDeadline?: string
   }
   bookedAt: string
-}
-
-interface GetUserTicketsResponse {
-  success: true
-  data: {
-    tickets: UserTicket[]
-    total: number
-    page?: number
-    limit?: number
-    hasMore?: boolean
-  }
 }
 
 export const getUserTickets: Endpoint = {
@@ -63,18 +57,8 @@ export const getUserTickets: Endpoint = {
     }
 
     try {
-      // Get authenticated user with profile
-      const authUser = await payload.findByID({
-        collection: 'users',
-        id: user.id,
-        depth: 1,
-      })
-
-      if (!authUser?.isActive) {
-        return Response.json({ error: 'User account is inactive' }, { status: 401 })
-      }
-
-      if (!authUser.profile || typeof authUser.profile === 'string') {
+      // Use profile directly from user object (consistent with other endpoints)
+      if (!user?.profile) {
         return Response.json({ error: 'Profile required' }, { status: 400 })
       }
 
@@ -84,16 +68,17 @@ export const getUserTickets: Endpoint = {
       const limit = searchParams.get('limit')
         ? Math.min(parseInt(searchParams.get('limit')!), 100)
         : undefined
-      const depth = searchParams.get('depth') ? parseInt(searchParams.get('depth')!) : 4
       const sort = searchParams.get('sort') || '-date'
+
+      const profileId = typeof user.profile === 'string' ? user.profile : user.profile.id
 
       // Build query options
       const queryOptions: any = {
         collection: 'tickets',
         where: {
-          passenger: { equals: authUser.profile.id },
+          passenger: { equals: profileId },
         },
-        depth: Math.min(depth, 5), // Max depth of 5 for safety
+        depth: 3, // Consistent depth
         sort,
       }
 
@@ -130,11 +115,43 @@ export const getUserTickets: Endpoint = {
             }
           }) || []
 
+        // Process arrival time and duration (consistent with other endpoints)
+        let arrivalTime: string | null = null
+        let duration: string | null = null
+        let destinationTerminal = null
+
+        if (trip?.stops && trip.stops.length > 0) {
+          const lastStop = trip.stops[trip.stops.length - 1]
+          destinationTerminal = lastStop.terminal
+
+          // Handle the stop time - it might be a Date object or string
+          arrivalTime = formatTime(lastStop.time)
+
+          // Get formatted departure time
+          const formattedDepartureTime = formatTime(trip.departureTime)
+
+          // Calculate duration only if both times are valid
+          if (
+            formattedDepartureTime &&
+            arrivalTime &&
+            formattedDepartureTime !== 'Invalid Date' &&
+            arrivalTime !== 'Invalid Date'
+          ) {
+            duration = calculateDuration(formattedDepartureTime, arrivalTime)
+          }
+        }
+
         // Calculate price per seat
         const pricePerSeat = ticket.pricePerTicket || trip?.price || 0
 
+        // Build status object with only meaningful fields
+        const status: UserTicket['status'] = {}
+        if (ticket.isPaid) status.isPaid = true
+        if (ticket.isCancelled) status.isCancelled = true
+        if (ticket.paymentDeadline) status.paymentDeadline = ticket.paymentDeadline
+
         return {
-          ticketId: ticket.id,
+          id: ticket.id,
           ticketNumber: ticket.ticketNumber,
           trip: {
             id: trip?.id || '',
@@ -142,17 +159,23 @@ export const getUserTickets: Endpoint = {
             from: {
               name: trip?.from?.name || '',
               province: trip?.from?.province || '',
+              address: trip?.from?.address || '',
             },
-            to: {
-              name: trip?.to?.name || '',
-              province: trip?.to?.province || '',
-            },
-            timeOfDay: trip?.timeOfDay || '',
+            to: destinationTerminal
+              ? {
+                  name: destinationTerminal.name,
+                  province: destinationTerminal.province,
+                  address: destinationTerminal.address || '',
+                }
+              : null,
+            departureTime: formatTime(trip?.departureTime) || '',
+            arrivalTime,
+            duration,
             bus: {
               number: bus?.number || '',
               type: {
                 name: busType?.name || '',
-                amenities: busType?.amenities || undefined,
+                amenities: busType?.amenities?.length > 0 ? busType.amenities : null,
               },
             },
           },
@@ -162,17 +185,13 @@ export const getUserTickets: Endpoint = {
             totalPrice: ticket.totalPrice || 0,
             pricePerSeat,
           },
-          status: {
-            isPaid: ticket.isPaid || false,
-            isCancelled: ticket.isCancelled || false,
-            paymentDeadline: ticket.paymentDeadline || undefined,
-          },
+          status,
           bookedAt: ticket.createdAt || ticket.updatedAt || new Date().toISOString(),
         }
       })
 
       // Build response with conditional pagination info
-      const responseData: GetUserTicketsResponse['data'] = {
+      const responseData: any = {
         tickets: transformedTickets,
         total: tickets.totalDocs || transformedTickets.length,
       }
@@ -184,12 +203,10 @@ export const getUserTickets: Endpoint = {
         responseData.hasMore = tickets.hasNextPage || false
       }
 
-      const response: GetUserTicketsResponse = {
+      return Response.json({
         success: true,
         data: responseData,
-      }
-
-      return Response.json(response, { status: 200 })
+      })
     } catch (error: unknown) {
       console.error('Get user tickets error:', error)
       return Response.json(

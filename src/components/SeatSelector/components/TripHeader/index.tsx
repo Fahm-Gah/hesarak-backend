@@ -9,7 +9,6 @@ interface TripHeaderProps {
 }
 
 export const TripHeader = memo<TripHeaderProps>(({ trip }) => {
-  // Format route string
   const formattedRoute = useMemo(() => {
     const origin = trip.from.name
     const stops = trip.stops || []
@@ -43,7 +42,7 @@ export const TripHeader = memo<TripHeaderProps>(({ trip }) => {
 
         <div className="trip-header__metadata-item">
           <Clock size={16} />
-          <span>{formatDepartureTime(trip.timeOfDay)}</span>
+          <span>{formatDepartureTime(trip.departureTime)}</span>
         </div>
 
         <div className="trip-header__metadata-item">
@@ -54,13 +53,13 @@ export const TripHeader = memo<TripHeaderProps>(({ trip }) => {
         </div>
       </div>
 
-      {trip.bus.type.amenities && trip.bus.type.amenities.length > 0 && (
+      {trip.bus.type.amenities.length > 0 && (
         <div className="trip-header__metadata-item trip-header__amenities">
           <span className="trip-header__amenities-label">Amenities:</span>
           <div className="trip-header__amenities-list">
             {trip.bus.type.amenities.map((amenity, index) => (
-              <span key={`${amenity.name}-${index}`} className="trip-header__amenity">
-                {amenity.name}
+              <span key={`${amenity}-${index}`} className="trip-header__amenity">
+                {amenity}
               </span>
             ))}
           </div>

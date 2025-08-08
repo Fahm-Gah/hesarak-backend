@@ -1,5 +1,3 @@
-// types.ts - Complete type definitions for the seat selector
-
 /**
  * Seat status enumeration for type safety
  */
@@ -56,7 +54,7 @@ export interface Terminal {
  */
 export interface TripStop {
   terminal: Terminal
-  time: string
+  time: string | Date
 }
 
 /**
@@ -74,7 +72,7 @@ export interface BusType {
   id: string
   name: string
   seats: Seat[]
-  amenities: Amenity[]
+  amenities: string[]
   capacity?: number
 }
 
@@ -95,11 +93,10 @@ export interface Trip {
   name: string
   from: Terminal
   stops: TripStop[]
-  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night'
   bus: Bus
   price: number
   isActive: boolean
-  departureTime?: string
+  departureTime: string | Date
   arrivalTime?: string
 }
 

@@ -1,6 +1,3 @@
-// Production-ready trip search endpoint for Hesarak Bus System
-// Supports Persian calendar dates, province-based search, and real-time availability
-
 import type { Endpoint, PayloadRequest } from 'payload'
 import {
   getDayOfWeek,
@@ -20,7 +17,6 @@ interface TripAvailability {
   totalSeats: number
   bookedSeats: number
   availableSeats: number
-  availableSeatNumbers: string[]
 }
 
 interface SearchedTrip {
@@ -46,19 +42,10 @@ interface SearchedTrip {
     type: {
       id: string
       name: string
-      amenities: Array<{ name: string }>
+      amenities?: string[] | null
     }
   }
   availability: TripAvailability
-  stops: Array<{
-    terminal: {
-      id: string
-      name: string
-      province: string
-    }
-    time: string
-  }>
-  isDirectRoute: boolean
 }
 
 export const searchTrips: Endpoint = {
@@ -67,7 +54,7 @@ export const searchTrips: Endpoint = {
   handler: async (req: PayloadRequest) => {
     const { payload, query } = req
 
-    // Extract and normalize query parameters with URL decoding
+    // Extract and normalize query parameters
     const { from: rawFrom, to: rawTo, date: rawDate } = query as SearchQuery
 
     // Input validation
@@ -81,15 +68,13 @@ export const searchTrips: Endpoint = {
       )
     }
 
-    // Normalize province names (case-insensitive) and decode + convert Persian date
+    // Normalize province names and decode + convert Persian date
     const from = rawFrom.trim()
     const to = rawTo.trim()
-
-    // Decode URL-encoded Persian characters first, then convert
     const decodedDate = decodeURIComponent(rawDate.trim())
     const convertedDate = convertPersianDateToGregorian(decodedDate)
 
-    // Validate date format and check if it's not in the past (validate AFTER conversion)
+    // Validate date
     const dateValidation = validateDate(decodedDate)
     if (!dateValidation.isValid) {
       return Response.json(
@@ -102,11 +87,10 @@ export const searchTrips: Endpoint = {
     }
 
     try {
-      const searchDate = dateValidation.date!
-      const dayOfWeek = getDayOfWeek(convertedDate) // Use converted Gregorian date for day calculation
+      const dayOfWeek = getDayOfWeek(convertedDate)
 
-      // Find terminals in the 'from' province (case-insensitive search)
-      let fromTerminalsResult = await payload.find({
+      // Find terminals in the 'from' province
+      const fromTerminalsResult = await payload.find({
         collection: 'terminals',
         where: {
           province: { equals: from },
@@ -114,19 +98,8 @@ export const searchTrips: Endpoint = {
         limit: 100,
       })
 
-      // If no exact match found, try case-insensitive search
-      if (fromTerminalsResult.docs.length === 0) {
-        fromTerminalsResult = await payload.find({
-          collection: 'terminals',
-          where: {
-            province: { like: from },
-          },
-          limit: 100,
-        })
-      }
-
-      // Find terminals in the 'to' province (case-insensitive search)
-      let toTerminalsResult = await payload.find({
+      // Find terminals in the 'to' province
+      const toTerminalsResult = await payload.find({
         collection: 'terminals',
         where: {
           province: { equals: to },
@@ -134,18 +107,6 @@ export const searchTrips: Endpoint = {
         limit: 100,
       })
 
-      // If no exact match found, try case-insensitive search
-      if (toTerminalsResult.docs.length === 0) {
-        toTerminalsResult = await payload.find({
-          collection: 'terminals',
-          where: {
-            province: { like: to },
-          },
-          limit: 100,
-        })
-      }
-
-      // Validate terminal results
       if (fromTerminalsResult.docs.length === 0) {
         return Response.json(
           {
@@ -169,7 +130,7 @@ export const searchTrips: Endpoint = {
       const fromTerminalIds = fromTerminalsResult.docs.map((t: any) => t.id)
       const toTerminalIds = toTerminalsResult.docs.map((t: any) => t.id)
 
-      // Fetch trip schedules with full data population
+      // Fetch trip schedules
       const tripSchedules = await payload.find({
         collection: 'trip-schedules',
         where: {
@@ -185,94 +146,102 @@ export const searchTrips: Endpoint = {
             },
           ],
         },
-        depth: 3, // Deep populate for terminal names, bus details, etc.
-        limit: 50, // Reasonable limit for performance
+        depth: 3,
+        limit: 50,
       })
 
-      // Filter trips that serve the requested route (province to province)
+      // Filter trips that serve the requested route
       const relevantTrips = tripSchedules.docs.filter((trip: any) => {
-        // Check if trip goes directly to a terminal in the destination province
-        if (toTerminalIds.includes(trip.to?.id)) {
-          return true
-        }
-
         // Check if any stop is in the destination province
         return trip.stops?.some((stop: any) => toTerminalIds.includes(stop.terminal?.id))
       })
 
-      // Get seat availability for each trip on the specified date
+      // Get seat availability for each trip with proper date filtering
       const tripsWithAvailability: SearchedTrip[] = await Promise.all(
         relevantTrips.map(async (trip: any) => {
-          // Get all non-cancelled tickets for this trip on the specified date
+          // Get booked tickets for this trip on the specified date
+          const dateObj = new Date(convertedDate)
+          const startOfDay = new Date(dateObj)
+          startOfDay.setHours(0, 0, 0, 0)
+
+          const endOfDay = new Date(dateObj)
+          endOfDay.setHours(23, 59, 59, 999)
+
           const bookedTickets = await payload.find({
             collection: 'tickets',
             where: {
               and: [
                 { trip: { equals: trip.id } },
-                { date: { equals: convertedDate } }, // Use converted Gregorian date
+                {
+                  date: {
+                    greater_than_equal: startOfDay.toISOString(),
+                    less_than_equal: endOfDay.toISOString(),
+                  },
+                },
                 { isCancelled: { not_equals: true } },
               ],
             },
           })
 
-          // Calculate booked seats
-          const bookedSeats = new Set<string>()
+          // Get booked seat count (simplified)
+          let bookedSeatsCount = 0
           bookedTickets.docs.forEach((ticket: any) => {
-            ticket.bookedSeats?.forEach((seat: any) => {
-              bookedSeats.add(seat.seat)
-            })
+            if (Array.isArray(ticket.bookedSeats)) {
+              bookedSeatsCount += ticket.bookedSeats.length
+            }
           })
 
-          // Get total available seats from bus type (excluding disabled seats)
+          // Get total seats from bus type (including disabled seats)
           const busType = trip.bus?.type
-          const totalSeats =
-            busType?.seats?.filter((seat: any) => seat.type === 'seat' && !seat.disabled) || []
+          let totalSeats = 0
+          let disabledSeatsCount = 0
 
-          const availableSeats = totalSeats.filter((seat: any) => !bookedSeats.has(seat.seatNumber))
+          if (busType?.seats && Array.isArray(busType.seats)) {
+            // Count all actual seats (including disabled ones)
+            const allSeats = busType.seats.filter((element: any) => element.type === 'seat')
+            totalSeats = allSeats.length
 
-          // Calculate arrival time and duration
+            // Count disabled seats to add to "booked" count
+            disabledSeatsCount = allSeats.filter((seat: any) => seat.disabled).length
+          }
+
+          // Find the destination terminal and arrival time
           let arrivalTime: string | null = null
           let duration: string | null = null
           let destinationTerminal = null
-          const isDirectRoute = toTerminalIds.includes(trip.to?.id)
 
-          if (!isDirectRoute) {
-            // Find the first stop in the destination province
-            const stopIndex = trip.stops?.findIndex((stop: any) =>
-              toTerminalIds.includes(stop.terminal?.id),
-            )
-            if (stopIndex >= 0) {
-              destinationTerminal = trip.stops[stopIndex].terminal
-              arrivalTime = formatTime(trip.stops[stopIndex].time)
-              duration = calculateDuration(formatTime(trip.timeOfDay), arrivalTime)
-            }
-          } else {
-            destinationTerminal = trip.to
-            // For direct routes, calculate based on final stop or estimate
-            if (trip.stops && trip.stops.length > 0) {
-              const lastStop = trip.stops[trip.stops.length - 1]
-              arrivalTime = formatTime(lastStop.time)
-              duration = calculateDuration(formatTime(trip.timeOfDay), arrivalTime)
-            }
+          const stopIndex = trip.stops?.findIndex((stop: any) =>
+            toTerminalIds.includes(stop.terminal?.id),
+          )
+
+          if (stopIndex >= 0) {
+            destinationTerminal = trip.stops[stopIndex].terminal
+            arrivalTime = formatTime(trip.stops[stopIndex].time)
+            duration = calculateDuration(formatTime(trip.departureTime), arrivalTime)
           }
+
+          // Calculate effective booked seats (actual bookings + disabled seats)
+          const effectiveBookedSeats = bookedSeatsCount + disabledSeatsCount
 
           return {
             id: trip.id,
             name: trip.name,
             price: trip.price,
-            departureTime: formatTime(trip.timeOfDay),
+            departureTime: formatTime(trip.departureTime),
             arrivalTime,
             duration,
             from: {
               id: trip.from.id,
               name: trip.from.name,
               province: trip.from.province,
+              address: trip.from.address || '',
             },
             to: destinationTerminal
               ? {
                   id: destinationTerminal.id,
                   name: destinationTerminal.name,
                   province: destinationTerminal.province,
+                  address: destinationTerminal.address || '',
                 }
               : null,
             bus: {
@@ -285,10 +254,9 @@ export const searchTrips: Endpoint = {
               },
             },
             availability: {
-              totalSeats: totalSeats.length,
-              bookedSeats: bookedSeats.size,
-              availableSeats: availableSeats.length,
-              availableSeatNumbers: availableSeats.map((seat: any) => seat.seatNumber),
+              totalSeats,
+              bookedSeats: effectiveBookedSeats, // Includes disabled seats
+              availableSeats: Math.max(0, totalSeats - effectiveBookedSeats),
             },
             stops:
               trip.stops?.map((stop: any) => ({
@@ -296,40 +264,28 @@ export const searchTrips: Endpoint = {
                   id: stop.terminal.id,
                   name: stop.terminal.name,
                   province: stop.terminal.province,
+                  address: stop.terminal.address || '',
                 },
                 time: formatTime(stop.time),
               })) || [],
-            isDirectRoute,
           }
         }),
       )
 
-      // Sort trips by departure time
+      // Sort by departure time and filter available trips
       tripsWithAvailability.sort((a, b) => a.departureTime.localeCompare(b.departureTime))
-
-      // Filter trips with available seats
       const availableTrips = tripsWithAvailability.filter(
         (trip) => trip.availability.availableSeats > 0,
       )
 
-      // Return comprehensive search results
       return Response.json({
         success: true,
         data: {
           searchParams: {
             fromProvince: from,
             toProvince: to,
-            originalDate: decodedDate, // Original Persian date from frontend
-            convertedDate, // Converted Gregorian date used for search
-            dayOfWeek,
-            fromTerminals: fromTerminalsResult.docs.map((t: any) => ({
-              id: t.id,
-              name: t.name,
-            })),
-            toTerminals: toTerminalsResult.docs.map((t: any) => ({
-              id: t.id,
-              name: t.name,
-            })),
+            originalDate: decodedDate,
+            convertedDate,
           },
           trips: tripsWithAvailability,
           summary: {
@@ -340,9 +296,7 @@ export const searchTrips: Endpoint = {
         },
       })
     } catch (error) {
-      // Log error for debugging (in production, use proper logging service)
       console.error('Error searching trips:', error)
-
       return Response.json(
         {
           success: false,

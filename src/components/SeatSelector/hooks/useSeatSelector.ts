@@ -115,7 +115,7 @@ export const useSeatSelector = ({
     return seatsArray.map(extractSeatId).filter((id): id is string => id !== null)
   }, [fieldValue])
 
-  // Build date filter query for API
+  // Build date filter query for API - Updated to match 12 AM normalized dates
   const dateFilterQuery = useMemo(() => {
     if (!travelDate) return null
 
@@ -123,13 +123,17 @@ export const useSeatSelector = ({
       const date = new Date(travelDate)
       if (isNaN(date.getTime())) return null
 
-      const startOfDay = new Date(date)
-      startOfDay.setUTCHours(0, 0, 0, 0)
+      // Normalize the input date to midnight (same as your hook does)
+      const normalizedDate = new Date(date)
+      normalizedDate.setHours(0, 0, 0, 0)
 
-      const endOfDay = new Date(date)
-      endOfDay.setUTCHours(23, 59, 59, 999)
+      // Create the range for the entire day
+      const startOfDay = new Date(normalizedDate)
+      const endOfDay = new Date(normalizedDate)
+      endOfDay.setHours(23, 59, 59, 999)
 
-      return `&where[date][greater_than_equal]=${startOfDay.toISOString()}&where[date][less_than]=${endOfDay.toISOString()}`
+      // Use local time instead of UTC to match the normalized dates
+      return `&where[date][greater_than_equal]=${startOfDay.toISOString()}&where[date][less_than_equal]=${endOfDay.toISOString()}`
     } catch (e) {
       console.error('Failed to create date filter:', e)
       return null

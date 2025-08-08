@@ -1,45 +1,10 @@
 import type { Endpoint } from 'payload'
-import { convertPersianDateToGregorian, validateDate } from '@/utils/dateUtils'
+import { convertPersianDateToGregorian, validateDate } from '../utils/dateUtils'
 
 interface BookingRequest {
   tripId: string
   date: string
   seatIds: string[]
-}
-
-interface BookingResponse {
-  success: true
-  message: string
-  data: {
-    ticketId: string
-    ticketNumber: string
-    passenger: {
-      id: string
-      fullName: string
-      fatherName: string
-      phoneNumber: string
-      gender: string
-    }
-    trip: {
-      id: string
-      name: string
-      price: number
-    }
-    booking: {
-      date: string
-      originalDate: string
-      seats: Array<{
-        id: string
-        seatNumber: string
-      }>
-      totalPrice: number
-      pricePerSeat: number
-    }
-    status: {
-      isPaid: boolean
-      paymentDeadline: string
-    }
-  }
 }
 
 export const bookTicket: Endpoint = {
@@ -48,12 +13,10 @@ export const bookTicket: Endpoint = {
   handler: async (req) => {
     const { payload, user } = req
 
-    // Authentication required
     if (!user) {
       return Response.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    // Parse and validate request
     let body: BookingRequest
     try {
       body = (await req.json?.()) || req.body
@@ -63,7 +26,6 @@ export const bookTicket: Endpoint = {
 
     const { tripId, date, seatIds } = body
 
-    // Input validation
     if (!tripId || !date || !seatIds || !Array.isArray(seatIds) || seatIds.length === 0) {
       return Response.json(
         {
@@ -73,14 +35,12 @@ export const bookTicket: Endpoint = {
       )
     }
 
-    // Date validation
     const dateValidation = validateDate(date)
     if (!dateValidation.isValid) {
       return Response.json({ error: dateValidation.error }, { status: 400 })
     }
     const normalizedDate = convertPersianDateToGregorian(date)
 
-    // Seat IDs validation
     const uniqueSeatIds = [...new Set(seatIds)]
     if (uniqueSeatIds.length !== seatIds.length) {
       return Response.json({ error: 'Duplicate seat IDs provided' }, { status: 400 })
@@ -91,7 +51,7 @@ export const bookTicket: Endpoint = {
     }
 
     try {
-      // Get authenticated user with profile
+      // Get user with profile
       const authUser = (await payload.findByID({
         collection: 'users',
         id: user.id,
@@ -122,16 +82,15 @@ export const bookTicket: Endpoint = {
         return Response.json({ error: 'Trip not found or no longer available' }, { status: 404 })
       }
 
-      // Validate seat availability from bus configuration
+      // Validate seats exist in bus configuration
       const busType = trip.bus?.type
-      if (!busType || typeof busType === 'string') {
+      if (!busType || !busType.seats) {
         return Response.json({ error: 'Bus configuration not found' }, { status: 500 })
       }
 
-      const busSeats = busType.seats || []
-      const validSeats = busSeats
-        .filter((seat: any) => seat.type === 'seat' && !seat.disabled)
-        .filter((seat: any) => uniqueSeatIds.includes(seat.id))
+      const validSeats = busType.seats.filter(
+        (seat: any) => seat.type === 'seat' && !seat.disabled && uniqueSeatIds.includes(seat.id),
+      )
 
       if (validSeats.length !== uniqueSeatIds.length) {
         const invalidIds = uniqueSeatIds.filter(
@@ -145,43 +104,76 @@ export const bookTicket: Endpoint = {
         )
       }
 
-      // Check existing bookings for conflicts
+      // Check for existing bookings with proper date range filtering
+      const dateObj = new Date(normalizedDate)
+      const startOfDay = new Date(dateObj)
+      startOfDay.setHours(0, 0, 0, 0)
+
+      const endOfDay = new Date(dateObj)
+      endOfDay.setHours(23, 59, 59, 999)
+
       const existingTickets = await payload.find({
         collection: 'tickets',
         where: {
           and: [
             { trip: { equals: tripId } },
-            { date: { equals: normalizedDate } },
-            { isCancelled: { equals: false } },
+            {
+              date: {
+                greater_than_equal: startOfDay.toISOString(),
+                less_than_equal: endOfDay.toISOString(),
+              },
+            },
+            { isCancelled: { not_equals: true } },
           ],
         },
+        limit: 1000, // Ensure we get all tickets
       })
 
-      // Analyze existing bookings
+      // Check for conflicts and user limits with improved logic
       const bookedSeatIds = new Set<string>()
       let userExistingSeats = 0
+      const userTickets: any[] = []
 
       existingTickets.docs.forEach((ticket: any) => {
-        ticket.bookedSeats?.forEach((seat: any) => {
-          if (seat.seat) {
-            bookedSeatIds.add(seat.seat)
-          }
-        })
+        if (Array.isArray(ticket.bookedSeats)) {
+          ticket.bookedSeats.forEach((seatData: any) => {
+            // Handle different seat data formats
+            let seatId: string | null = null
 
-        // Count user's existing SEATS for this trip and date
-        const bookedByUser =
-          typeof ticket.bookedBy === 'string'
-            ? ticket.bookedBy === user.id
-            : ticket.bookedBy?.id === user.id
+            if (typeof seatData === 'string') {
+              seatId = seatData
+            } else if (seatData && typeof seatData === 'object') {
+              seatId = seatData.seat || seatData.id || seatData._id || seatData.seatId
+              // Handle nested seat objects
+              if (typeof seatId === 'object' && seatId !== null) {
+                seatId = (seatId as any).id || (seatId as any)._id || null
+              }
+            }
 
-        if (bookedByUser) {
-          userExistingSeats += ticket.bookedSeats?.length || 0
+            if (seatId) {
+              bookedSeatIds.add(seatId)
+            }
+          })
+        }
+
+        // Count user's existing seats with better user ID comparison
+        let isUserTicket = false
+
+        if (typeof ticket.bookedBy === 'string') {
+          isUserTicket = ticket.bookedBy === user.id
+        } else if (ticket.bookedBy && typeof ticket.bookedBy === 'object') {
+          isUserTicket = ticket.bookedBy.id === user.id
+        }
+
+        if (isUserTicket) {
+          const seatCount = Array.isArray(ticket.bookedSeats) ? ticket.bookedSeats.length : 0
+          userExistingSeats += seatCount
+          userTickets.push(ticket)
         }
       })
 
-      // Check for booking conflicts using bus seat IDs
+      // Check for conflicts
       const conflictingIds = uniqueSeatIds.filter((id: string) => bookedSeatIds.has(id))
-
       if (conflictingIds.length > 0) {
         const conflictedSeats = validSeats
           .filter((seat: any) => conflictingIds.includes(seat.id))
@@ -195,15 +187,59 @@ export const bookTicket: Endpoint = {
         )
       }
 
-      // Check user booking limits
+      // Check user booking limits - IMPROVED VALIDATION
       const maxSeatsPerUser = 2
-      const totalSeatsAfterBooking = userExistingSeats + uniqueSeatIds.length // Now correctly adding seats to seats
+      const totalSeatsAfterBooking = userExistingSeats + uniqueSeatIds.length
 
       if (totalSeatsAfterBooking > maxSeatsPerUser) {
-        const remainingSeats = maxSeatsPerUser - userExistingSeats
+        const remainingSeats = Math.max(0, maxSeatsPerUser - userExistingSeats)
         return Response.json(
           {
-            error: `Booking limit exceeded. You can only book ${remainingSeats} more seat(s). Maximum ${maxSeatsPerUser} seats per user per trip.`,
+            error: `Booking limit exceeded. You already have ${userExistingSeats} seat(s) booked for this trip. You can only book ${remainingSeats} more seat(s). Maximum ${maxSeatsPerUser} seats per user per trip.`,
+          },
+          { status: 400 },
+        )
+      }
+
+      // Additional safety check - prevent booking if user already has max seats
+      if (userExistingSeats >= maxSeatsPerUser) {
+        return Response.json(
+          {
+            error: `You have already reached the maximum limit of ${maxSeatsPerUser} seats for this trip.`,
+          },
+          { status: 400 },
+        )
+      }
+
+      // CRITICAL: Re-check user limits right before creating the ticket (race condition protection)
+      const finalCheck = await payload.find({
+        collection: 'tickets',
+        where: {
+          and: [
+            { trip: { equals: tripId } },
+            {
+              date: {
+                greater_than_equal: startOfDay.toISOString(),
+                less_than_equal: endOfDay.toISOString(),
+              },
+            },
+            { isCancelled: { not_equals: true } },
+            { bookedBy: { equals: user.id } },
+          ],
+        },
+        limit: 1000,
+      })
+
+      let finalUserSeatCount = 0
+      finalCheck.docs.forEach((ticket: any) => {
+        const seatCount = Array.isArray(ticket.bookedSeats) ? ticket.bookedSeats.length : 0
+        finalUserSeatCount += seatCount
+      })
+
+      if (finalUserSeatCount + uniqueSeatIds.length > maxSeatsPerUser) {
+        return Response.json(
+          {
+            error: `You have already booked ${finalUserSeatCount} seat(s) for this trip. You can only book a maximum of ${maxSeatsPerUser} seats per trip.`,
           },
           { status: 400 },
         )
@@ -213,11 +249,7 @@ export const bookTicket: Endpoint = {
       const pricePerSeat = trip.price
       const totalPrice = pricePerSeat * uniqueSeatIds.length
 
-      if (totalPrice <= 0) {
-        return Response.json({ error: 'Invalid trip pricing configuration' }, { status: 500 })
-      }
-
-      // Create ticket - store bus seat IDs in the existing seat field
+      // Create ticket with simplified bookedSeats format
       const ticket = (await payload.create({
         collection: 'tickets',
         data: {
@@ -225,84 +257,55 @@ export const bookTicket: Endpoint = {
           trip: tripId,
           date: normalizedDate,
           bookedSeats: validSeats.map((seat: any) => ({
-            seat: seat.id, // Store the bus seat ID directly in the seat field
+            seat: seat.id, // Store only the seat ID
           })),
           pricePerTicket: pricePerSeat,
           totalPrice,
           isPaid: true,
           isCancelled: false,
           bookedBy: user.id,
-          // I've commented this out intentionally, we will come back to it later, inshaa'Allah
-          // paymentDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         },
       })) as any
 
-      // Return success response
-      const response: BookingResponse = {
-        success: true,
-        message: 'Tickets booked successfully',
-        data: {
-          ticketId: ticket.id,
-          ticketNumber: ticket.ticketNumber,
-          passenger: {
-            id: authUser.profile.id,
-            fullName: authUser.profile.fullName,
-            fatherName: authUser.profile.fatherName || '',
-            phoneNumber: authUser.profile.phoneNumber || '',
-            gender: authUser.profile.gender || 'male',
-          },
-          trip: {
-            id: trip.id,
-            name: trip.name,
-            price: trip.price,
-          },
-          booking: {
-            date: normalizedDate,
-            originalDate: date,
-            seats: validSeats.map((seat: any) => ({
-              id: seat.id,
-              seatNumber: seat.seatNumber,
-            })),
-            totalPrice,
-            pricePerSeat,
-          },
-          status: {
-            isPaid: ticket.isPaid,
-            paymentDeadline: ticket.paymentDeadline || '',
+      return Response.json(
+        {
+          success: true,
+          message: 'Tickets booked successfully',
+          data: {
+            ticketId: ticket.id,
+            ticketNumber: ticket.ticketNumber,
+            passenger: {
+              id: authUser.profile.id,
+              fullName: authUser.profile.fullName,
+              fatherName: authUser.profile.fatherName || '',
+              phoneNumber: authUser.profile.phoneNumber || '',
+              gender: authUser.profile.gender || 'male',
+            },
+            trip: {
+              id: trip.id,
+              name: trip.name,
+              price: trip.price,
+            },
+            booking: {
+              date: normalizedDate,
+              originalDate: date,
+              seats: validSeats.map((seat: any) => ({
+                id: seat.id,
+                seatNumber: seat.seatNumber,
+              })),
+              totalPrice,
+              pricePerSeat,
+            },
+            status: {
+              isPaid: ticket.isPaid,
+              paymentDeadline: ticket.paymentDeadline || '',
+            },
           },
         },
-      }
-
-      return Response.json(response, { status: 201 })
+        { status: 201 },
+      )
     } catch (error: unknown) {
       console.error('Booking error:', error)
-
-      // Handle specific PayloadCMS errors
-      if (error && typeof error === 'object' && 'name' in error) {
-        if (error.name === 'ValidationError') {
-          const validationError = error as any
-          return Response.json(
-            {
-              error: 'Validation failed',
-              details: validationError.data || validationError.message,
-            },
-            { status: 400 },
-          )
-        }
-
-        if (error.name === 'MongoError' || error.name === 'BulkWriteError') {
-          const dbError = error as any
-          if (dbError.code === 11000) {
-            return Response.json(
-              {
-                error: 'A booking conflict occurred. Please try again.',
-              },
-              { status: 409 },
-            )
-          }
-        }
-      }
-
       return Response.json(
         {
           error: 'Booking failed due to an internal error. Please try again.',
