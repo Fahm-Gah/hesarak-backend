@@ -4,6 +4,7 @@ import { populateBookedBy } from './hooks/populateBookedBy'
 import { calculateTotalPrice } from './hooks/calculateTotalPrice'
 import { validateBookedSeats } from './hooks/validateBookedSeats'
 import { normalizeDateToMidnight } from './hooks/normalizeDateToMidnight'
+import { validateTripDate } from './hooks/validateTripDate'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -38,6 +39,15 @@ export const Tickets: CollectionConfig = {
       name: 'date',
       type: 'date',
       required: true,
+      validate: validateTripDate,
+      admin: {
+        date: {
+          displayFormat: 'EEE, MMM d, yyyy',
+        },
+        components: {
+          Field: './components/TripDateField',
+        },
+      },
     },
     {
       name: 'bookedSeats',
@@ -83,7 +93,9 @@ export const Tickets: CollectionConfig = {
       name: 'bookedBy',
       type: 'relationship',
       relationTo: 'users',
-      hidden: true,
+      admin: {
+        hidden: true,
+      },
     },
     {
       name: 'paymentDeadline',

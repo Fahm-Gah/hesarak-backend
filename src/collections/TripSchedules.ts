@@ -72,24 +72,18 @@ export const TripSchedules: CollectionConfig = {
     },
     {
       name: 'days',
-      type: 'array',
-      required: false,
-      fields: [
-        {
-          name: 'day',
-          type: 'select',
-          options: [
-            { label: 'Saturday', value: 'sat' },
-            { label: 'Sunday', value: 'sun' },
-            { label: 'Monday', value: 'mon' },
-            { label: 'Tuesday', value: 'tue' },
-            { label: 'Wednesday', value: 'wed' },
-            { label: 'Thursday', value: 'thu' },
-            { label: 'Friday', value: 'fri' },
-          ],
-          required: true,
-        },
+      type: 'select',
+      options: [
+        { label: 'Saturday', value: 'sat' },
+        { label: 'Sunday', value: 'sun' },
+        { label: 'Monday', value: 'mon' },
+        { label: 'Tuesday', value: 'tue' },
+        { label: 'Wednesday', value: 'wed' },
+        { label: 'Thursday', value: 'thu' },
+        { label: 'Friday', value: 'fri' },
       ],
+      required: true,
+      hasMany: true,
       admin: {
         condition: (_, { frequency }) => frequency === 'specific-days',
         position: 'sidebar',

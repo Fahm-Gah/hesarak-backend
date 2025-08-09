@@ -354,12 +354,7 @@ export interface TripSchedule {
       }[]
     | null;
   frequency: 'daily' | 'specific-days';
-  days?:
-    | {
-        day: 'sat' | 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
-        id?: string | null;
-      }[]
-    | null;
+  days?: ('sat' | 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri')[] | null;
   isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -708,12 +703,7 @@ export interface TripSchedulesSelect<T extends boolean = true> {
         id?: T;
       };
   frequency?: T;
-  days?:
-    | T
-    | {
-        day?: T;
-        id?: T;
-      };
+  days?: T;
   isActive?: T;
   updatedAt?: T;
   createdAt?: T;

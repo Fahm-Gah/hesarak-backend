@@ -139,10 +139,7 @@ export const searchTrips: Endpoint = {
           or: [
             { frequency: { equals: 'daily' } },
             {
-              and: [
-                { frequency: { equals: 'specific-days' } },
-                { 'days.day': { contains: dayOfWeek } },
-              ],
+              and: [{ frequency: { equals: 'specific-days' } }, { days: { contains: dayOfWeek } }],
             },
           ],
         },
