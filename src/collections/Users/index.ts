@@ -28,7 +28,7 @@ export const Users: CollectionConfig = {
       unique: true,
       index: true,
       admin: {
-        description: 'Phone number in E.164 format (automatically normalized)',
+        description: 'Phone number in E.164 format (automatically normalized to AF)',
       },
       validate: (value: any) => {
         if (!value) return 'Phone number is required'
@@ -113,8 +113,10 @@ export const Users: CollectionConfig = {
       type: 'date',
       admin: {
         readOnly: true,
-        description: 'Last login timestamp',
         position: 'sidebar',
+        date: {
+          displayFormat: 'DD/MM/YYYY HH:mm',
+        },
       },
     },
     {

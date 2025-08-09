@@ -175,9 +175,6 @@ export interface User {
    * Whether the user account is active
    */
   isActive?: boolean | null;
-  /**
-   * Last login timestamp
-   */
   lastLoginAt?: string | null;
   /**
    * Account creation date
@@ -186,7 +183,7 @@ export interface User {
   updatedAt: string;
   email?: string | null;
   /**
-   * Phone number in E.164 format (automatically normalized)
+   * Phone number in E.164 format (automatically normalized to AF)
    */
   username: string;
   resetPasswordToken?: string | null;

@@ -57,9 +57,10 @@ export default buildConfig({
   ],
   cors: {
     origins: [
-      'http://localhost:3000', // local dev
-      '*', // Allow all origins
+      'http://localhost:3000', // dev
+      'https://your-frontend.example', // production front-end
     ],
   },
+  csrf: ['http://localhost:3000', 'https://your-frontend.example'],
   endpoints: [getProvinces, searchTrips, getTripDetails, registerUser, bookTicket, getUserTickets],
 })

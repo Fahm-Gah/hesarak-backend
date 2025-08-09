@@ -45,11 +45,22 @@ const generateObjectId = () => {
 
 const useHistory = (initialState: LayoutState) => {
   const [state, setStateInternal] = useState(initialState)
-  const [history, setHistory] = useState<LayoutState[]>([initialState])
-  const [index, setIndex] = useState(0)
+  const [history, setHistory] = useState<LayoutState[]>([])
+  const [index, setIndex] = useState(-1)
+
+  // Initialize history only once
+  useEffect(() => {
+    if (history.length === 0) {
+      setHistory([initialState])
+      setIndex(0)
+    }
+  }, [initialState, history.length])
 
   const push = useCallback(
     (newState: LayoutState) => {
+      // Only push if state is actually different
+      if (JSON.stringify(newState) === JSON.stringify(state)) return
+
       const h = history.slice(0, index + 1)
       h.push(newState)
       const sliced = h.slice(-50)
@@ -57,7 +68,7 @@ const useHistory = (initialState: LayoutState) => {
       setIndex(sliced.length - 1)
       setStateInternal(newState)
     },
-    [history, index],
+    [history, index, state],
   )
 
   const undo = useCallback(() => {
@@ -88,7 +99,7 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
   const { value, setValue } = useField<any[]>({ path })
   const { openModal } = useModal()
 
-  const getInitialLayout = useMemo((): LayoutState => {
+  const getInitialLayout = useCallback((): LayoutState => {
     if (Array.isArray(value) && value.length) {
       try {
         const elems: SeatElement[] = value.map((item) => ({
@@ -122,7 +133,7 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
     redo,
     canUndo,
     canRedo,
-  } = useHistory(getInitialLayout)
+  } = useHistory(getInitialLayout())
 
   const [ui, setUi] = useState({
     selectedTool: 'seat' as SeatElement['type'],
@@ -149,6 +160,14 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
   } = ui
 
   const container = useRef<HTMLDivElement>(null)
+  const isMountedRef = useRef(true)
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
 
   const nextSeatNumber = useMemo(() => {
     const nums = layout.elements
@@ -158,18 +177,38 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
     return nums.length ? Math.max(...nums) + 1 : 1
   }, [layout.elements])
 
+  // Track if this is the initial render to prevent premature form changes
+  const hasUserInteracted = useRef(false)
+
+  // Update field value when layout changes - this is critical for form integration
   useEffect(() => {
-    setValue(
-      layout.elements.map((el) => ({
-        id: el.id,
-        type: el.type,
-        position: el.position,
-        ...(el.seatNumber && { seatNumber: el.seatNumber }),
-        ...(el.size && { size: el.size }),
-        ...(el.disabled && { disabled: el.disabled }),
-      })),
-    )
+    const layoutData = layout.elements.map((el) => ({
+      id: el.id,
+      type: el.type,
+      position: el.position,
+      ...(el.seatNumber && { seatNumber: el.seatNumber }),
+      ...(el.size && { size: el.size }),
+      ...(el.disabled && { disabled: el.disabled }),
+    }))
+
+    // Only update the form field after user interaction to prevent premature save button activation
+    if (hasUserInteracted.current) {
+      setValue(layoutData)
+    }
   }, [layout.elements, setValue])
+
+  // Sync external value changes back to layout (when form is loaded with existing data)
+  const isInitialLoad = useRef(true)
+  useEffect(() => {
+    // Only sync on initial load to prevent infinite loops
+    if (isInitialLoad.current && value && Array.isArray(value) && value.length > 0) {
+      const newLayout = getInitialLayout()
+      setLayout(newLayout)
+      isInitialLoad.current = false
+    } else if (!value || (Array.isArray(value) && value.length === 0)) {
+      isInitialLoad.current = true
+    }
+  }, [value, getInitialLayout, setLayout])
 
   const getAt = useCallback(
     (row: number, col: number, exclude = new Set<string>()) =>
@@ -190,12 +229,22 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
   const canPlace = useCallback(
     (row: number, col: number, rs: number, cs: number, exclude = new Set<string>()) => {
       const { rows, cols } = layout.dimensions
-      if (row < 1 || col < 1 || row + rs - 1 > rows || col + cs - 1 > cols) return false
+
+      // Check if the element would fit within grid bounds
+      if (row < 1 || col < 1 || row + rs - 1 > rows || col + cs - 1 > cols) {
+        return false
+      }
+
+      // Check each cell that would be occupied
       for (let r = row; r < row + rs; r++) {
         for (let c = col; c < col + cs; c++) {
-          if (getAt(r, c, exclude)) return false
+          const existingElement = getAt(r, c, exclude)
+          if (existingElement) {
+            return false
+          }
         }
       }
+
       return true
     },
     [layout.dimensions, getAt],
@@ -205,6 +254,10 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
     (row: number, col: number) => {
       const { rowSpan, colSpan } = elementSize
       if (!canPlace(row, col, rowSpan, colSpan)) return
+
+      // Mark that user has interacted
+      hasUserInteracted.current = true
+
       const el: SeatElement = {
         id: generateObjectId(),
         type: selectedTool,
@@ -213,16 +266,19 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
         size: rowSpan > 1 || colSpan > 1 ? { rowSpan, colSpan } : undefined,
         disabled: false,
       }
-      setLayout({ ...layout, elements: [...layout.elements, el] })
+      const newLayout = { ...layout, elements: [...layout.elements, el] }
+      setLayout(newLayout)
     },
     [selectedTool, elementSize, canPlace, nextSeatNumber, layout, setLayout],
   )
 
   const removeSel = useCallback(() => {
-    setLayout({
+    hasUserInteracted.current = true
+    const newLayout = {
       ...layout,
       elements: layout.elements.filter((el) => !selected.has(el.id)),
-    })
+    }
+    setLayout(newLayout)
     setUi((u) => ({ ...u, selected: new Set() }))
   }, [selected, layout, setLayout])
 
@@ -233,22 +289,27 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
   const clearAll = useCallback(() => openModal('clear-layout-confirm'), [openModal])
 
   const confirmClear = useCallback(() => {
-    setLayout({ ...layout, elements: [] })
+    hasUserInteracted.current = true
+    const newLayout = { ...layout, elements: [] }
+    setLayout(newLayout)
     setUi((u) => ({ ...u, selected: new Set() }))
   }, [layout, setLayout])
 
   const toggleDisable = useCallback(() => {
-    setLayout({
+    hasUserInteracted.current = true
+    const newLayout = {
       ...layout,
       elements: layout.elements.map((el) =>
         selected.has(el.id) && el.type === 'seat' ? { ...el, disabled: !el.disabled } : el,
       ),
-    })
+    }
+    setLayout(newLayout)
   }, [selected, layout, setLayout])
 
   const moveSel = useCallback(
     (dR: number, dC: number) => {
       const sel = layout.elements.filter((el) => selected.has(el.id))
+      // Exclude ALL selected elements from collision detection
       const excl = new Set(selected)
       const ok = sel.every((el) =>
         canPlace(
@@ -256,62 +317,82 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
           el.position.col + dC,
           el.size?.rowSpan || 1,
           el.size?.colSpan || 1,
-          excl,
+          excl, // This now properly excludes all selected elements
         ),
       )
       if (ok) {
-        setLayout({
+        hasUserInteracted.current = true
+        const newLayout = {
           ...layout,
           elements: layout.elements.map((el) =>
             selected.has(el.id)
               ? { ...el, position: { row: el.position.row + dR, col: el.position.col + dC } }
               : el,
           ),
-        })
+        }
+        setLayout(newLayout)
       }
     },
     [selected, layout, canPlace, setLayout],
   )
 
+  // Keyboard event listener with proper cleanup
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      // Only handle if component is still mounted and focused
+      if (!isMountedRef.current) return
       if (editing) return
       if (!container.current?.contains(document.activeElement)) return
+
       const dir: Record<string, { row: number; col: number }> = {
         ArrowUp: { row: -1, col: 0 },
         ArrowDown: { row: 1, col: 0 },
         ArrowLeft: { row: 0, col: -1 },
         ArrowRight: { row: 0, col: 1 },
       }
+
       if (e.ctrlKey || e.metaKey) {
         if (e.key.toLowerCase() === 'z') {
           e.preventDefault()
           undo()
+          return
         }
         if (e.key.toLowerCase() === 'y') {
           e.preventDefault()
           redo()
+          return
         }
         if (e.key.toLowerCase() === 'a') {
           e.preventDefault()
           selectAll()
+          return
         }
       }
+
       if (e.key === 'Delete' && selected.size) {
         e.preventDefault()
         removeSel()
+        return
       }
+
       if (e.key === 'Escape') {
+        e.preventDefault()
         setUi((u) => ({ ...u, selected: new Set(), editing: null }))
+        return
       }
+
       if (selected.size && dir[e.key]) {
         e.preventDefault()
         const { row, col } = dir[e.key]
         moveSel(row, col)
+        return
       }
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
   }, [editing, selected, undo, redo, selectAll, removeSel, moveSel])
 
   const onDragStart = useCallback(
@@ -320,6 +401,12 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
       if (!isSel) setUi((u) => ({ ...u, selected: new Set([el.id]), last: el.id }))
       setUi((u) => ({ ...u, dragEl: el, dragging: true }))
       e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.setData('text/plain', '') // For mobile compatibility
+
+      // Set drag image to be invisible so we can use our custom preview
+      const img = new Image()
+      img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+      e.dataTransfer.setDragImage(img, 0, 0)
     },
     [selected],
   )
@@ -329,12 +416,18 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
       e.preventDefault()
       if (!dragEl) return
       e.dataTransfer.dropEffect = 'move'
+
+      // Calculate the offset from the drag element's top-left corner to the cursor
+      // This ensures the element follows the cursor from its anchor point
       const multi = selected.size > 1 && selected.has(dragEl.id)
+
       const previewPos = multi
         ? (() => {
+            // For multi-selection, calculate where each element would go
             const dR = row - dragEl.position.row
             const dC = col - dragEl.position.col
             const sel = layout.elements.filter((el) => selected.has(el.id))
+            // Exclude ALL selected elements from collision detection
             const ex = new Set(selected)
             const ok = sel.every((el) =>
               canPlace(
@@ -372,6 +465,10 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
         stopDrag()
         return
       }
+
+      // Mark user interaction for save button activation
+      hasUserInteracted.current = true
+
       const multi = selected.size > 1 && selected.has(dragEl.id)
       const update = (els: SeatElement[]) =>
         multi
@@ -387,7 +484,9 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
                 : el,
             )
           : els.map((el) => (el.id === dragEl.id ? { ...el, position: preview } : el))
-      setLayout({ ...layout, elements: update(layout.elements) })
+
+      const newLayout = { ...layout, elements: update(layout.elements) }
+      setLayout(newLayout)
       stopDrag()
     },
     [dragEl, preview, selected, layout, setLayout, stopDrag],
@@ -435,24 +534,28 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
 
   const finishEdit = useCallback(() => {
     if (!editing) return
-    setLayout({
+    hasUserInteracted.current = true
+    const newLayout = {
       ...layout,
       elements: layout.elements.map((el) =>
         el.id === editing ? { ...el, seatNumber: ui.editVal } : el,
       ),
-    })
+    }
+    setLayout(newLayout)
     setUi((u) => ({ ...u, editing: null, editVal: '' }))
   }, [editing, ui.editVal, layout, setLayout])
 
   const updateSize = useCallback(
     (el: SeatElement, rs: number, cs: number) => {
       if (canPlace(el.position.row, el.position.col, rs, cs, new Set([el.id]))) {
-        setLayout({
+        hasUserInteracted.current = true
+        const newLayout = {
           ...layout,
           elements: layout.elements.map((e) =>
             e.id === el.id ? { ...e, size: { rowSpan: rs, colSpan: cs } } : e,
           ),
-        })
+        }
+        setLayout(newLayout)
       }
     },
     [layout, canPlace, setLayout],
@@ -608,12 +711,14 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
                   min="4"
                   max="20"
                   value={layout.dimensions.rows}
-                  onChange={(e) =>
-                    setLayout({
+                  onChange={(e) => {
+                    hasUserInteracted.current = true
+                    const newLayout = {
                       ...layout,
                       dimensions: { ...layout.dimensions, rows: parseInt(e.target.value) || 12 },
-                    })
-                  }
+                    }
+                    setLayout(newLayout)
+                  }}
                 />
               </div>
               <div className="seat-maker__size-input">
@@ -623,12 +728,14 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
                   min="2"
                   max="8"
                   value={layout.dimensions.cols}
-                  onChange={(e) =>
-                    setLayout({
+                  onChange={(e) => {
+                    hasUserInteracted.current = true
+                    const newLayout = {
                       ...layout,
                       dimensions: { ...layout.dimensions, cols: parseInt(e.target.value) || 4 },
-                    })
-                  }
+                    }
+                    setLayout(newLayout)
+                  }}
                 />
               </div>
             </div>

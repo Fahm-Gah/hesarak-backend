@@ -1,5 +1,6 @@
 import React, { useMemo, memo } from 'react'
 import { X } from 'lucide-react'
+import { useFormFields } from '@payloadcms/ui'
 import type { Trip } from '../../types'
 import './index.scss'
 
@@ -13,6 +14,16 @@ interface SelectedSeatsListProps {
 
 export const SelectedSeatsList = memo<SelectedSeatsListProps>(
   ({ selectedSeatIds, trip, removeSeat, clearAll, readOnly = false }) => {
+    // read the form-level override price (if admin/agent set it)
+    const priceField = useFormFields(([fields]) => fields?.pricePerTicket)
+    const rawOverride = priceField?.value
+
+    const parsedOverride = useMemo(() => {
+      if (rawOverride === null || rawOverride === undefined || rawOverride === '') return undefined
+      const n = Number(rawOverride)
+      return Number.isNaN(n) ? undefined : n
+    }, [rawOverride])
+
     const seatNumberMap = useMemo(() => {
       if (!trip?.bus?.type?.seats || !Array.isArray(trip.bus.type.seats)) {
         return new Map<string, string>()
@@ -30,7 +41,19 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
     }, [trip])
 
     const getSeatNumber = (id: string) => seatNumberMap.get(id) || 'N/A'
-    const totalPrice = trip ? selectedSeatIds.length * trip.price : 0
+
+    // Determine effective per-seat price (priority: override -> trip.price -> 0)
+    const effectivePerSeatPrice = useMemo(() => {
+      if (typeof parsedOverride === 'number') return parsedOverride
+      if (trip && typeof trip.price === 'number') return trip.price
+      // fallback
+      return 0
+    }, [parsedOverride, trip])
+
+    // total is sum of per-seat prices (supports future per-seat variance)
+    const totalPrice = useMemo(() => {
+      return selectedSeatIds.reduce((acc) => acc + effectivePerSeatPrice, 0)
+    }, [selectedSeatIds, effectivePerSeatPrice])
 
     if (!trip) return null
 
@@ -72,7 +95,7 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
               <div className="selected-seats-list__seat-details">
                 <span className="selected-seats-list__seat-number">Seat {getSeatNumber(id)}</span>
                 <span className="selected-seats-list__seat-price">
-                  AFN {trip.price.toLocaleString()}
+                  AFN {effectivePerSeatPrice.toLocaleString()}
                 </span>
               </div>
               {!readOnly && (

@@ -87,6 +87,14 @@ export const useSeatSelector = ({
   const [recentlyUpdatedSeats, setRecentlyUpdatedSeats] = useState<Set<string>>(new Set())
   const updateTimeoutRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
+  // Track component mount state to prevent memory leaks
+  const isMountedRef = useRef(true)
+
+  // Reset mounted state on each render (component is clearly mounted if we're rendering)
+  useEffect(() => {
+    isMountedRef.current = true
+  })
+
   // Track the last saved state to detect changes
   const lastSavedStateRef = useRef<{
     lastUpdateTime?: number
@@ -166,8 +174,11 @@ export const useSeatSelector = ({
     },
   )
 
-  // Helper function to mark seat as recently updated
+  // Helper function to mark seat as recently updated (with memory leak protection)
   const markSeatAsUpdated = useCallback((seatId: string) => {
+    // Don't update state if component is unmounted
+    if (!isMountedRef.current) return
+
     setRecentlyUpdatedSeats((prev) => new Set(prev).add(seatId))
 
     // Clear any existing timeout for this seat
@@ -178,11 +189,14 @@ export const useSeatSelector = ({
 
     // Set new timeout to remove the update indicator
     const newTimeout = setTimeout(() => {
-      setRecentlyUpdatedSeats((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(seatId)
-        return newSet
-      })
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setRecentlyUpdatedSeats((prev) => {
+          const newSet = new Set(prev)
+          newSet.delete(seatId)
+          return newSet
+        })
+      }
       updateTimeoutRef.current.delete(seatId)
     }, 600) // Match animation duration
 
@@ -199,6 +213,17 @@ export const useSeatSelector = ({
     return bookedSeats.map(extractSeatId).filter((id): id is string => id !== null)
   }, [savedDocumentData])
 
+  // Safe async operation wrapper
+  const safeAsyncOperation = useCallback((operation: () => Promise<void>, errorMessage: string) => {
+    if (!isMountedRef.current) return
+
+    operation().catch((err) => {
+      if (isMountedRef.current) {
+        console.error(errorMessage, err)
+      }
+    })
+  }, [])
+
   // Detect when document has been saved and refresh bookings
   useEffect(() => {
     const hasDocumentChanged =
@@ -209,7 +234,7 @@ export const useSeatSelector = ({
       // Check if form was just submitted (saved)
       (isSubmitted && !lastSavedStateRef.current.isSubmitted && !isModified)
 
-    if (hasDocumentChanged) {
+    if (hasDocumentChanged && isMountedRef.current) {
       console.log('Document save detected. Refreshing booking data...')
 
       // Update our tracking ref
@@ -219,16 +244,15 @@ export const useSeatSelector = ({
         isSubmitted,
       }
 
-      // Force a re-fetch of the bookings data
-      mutateBookings()
-        .then(() => {
-          console.log('Booking data refreshed successfully.')
-          // Mark all currently selected seats for visual feedback
+      // Safe async operation
+      safeAsyncOperation(async () => {
+        await mutateBookings()
+        console.log('Booking data refreshed successfully.')
+        // Mark all currently selected seats for visual feedback
+        if (isMountedRef.current) {
           currentFormSeatIds.forEach((seatId) => markSeatAsUpdated(seatId))
-        })
-        .catch((err) => {
-          console.error('Failed to refresh booking data after save:', err)
-        })
+        }
+      }, 'Failed to refresh booking data after save:')
     }
   }, [
     lastUpdateTime,
@@ -238,23 +262,24 @@ export const useSeatSelector = ({
     mutateBookings,
     currentFormSeatIds,
     markSeatAsUpdated,
+    safeAsyncOperation,
   ])
 
   // Also refresh when the form transitions from modified to unmodified (indicates a save)
   const wasModifiedRef = useRef(isModified)
   useEffect(() => {
-    if (wasModifiedRef.current && !isModified) {
+    if (wasModifiedRef.current && !isModified && isMountedRef.current) {
       console.log('Form transitioned from modified to unmodified. Refreshing booking data...')
-      mutateBookings()
-        .then(() => {
+
+      safeAsyncOperation(async () => {
+        await mutateBookings()
+        if (isMountedRef.current) {
           currentFormSeatIds.forEach((seatId) => markSeatAsUpdated(seatId))
-        })
-        .catch((err) => {
-          console.error('Failed to refresh booking data:', err)
-        })
+        }
+      }, 'Failed to refresh booking data:')
     }
     wasModifiedRef.current = isModified
-  }, [isModified, mutateBookings, currentFormSeatIds, markSeatAsUpdated])
+  }, [isModified, mutateBookings, currentFormSeatIds, markSeatAsUpdated, safeAsyncOperation])
 
   // Process booked seats and identify current ticket seats
   const { allBookedSeatsMap, currentTicketOriginalSeats } = useMemo(() => {
@@ -402,9 +427,13 @@ export const useSeatSelector = ({
     setFieldValue([])
   }, [currentFormSeatIds, setFieldValue, markSeatAsUpdated])
 
-  // Cleanup timeouts on unmount
+  // Cleanup timeouts and mark as unmounted on component unmount
   useEffect(() => {
     return () => {
+      // Mark component as unmounted
+      isMountedRef.current = false
+
+      // Clear all timeouts to prevent memory leaks
       updateTimeoutRef.current.forEach((timeout) => clearTimeout(timeout))
       updateTimeoutRef.current.clear()
     }
