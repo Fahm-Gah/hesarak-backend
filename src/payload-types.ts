@@ -150,8 +150,6 @@ export interface UserAuthOperations {
       };
 }
 /**
- * User accounts with phone-based authentication
- *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -361,18 +359,8 @@ export interface Ticket {
   ticketNumber?: string | null;
   passenger: string | Profile;
   trip: string | TripSchedule;
-  /**
-   * Automatically populated from trip departure terminal
-   */
-  from?: (string | null) | Terminal;
-  /**
-   * Automatically populated from selected stop or final destination
-   */
-  to?: (string | null) | Terminal;
-  /**
-   * Passenger destination (automatically updates from/to fields)
-   */
-  selectedStop: number;
+  from?: string | null;
+  to?: string | null;
   date: string;
   bookedSeats:
     | {
@@ -774,7 +762,6 @@ export interface TicketsSelect<T extends boolean = true> {
   trip?: T;
   from?: T;
   to?: T;
-  selectedStop?: T;
   date?: T;
   bookedSeats?: T;
   pricePerTicket?: T;

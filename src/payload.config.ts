@@ -23,6 +23,17 @@ import { registerUser } from './endpoints/registerUser'
 import { bookTicket } from './endpoints/bookTicket'
 import { getUserTickets } from './endpoints/getUserTickets'
 
+const allowedOrigins = [
+  // Your local frontend MUST be here
+  'http://localhost:3000',
+
+  // The Vercel backend URL itself (good practice)
+  'https://hesarak-backend-git-cors-fix-matee-safis-projects.vercel.app',
+
+  // Add your future production frontend URL here when you have one
+  // 'https://www.your-live-frontend.com'
+]
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -55,12 +66,7 @@ export default buildConfig({
       },
     }),
   ],
-  cors: {
-    origins: [
-      'http://localhost:3000', // dev
-      'https://your-frontend.example', // production front-end
-    ],
-  },
-  csrf: ['http://localhost:3000', 'https://your-frontend.example'],
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   endpoints: [getProvinces, searchTrips, getTripDetails, registerUser, bookTicket, getUserTickets],
 })

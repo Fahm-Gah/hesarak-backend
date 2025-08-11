@@ -23,7 +23,6 @@ import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e0
 import { BlockquoteFeatureClient as BlockquoteFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_d003390aa778073df7b4ca837679dbcc } from '../../../components/SeatLayoutDesigner'
-import { default as default_c6fe84ec5462dcba83bd3e138d6005d1 } from '@/components/StopSelector'
 import { default as default_a1e9bc2b83a50eb89267a31cb86263a7 } from '@/components/TripDateField'
 import { default as default_1be84222cbe21a84f55e4e4675c44153 } from '@/components/SeatSelector'
 import { QueryPresetsAccessCell as QueryPresetsAccessCell_3817bf644402e67bfe6577f60ef982de } from '@payloadcms/ui'
@@ -59,7 +58,6 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BlockquoteFeatureClient": BlockquoteFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/SeatLayoutDesigner#default": default_d003390aa778073df7b4ca837679dbcc,
-  "@/components/StopSelector#default": default_c6fe84ec5462dcba83bd3e138d6005d1,
   "@/components/TripDateField#default": default_a1e9bc2b83a50eb89267a31cb86263a7,
   "@/components/SeatSelector#default": default_1be84222cbe21a84f55e4e4675c44153,
   "@payloadcms/ui#QueryPresetsAccessCell": QueryPresetsAccessCell_3817bf644402e67bfe6577f60ef982de,

@@ -8,9 +8,12 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['profile', 'email', 'username', 'roles', 'isActive'],
-    description: 'User accounts with phone-based authentication',
   },
   auth: {
+    cookies: {
+      sameSite: 'None',
+      secure: false,
+    },
     loginWithUsername: {
       allowEmailLogin: true, // Users can login with email or phone
       requireEmail: false, // Email is not required for username login
