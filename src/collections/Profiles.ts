@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 export const Profiles: CollectionConfig = {
   slug: 'profiles',
+  enableQueryPresets: true,
   admin: {
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'fatherName', 'phoneNumber', 'gender'],

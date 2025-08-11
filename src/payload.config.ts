@@ -23,6 +23,8 @@ import { registerUser } from './endpoints/registerUser'
 import { bookTicket } from './endpoints/bookTicket'
 import { getUserTickets } from './endpoints/getUserTickets'
 import { updateLocation } from './endpoints/updateLocation'
+import { TripRecords } from './collections/TripRecords'
+import { Drivers } from './collections/Drivers'
 
 const allowedOrigins = [
   // Your local frontend MUST be here
@@ -45,7 +47,19 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Profiles, Media, Posts, Buses, BusTypes, Terminals, TripSchedules, Tickets],
+  collections: [
+    Users,
+    Profiles,
+    Media,
+    Posts,
+    Buses,
+    BusTypes,
+    Terminals,
+    TripSchedules,
+    Tickets,
+    TripRecords,
+    Drivers,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

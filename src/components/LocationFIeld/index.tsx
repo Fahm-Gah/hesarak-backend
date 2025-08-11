@@ -1,4 +1,3 @@
-// src/components/LocationField/index.tsx
 'use client'
 
 import React, { lazy, Suspense } from 'react'

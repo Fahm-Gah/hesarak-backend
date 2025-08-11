@@ -5,6 +5,7 @@ import { updateLastLogin } from './hooks/updateLastLogin'
 
 export const Users: CollectionConfig = {
   slug: 'users',
+  enableQueryPresets: true,
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['profile', 'email', 'username', 'roles', 'isActive'],
@@ -126,7 +127,7 @@ export const Users: CollectionConfig = {
       type: 'ui',
       admin: {
         components: {
-          Field: '@/components/LocationField',
+          Field: './components/LocationField',
         },
       },
     },

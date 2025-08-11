@@ -76,6 +76,8 @@ export interface Config {
     terminals: Terminal;
     'trip-schedules': TripSchedule;
     tickets: Ticket;
+    'trip-records': TripRecord;
+    drivers: Driver;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -93,6 +95,8 @@ export interface Config {
     terminals: TerminalsSelect<false> | TerminalsSelect<true>;
     'trip-schedules': TripSchedulesSelect<false> | TripSchedulesSelect<true>;
     tickets: TicketsSelect<false> | TicketsSelect<true>;
+    'trip-records': TripRecordsSelect<false> | TripRecordsSelect<true>;
+    drivers: DriversSelect<false> | DriversSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -433,6 +437,35 @@ export interface Ticket {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "trip-records".
+ */
+export interface TripRecord {
+  id: string;
+  driver: string | Driver;
+  bus: string | Bus;
+  commission: number;
+  date: string;
+  from: string | Terminal;
+  to: string | Terminal;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "drivers".
+ */
+export interface Driver {
+  id: string;
+  fullName: string;
+  fatherName?: string | null;
+  phoneNumber: string;
+  licenseNumber?: string | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
@@ -567,6 +600,14 @@ export interface PayloadLockedDocument {
         value: string | Ticket;
       } | null)
     | ({
+        relationTo: 'trip-records';
+        value: string | TripRecord;
+      } | null)
+    | ({
+        relationTo: 'drivers';
+        value: string | Driver;
+      } | null)
+    | ({
         relationTo: 'payload-jobs';
         value: string | PayloadJob;
       } | null);
@@ -652,7 +693,7 @@ export interface PayloadQueryPreset {
     | number
     | boolean
     | null;
-  relatedCollection: 'tickets';
+  relatedCollection: 'users' | 'profiles' | 'tickets';
   /**
    * This is a tempoary field used to determine if updating the preset would remove the user's access to it. When `true`, this record will be deleted after running the preset's `validate` function.
    */
@@ -836,6 +877,33 @@ export interface TicketsSelect<T extends boolean = true> {
   isCancelled?: T;
   bookedBy?: T;
   paymentDeadline?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "trip-records_select".
+ */
+export interface TripRecordsSelect<T extends boolean = true> {
+  driver?: T;
+  bus?: T;
+  commission?: T;
+  date?: T;
+  from?: T;
+  to?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "drivers_select".
+ */
+export interface DriversSelect<T extends boolean = true> {
+  fullName?: T;
+  fatherName?: T;
+  phoneNumber?: T;
+  licenseNumber?: T;
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }
