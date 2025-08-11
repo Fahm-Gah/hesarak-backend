@@ -1,3 +1,4 @@
+import { default as default_5b04d034b925eeb48872a1782b24013c } from '@/components/LocationField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -33,6 +34,7 @@ import { QueryPresetsColumnField as QueryPresetsColumnField_3817bf644402e67bfe65
 import { UploadthingClientUploadHandler as UploadthingClientUploadHandler_749dcaa11bb61b873d113cb6c609bc10 } from '@payloadcms/storage-uploadthing/client'
 
 export const importMap = {
+  "@/components/LocationField#default": default_5b04d034b925eeb48872a1782b24013c,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,

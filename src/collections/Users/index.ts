@@ -15,12 +15,12 @@ export const Users: CollectionConfig = {
       secure: false,
     },
     loginWithUsername: {
-      allowEmailLogin: true, // Users can login with email or phone
-      requireEmail: false, // Email is not required for username login
+      allowEmailLogin: true,
+      requireEmail: false,
     },
     tokenExpiration: 60 * 60 * 24 * 7, // 7 days
     maxLoginAttempts: 5,
-    lockTime: 60 * 60 * 2, // 2 hours lockout after max attempts
+    lockTime: 60 * 60 * 2,
   },
   fields: [
     {
@@ -36,12 +36,10 @@ export const Users: CollectionConfig = {
       validate: (value: any) => {
         if (!value) return 'Phone number is required'
 
-        // Check if it's already in E.164 format (from hook normalization)
         if (value.startsWith('+') && /^\+\d{10,15}$/.test(value)) {
           return true
         }
 
-        // Otherwise validate as Afghan phone number
         try {
           const phoneNumber = parsePhoneNumberFromString(value, 'AF')
           if (!phoneNumber || !phoneNumber.isValid()) {
@@ -118,9 +116,133 @@ export const Users: CollectionConfig = {
         readOnly: true,
         position: 'sidebar',
         date: {
-          displayFormat: 'DD/MM/YYYY HH:mm',
+          pickerAppearance: 'dayAndTime',
         },
       },
+    },
+    // Location UI Field for Admin Panel
+    {
+      name: 'locationDisplay',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/LocationField',
+        },
+      },
+    },
+    // Location tracking fields
+    {
+      name: 'location',
+      type: 'group',
+      label: 'Location Information',
+      admin: {
+        description: 'User location data from browser or IP geolocation',
+        condition: () => false, // Hide the raw fields, show only through UI component
+      },
+      fields: [
+        {
+          name: 'coordinates',
+          type: 'point',
+          label: 'Geographic Coordinates',
+        },
+        {
+          name: 'accuracy',
+          type: 'number',
+          label: 'Location Accuracy (meters)',
+        },
+        {
+          name: 'city',
+          type: 'text',
+          label: 'City',
+        },
+        {
+          name: 'region',
+          type: 'text',
+          label: 'Region/State',
+        },
+        {
+          name: 'country',
+          type: 'text',
+          label: 'Country',
+        },
+        {
+          name: 'countryCode',
+          type: 'text',
+          label: 'Country Code',
+          maxLength: 2,
+        },
+        {
+          name: 'timezone',
+          type: 'text',
+          label: 'Timezone',
+        },
+        {
+          name: 'source',
+          type: 'select',
+          label: 'Location Source',
+          options: [
+            { label: 'Browser Geolocation', value: 'browser' },
+            { label: 'IP Geolocation', value: 'ip' },
+            { label: 'Manual Entry', value: 'manual' },
+          ],
+        },
+        {
+          name: 'ipAddress',
+          type: 'text',
+          label: 'IP Address',
+        },
+        {
+          name: 'lastUpdated',
+          type: 'date',
+          label: 'Location Last Updated',
+        },
+        {
+          name: 'permissionGranted',
+          type: 'checkbox',
+          label: 'Location Permission Granted',
+          defaultValue: false,
+        },
+      ],
+    },
+    {
+      name: 'locationHistory',
+      type: 'array',
+      label: 'Location History',
+      admin: {
+        description: 'Historical location data (last 10 entries)',
+        hidden: true,
+      },
+      fields: [
+        {
+          name: 'coordinates',
+          type: 'point',
+          label: 'Coordinates',
+        },
+        {
+          name: 'city',
+          type: 'text',
+          label: 'City',
+        },
+        {
+          name: 'country',
+          type: 'text',
+          label: 'Country',
+        },
+        {
+          name: 'source',
+          type: 'select',
+          options: [
+            { label: 'Browser', value: 'browser' },
+            { label: 'IP', value: 'ip' },
+          ],
+        },
+        {
+          name: 'timestamp',
+          type: 'date',
+          label: 'Recorded At',
+        },
+      ],
+      maxRows: 10,
     },
     {
       name: 'createdAt',

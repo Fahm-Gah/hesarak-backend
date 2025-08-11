@@ -6,6 +6,7 @@ import { validateBookedSeats } from './hooks/validateBookedSeats'
 import { normalizeDateToMidnight } from './hooks/normalizeDateToMidnight'
 import { validateTripDate } from './hooks/validateTripDate'
 import { clearSeatsOnTripDateChange } from './hooks/clearSeatsOnTripDateChange'
+import { populateFromAndTo } from './hooks/populateFromAndTo'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -21,7 +22,13 @@ export const Tickets: CollectionConfig = {
       'totalPrice',
       'createdAt',
     ],
-    listSearchableFields: ['ticketNumber', 'passenger.fullName', 'trip.name', 'trip.from.name'],
+    listSearchableFields: [
+      'ticketNumber',
+      'passenger.fullName',
+      'trip.name',
+      'fromTerminalName',
+      'toTerminalName',
+    ],
     pagination: {
       defaultLimit: 50,
       limits: [10, 25, 50, 100, 200],
@@ -57,13 +64,47 @@ export const Tickets: CollectionConfig = {
         allowCreate: false,
       },
     },
+    // Hidden relationship fields for database queries and joins
     {
       name: 'from',
-      type: 'text',
+      type: 'relationship',
+      relationTo: 'terminals',
+      required: false,
+      admin: {
+        hidden: true,
+        condition: () => false,
+      },
+      index: true,
     },
     {
       name: 'to',
+      type: 'relationship',
+      relationTo: 'terminals',
+      required: false,
+      admin: {
+        hidden: true,
+        condition: () => false,
+      },
+      index: true,
+    },
+    // Denormalized text fields for easy searching and filtering
+    {
+      name: 'fromTerminalName',
       type: 'text',
+      admin: {
+        hidden: true,
+        condition: () => false,
+      },
+      index: true,
+    },
+    {
+      name: 'toTerminalName',
+      type: 'text',
+      admin: {
+        hidden: true,
+        condition: () => false,
+      },
+      index: true,
     },
     {
       name: 'date',
@@ -162,6 +203,7 @@ export const Tickets: CollectionConfig = {
       populateBookedBy,
       calculateTotalPrice,
       normalizeDateToMidnight,
+      populateFromAndTo,
     ],
   },
 }

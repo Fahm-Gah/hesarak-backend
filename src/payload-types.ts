@@ -177,6 +177,43 @@ export interface User {
   isActive?: boolean | null;
   lastLoginAt?: string | null;
   /**
+   * User location data from browser or IP geolocation
+   */
+  location?: {
+    /**
+     * @minItems 2
+     * @maxItems 2
+     */
+    coordinates?: [number, number] | null;
+    accuracy?: number | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    countryCode?: string | null;
+    timezone?: string | null;
+    source?: ('browser' | 'ip' | 'manual') | null;
+    ipAddress?: string | null;
+    lastUpdated?: string | null;
+    permissionGranted?: boolean | null;
+  };
+  /**
+   * Historical location data (last 10 entries)
+   */
+  locationHistory?:
+    | {
+        /**
+         * @minItems 2
+         * @maxItems 2
+         */
+        coordinates?: [number, number] | null;
+        city?: string | null;
+        country?: string | null;
+        source?: ('browser' | 'ip') | null;
+        timestamp?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Account creation date
    */
   createdAt: string;
@@ -359,8 +396,10 @@ export interface Ticket {
   ticketNumber?: string | null;
   passenger: string | Profile;
   trip: string | TripSchedule;
-  from?: string | null;
-  to?: string | null;
+  from?: (string | null) | Terminal;
+  to?: (string | null) | Terminal;
+  fromTerminalName?: string | null;
+  toTerminalName?: string | null;
   date: string;
   bookedSeats:
     | {
@@ -632,6 +671,31 @@ export interface UsersSelect<T extends boolean = true> {
   terminal?: T;
   isActive?: T;
   lastLoginAt?: T;
+  location?:
+    | T
+    | {
+        coordinates?: T;
+        accuracy?: T;
+        city?: T;
+        region?: T;
+        country?: T;
+        countryCode?: T;
+        timezone?: T;
+        source?: T;
+        ipAddress?: T;
+        lastUpdated?: T;
+        permissionGranted?: T;
+      };
+  locationHistory?:
+    | T
+    | {
+        coordinates?: T;
+        city?: T;
+        country?: T;
+        source?: T;
+        timestamp?: T;
+        id?: T;
+      };
   createdAt?: T;
   updatedAt?: T;
   email?: T;
@@ -762,6 +826,8 @@ export interface TicketsSelect<T extends boolean = true> {
   trip?: T;
   from?: T;
   to?: T;
+  fromTerminalName?: T;
+  toTerminalName?: T;
   date?: T;
   bookedSeats?: T;
   pricePerTicket?: T;

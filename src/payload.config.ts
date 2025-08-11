@@ -22,13 +22,14 @@ import { getTripDetails } from './endpoints/getTripDetails'
 import { registerUser } from './endpoints/registerUser'
 import { bookTicket } from './endpoints/bookTicket'
 import { getUserTickets } from './endpoints/getUserTickets'
+import { updateLocation } from './endpoints/updateLocation'
 
 const allowedOrigins = [
   // Your local frontend MUST be here
   'http://localhost:3000',
 
   // The Vercel backend URL itself (good practice)
-  'https://hesarak-backend-git-cors-fix-matee-safis-projects.vercel.app',
+  'https://hesarak-backend.vercel.app',
 
   // Add your future production frontend URL here when you have one
   // 'https://www.your-live-frontend.com'
@@ -68,5 +69,13 @@ export default buildConfig({
   ],
   cors: allowedOrigins,
   csrf: allowedOrigins,
-  endpoints: [getProvinces, searchTrips, getTripDetails, registerUser, bookTicket, getUserTickets],
+  endpoints: [
+    getProvinces,
+    searchTrips,
+    getTripDetails,
+    registerUser,
+    bookTicket,
+    getUserTickets,
+    updateLocation, // Add the new location endpoint
+  ],
 })
