@@ -90,7 +90,15 @@ export const useSeatSelector = ({
   // Track component mount state to prevent memory leaks
   const isMountedRef = useRef(true)
 
-  // Reset mounted state on each render (component is clearly mounted if we're rendering)
+  // Track previous trip/date to detect changes - but normalized
+  const previousTripIdRef = useRef<string | undefined>(tripId)
+  const previousNormalizedDateRef = useRef<string>('')
+
+  // Flag to prevent clearing during save operations
+  const saveInProgressRef = useRef(false)
+  const clearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Reset mounted state on each render
   useEffect(() => {
     isMountedRef.current = true
   })
@@ -123,7 +131,105 @@ export const useSeatSelector = ({
     return seatsArray.map(extractSeatId).filter((id): id is string => id !== null)
   }, [fieldValue])
 
-  // Build date filter query for API - Updated to match 12 AM normalized dates
+  // Helper to normalize dates for comparison (ignore time/timezone differences)
+  const normalizeDateForComparison = useCallback((date: string | undefined): string => {
+    if (!date) return ''
+    try {
+      const d = new Date(date)
+      if (isNaN(d.getTime())) return ''
+      // Return just the date part: YYYY-MM-DD
+      return d.toISOString().split('T')[0]
+    } catch {
+      return ''
+    }
+  }, [])
+
+  // Track when save is in progress
+  useEffect(() => {
+    // When form is submitted and modified, save is starting
+    if (isSubmitted && isModified) {
+      saveInProgressRef.current = true
+      console.log('Save in progress - preventing seat clearing')
+    }
+
+    // When form is submitted but not modified, save is complete
+    if (isSubmitted && !isModified) {
+      // Keep the flag true for a bit longer to handle async updates
+      setTimeout(() => {
+        saveInProgressRef.current = false
+        console.log('Save complete - re-enabling seat clearing')
+      }, 1000)
+    }
+  }, [isSubmitted, isModified])
+
+  // CRITICAL FIX: Clear seats when trip or date ACTUALLY changes
+  useEffect(() => {
+    // Clear any pending timeout
+    if (clearTimeoutRef.current) {
+      clearTimeout(clearTimeoutRef.current)
+    }
+
+    // Normalize the current date for comparison
+    const normalizedCurrentDate = normalizeDateForComparison(travelDate)
+
+    // Check for actual changes
+    const tripChanged =
+      tripId !== previousTripIdRef.current && previousTripIdRef.current !== undefined
+    const dateChanged =
+      normalizedCurrentDate !== previousNormalizedDateRef.current &&
+      previousNormalizedDateRef.current !== ''
+
+    // Log for debugging
+    if (tripChanged || dateChanged) {
+      console.log('Detected trip/date change:', {
+        tripChanged,
+        dateChanged,
+        oldTrip: previousTripIdRef.current,
+        newTrip: tripId,
+        oldNormalizedDate: previousNormalizedDateRef.current,
+        newNormalizedDate: normalizedCurrentDate,
+        saveInProgress: saveInProgressRef.current,
+        isSubmitted,
+        isModified,
+        seatsCount: currentFormSeatIds.length,
+      })
+    }
+
+    // Only clear if:
+    // 1. There's an actual change in trip or date
+    // 2. We have seats selected
+    // 3. Save is not in progress
+    // 4. This isn't an initial load
+    if (
+      (tripChanged || dateChanged) &&
+      currentFormSeatIds.length > 0 &&
+      !saveInProgressRef.current
+    ) {
+      // Debounce the clear action to avoid multiple triggers
+      clearTimeoutRef.current = setTimeout(() => {
+        // Double-check that save is still not in progress
+        if (!saveInProgressRef.current && isMountedRef.current) {
+          console.log('Clearing selected seats due to trip/date change')
+
+          // Clear the selected seats
+          setFieldValue([])
+
+          // Clear any visual feedback
+          setRecentlyUpdatedSeats(new Set())
+
+          // Clear all pending timeouts
+          updateTimeoutRef.current.forEach((timeout) => clearTimeout(timeout))
+          updateTimeoutRef.current.clear()
+        }
+      }, 100) // Small delay to handle rapid updates
+    }
+
+    // Update refs for next comparison
+    previousTripIdRef.current = tripId
+    previousNormalizedDateRef.current = normalizedCurrentDate
+  }, [tripId, travelDate, setFieldValue, currentFormSeatIds.length, normalizeDateForComparison])
+
+  // Build date filter query for API
   const dateFilterQuery = useMemo(() => {
     if (!travelDate) return null
 
@@ -131,16 +237,15 @@ export const useSeatSelector = ({
       const date = new Date(travelDate)
       if (isNaN(date.getTime())) return null
 
-      // Normalize the input date to midnight (same as your hook does)
+      // Normalize the input date to midnight UTC (matching your backend)
       const normalizedDate = new Date(date)
-      normalizedDate.setHours(0, 0, 0, 0)
+      normalizedDate.setUTCHours(0, 0, 0, 0)
 
       // Create the range for the entire day
       const startOfDay = new Date(normalizedDate)
       const endOfDay = new Date(normalizedDate)
-      endOfDay.setHours(23, 59, 59, 999)
+      endOfDay.setUTCHours(23, 59, 59, 999)
 
-      // Use local time instead of UTC to match the normalized dates
       return `&where[date][greater_than_equal]=${startOfDay.toISOString()}&where[date][less_than_equal]=${endOfDay.toISOString()}`
     } catch (e) {
       console.error('Failed to create date filter:', e)
@@ -174,22 +279,18 @@ export const useSeatSelector = ({
     },
   )
 
-  // Helper function to mark seat as recently updated (with memory leak protection)
+  // Helper function to mark seat as recently updated
   const markSeatAsUpdated = useCallback((seatId: string) => {
-    // Don't update state if component is unmounted
     if (!isMountedRef.current) return
 
     setRecentlyUpdatedSeats((prev) => new Set(prev).add(seatId))
 
-    // Clear any existing timeout for this seat
     const existingTimeout = updateTimeoutRef.current.get(seatId)
     if (existingTimeout) {
       clearTimeout(existingTimeout)
     }
 
-    // Set new timeout to remove the update indicator
     const newTimeout = setTimeout(() => {
-      // Only update state if component is still mounted
       if (isMountedRef.current) {
         setRecentlyUpdatedSeats((prev) => {
           const newSet = new Set(prev)
@@ -198,7 +299,7 @@ export const useSeatSelector = ({
         })
       }
       updateTimeoutRef.current.delete(seatId)
-    }, 600) // Match animation duration
+    }, 600)
 
     updateTimeoutRef.current.set(seatId, newTimeout)
   }, [])
@@ -227,30 +328,35 @@ export const useSeatSelector = ({
   // Detect when document has been saved and refresh bookings
   useEffect(() => {
     const hasDocumentChanged =
-      // Check if lastUpdateTime has changed
       (lastUpdateTime && lastUpdateTime !== lastSavedStateRef.current.lastUpdateTime) ||
-      // Check if saved seats have changed
       JSON.stringify(savedSeatIds) !== JSON.stringify(lastSavedStateRef.current.savedSeats) ||
-      // Check if form was just submitted (saved)
       (isSubmitted && !lastSavedStateRef.current.isSubmitted && !isModified)
 
     if (hasDocumentChanged && isMountedRef.current) {
-      console.log('Document save detected. Refreshing booking data...')
+      console.log('Document save detected. Refreshing booking data...', {
+        savedSeats: savedSeatIds,
+        currentFormSeats: currentFormSeatIds,
+      })
 
-      // Update our tracking ref
       lastSavedStateRef.current = {
         lastUpdateTime,
         savedSeats: savedSeatIds,
         isSubmitted,
       }
 
-      // Safe async operation
+      // Restore seats if they were cleared incorrectly
+      if (savedSeatIds.length > 0 && currentFormSeatIds.length === 0) {
+        console.log('Restoring saved seats to form after save')
+        const restoredValue = savedSeatIds.map((id) => ({ seat: id }))
+        setFieldValue(restoredValue)
+      }
+
       safeAsyncOperation(async () => {
         await mutateBookings()
         console.log('Booking data refreshed successfully.')
-        // Mark all currently selected seats for visual feedback
         if (isMountedRef.current) {
-          currentFormSeatIds.forEach((seatId) => markSeatAsUpdated(seatId))
+          const seatsToMark = currentFormSeatIds.length > 0 ? currentFormSeatIds : savedSeatIds
+          seatsToMark.forEach((seatId) => markSeatAsUpdated(seatId))
         }
       }, 'Failed to refresh booking data after save:')
     }
@@ -263,9 +369,10 @@ export const useSeatSelector = ({
     currentFormSeatIds,
     markSeatAsUpdated,
     safeAsyncOperation,
+    setFieldValue,
   ])
 
-  // Also refresh when the form transitions from modified to unmodified (indicates a save)
+  // Refresh when form transitions from modified to unmodified
   const wasModifiedRef = useRef(isModified)
   useEffect(() => {
     if (wasModifiedRef.current && !isModified && isMountedRef.current) {
@@ -329,7 +436,7 @@ export const useSeatSelector = ({
     }
   }, [tripData])
 
-  // SEPARATED: Booking status (for icons/punch holes) - NEVER CHANGES
+  // Booking status (for icons/punch holes)
   const getBookingStatus = useCallback(
     (seatId: string): BookingStatus => {
       const booking = allBookedSeatsMap.get(seatId)
@@ -346,7 +453,7 @@ export const useSeatSelector = ({
     [allBookedSeatsMap, currentTicketOriginalSeats, currentTicketId],
   )
 
-  // SEPARATED: Selection status (for colors only)
+  // Selection status
   const getIsSelected = useCallback(
     (seatId: string): boolean => {
       return currentFormSeatIds.includes(seatId)
@@ -354,7 +461,7 @@ export const useSeatSelector = ({
     [currentFormSeatIds],
   )
 
-  // SEPARATED: Recently updated status (for visual feedback)
+  // Recently updated status
   const getJustUpdated = useCallback(
     (seatId: string): boolean => {
       return recentlyUpdatedSeats.has(seatId)
@@ -362,7 +469,7 @@ export const useSeatSelector = ({
     [recentlyUpdatedSeats],
   )
 
-  // SEPARATED: Combined status (for styling/colors)
+  // Combined status (for styling/colors)
   const getSeatStatus = useCallback(
     (seatId: string): SeatStatus => {
       const bookingStatus = getBookingStatus(seatId)
@@ -427,13 +534,15 @@ export const useSeatSelector = ({
     setFieldValue([])
   }, [currentFormSeatIds, setFieldValue, markSeatAsUpdated])
 
-  // Cleanup timeouts and mark as unmounted on component unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Mark component as unmounted
       isMountedRef.current = false
 
-      // Clear all timeouts to prevent memory leaks
+      if (clearTimeoutRef.current) {
+        clearTimeout(clearTimeoutRef.current)
+      }
+
       updateTimeoutRef.current.forEach((timeout) => clearTimeout(timeout))
       updateTimeoutRef.current.clear()
     }

@@ -5,12 +5,27 @@ import { calculateTotalPrice } from './hooks/calculateTotalPrice'
 import { validateBookedSeats } from './hooks/validateBookedSeats'
 import { normalizeDateToMidnight } from './hooks/normalizeDateToMidnight'
 import { validateTripDate } from './hooks/validateTripDate'
+import { clearSeatsOnTripDateChange } from './hooks/clearSeatsOnTripDateChange'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
+  enableQueryPresets: true,
   admin: {
     useAsTitle: 'ticketNumber',
-    defaultColumns: ['passenger', 'trip', 'date', 'isPaid', 'totalPrice'],
+    defaultColumns: [
+      'ticketNumber',
+      'passenger',
+      'trip',
+      'date',
+      'isPaid',
+      'totalPrice',
+      'createdAt',
+    ],
+    listSearchableFields: ['ticketNumber', 'passenger.fullName', 'trip.name', 'trip.from.name'],
+    pagination: {
+      defaultLimit: 50,
+      limits: [10, 25, 50, 100, 200],
+    },
   },
   disableDuplicate: true,
   fields: [
@@ -28,24 +43,40 @@ export const Tickets: CollectionConfig = {
       type: 'relationship',
       relationTo: 'profiles',
       required: true,
+      admin: {
+        allowCreate: true,
+      },
     },
     {
       name: 'trip',
       type: 'relationship',
       relationTo: 'trip-schedules',
       required: true,
+      admin: {
+        allowEdit: false,
+        allowCreate: false,
+      },
+    },
+    {
+      name: 'from',
+      type: 'text',
+    },
+    {
+      name: 'to',
+      type: 'text',
     },
     {
       name: 'date',
       type: 'date',
       required: true,
       validate: validateTripDate,
+      index: true,
       admin: {
         date: {
           displayFormat: 'EEE, MMM d, yyyy',
         },
         components: {
-          Field: './components/TripDateField',
+          Field: '@/components/TripDateField',
         },
       },
     },
@@ -53,9 +84,15 @@ export const Tickets: CollectionConfig = {
       name: 'bookedSeats',
       type: 'json',
       required: true,
+      validate: (value: any) => {
+        if (!value || !Array.isArray(value) || value.length === 0) {
+          return 'Please select at least one seat'
+        }
+        return true
+      },
       admin: {
         components: {
-          Field: './components/SeatSelector',
+          Field: '@/components/SeatSelector',
         },
         readOnly: true,
       },
@@ -76,18 +113,26 @@ export const Tickets: CollectionConfig = {
         description: 'Automatically calculated based on seats and price',
         position: 'sidebar',
       },
+      index: true,
     },
     {
       name: 'isPaid',
       type: 'checkbox',
       defaultValue: true,
-      admin: { position: 'sidebar' },
+      admin: {
+        position: 'sidebar',
+      },
+      index: true,
     },
     {
       name: 'isCancelled',
       type: 'checkbox',
       defaultValue: false,
-      admin: { position: 'sidebar', hidden: true },
+      admin: {
+        position: 'sidebar',
+        description: 'Mark as cancelled (keeps record but frees seats)',
+      },
+      index: true,
     },
     {
       name: 'bookedBy',
@@ -95,6 +140,7 @@ export const Tickets: CollectionConfig = {
       relationTo: 'users',
       admin: {
         hidden: true,
+        position: 'sidebar',
       },
     },
     {
@@ -110,6 +156,7 @@ export const Tickets: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
+      clearSeatsOnTripDateChange,
       validateBookedSeats,
       generateUniqueTicket,
       populateBookedBy,

@@ -10,14 +10,16 @@ export const normalizeDateToMidnight: CollectionBeforeChangeHook = async ({
 
   if ((operation === 'create' || dateChanged) && data.date) {
     try {
+      // Parse the date
       const ticketDate = new Date(data.date)
 
       // Check if the date is valid
       if (!isNaN(ticketDate.getTime())) {
-        ticketDate.setHours(0, 0, 0, 0) // Set to midnight
-        data.date = ticketDate.toISOString()
+        // Set to midnight UTC
+        ticketDate.setUTCHours(0, 0, 0, 0)
 
-        console.log(`Normalized ticket date to midnight: ${data.date}`)
+        // Store as ISO string
+        data.date = ticketDate.toISOString()
       }
     } catch (err) {
       console.error('Error normalizing date to midnight:', err)

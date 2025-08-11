@@ -20,8 +20,6 @@ export const BusTypes: CollectionConfig = {
       name: 'amenities',
       type: 'text',
       hasMany: true,
-      unique: true,
-      admin: { description: 'List of amenities (AC, WiFi, etc.)' },
     },
     {
       name: 'seats',

@@ -1,4 +1,3 @@
-// src/components/SeatSelector/index.tsx
 'use client'
 
 import React, { useCallback, useMemo } from 'react'
@@ -15,7 +14,6 @@ import { StateDisplay } from './components/StateDisplay'
 import './index.scss'
 
 export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false }) => {
-  // Payload still gives you `path` of type unknown, but hook coerces it
   const { tripId, travelDate } = useFormFields(([f]) => ({
     tripId: f.trip?.value as string | undefined,
     travelDate: f.date?.value as string | undefined,

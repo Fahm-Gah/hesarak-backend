@@ -36,19 +36,14 @@
     &__grid-overlay {
       position: absolute;
       inset: 0;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: var(--theme-elevation-25);
       backdrop-filter: blur(2px);
-      z-index: 10;
+      z-index: 3;
       border-radius: var(--style-radius-m);
       transition: opacity 200ms ease-in-out;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      // Dark mode support
-      @media (prefers-color-scheme: dark) {
-        background-color: rgba(0, 0, 0, 0.9);
-      }
 
       // Style the PayloadCMS ShimmerEffect
       .shimmer-effect {

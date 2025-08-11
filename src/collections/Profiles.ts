@@ -24,10 +24,6 @@ export const Profiles: CollectionConfig = {
       name: 'phoneNumber',
       type: 'text',
       required: false,
-      admin: {
-        description: 'Original phone number as entered by user',
-        // readOnly: true,
-      },
     },
     {
       name: 'gender',
