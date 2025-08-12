@@ -8,7 +8,7 @@ export const Profiles: CollectionConfig = {
   admin: {
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'fatherName', 'phoneNumber', 'gender'],
-    group: 'Users & Access',
+    group: 'Bookings',
   },
   fields: [
     {
