@@ -1,4 +1,4 @@
-import { terminalsAccess } from '@/access/accessControl'
+import { terminalsAccess } from '@/access/accessControls'
 import type { CollectionConfig } from 'payload'
 
 export const Terminals: CollectionConfig = {

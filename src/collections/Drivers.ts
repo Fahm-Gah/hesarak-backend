@@ -1,4 +1,4 @@
-import { driversAccess, fieldAccessAdminOnly } from '@/access/accessControl'
+import { driversAccess, fieldAccessAdminOnly } from '@/access/accessControls'
 import { CollectionConfig } from 'payload'
 
 export const Drivers: CollectionConfig = {

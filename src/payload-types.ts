@@ -170,7 +170,7 @@ export interface User {
   /**
    * User roles and permissions
    */
-  roles: ('customer' | 'agent' | 'driver' | 'admin' | 'superadmin' | 'dev')[];
+  roles: ('customer' | 'editor' | 'agent' | 'driver' | 'admin' | 'superadmin' | 'dev')[];
   /**
    * Terminals where this agent works
    */

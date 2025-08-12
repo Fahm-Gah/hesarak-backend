@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { calculateCapacity } from './hooks/calculateCapacity'
-import { busTypesAccess } from '@/access/accessControl'
+import { busTypesAccess } from '@/access/accessControls'
 
 export const BusTypes: CollectionConfig = {
   slug: 'bus-types',

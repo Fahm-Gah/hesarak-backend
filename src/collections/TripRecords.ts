@@ -1,4 +1,4 @@
-import { fieldAccessAdminOnly, tripRecordsAccess } from '@/access/accessControl'
+import { fieldAccessAdminOnly, tripRecordsAccess } from '@/access/accessControls'
 import { CollectionConfig } from 'payload'
 
 export const TripRecords: CollectionConfig = {

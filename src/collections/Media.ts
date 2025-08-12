@@ -1,4 +1,4 @@
-import { mediaAccess } from '@/access/accessControl'
+import { mediaAccess } from '@/access/accessControls'
 import type { CollectionConfig } from 'payload'
 
 export const Media: CollectionConfig = {

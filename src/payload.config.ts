@@ -26,16 +26,7 @@ import { updateLocation } from './endpoints/updateLocation'
 import { TripRecords } from './collections/TripRecords'
 import { Drivers } from './collections/Drivers'
 
-const allowedOrigins = [
-  // Your local frontend MUST be here
-  'http://localhost:3000',
-
-  // The Vercel backend URL itself (good practice)
-  'https://hesarak-backend.vercel.app',
-
-  // Add your future production frontend URL here when you have one
-  // 'https://www.your-live-frontend.com'
-]
+const allowedOrigins = ['http://localhost:3000', 'https://hesarak-backend.vercel.app']
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -73,11 +64,11 @@ export default buildConfig({
     payloadCloudPlugin(),
     uploadthingStorage({
       collections: {
-        media: true, // Apply to 'media' collection
+        media: true,
       },
       options: {
         token: process.env.UPLOADTHING_TOKEN || '',
-        acl: 'public-read', // This is optional
+        acl: 'public-read',
       },
     }),
   ],

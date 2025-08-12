@@ -1,4 +1,4 @@
-import { busesAccess } from '@/access/accessControl'
+import { busesAccess } from '@/access/accessControls'
 import type { CollectionConfig } from 'payload'
 
 export const Buses: CollectionConfig = {

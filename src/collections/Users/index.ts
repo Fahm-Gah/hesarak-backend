@@ -3,10 +3,10 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import { normalizePhone } from './hooks/normalizePhone'
 import { updateLastLogin } from './hooks/updateLastLogin'
 import {
-  usersAccess,
   fieldAccessAdminOnly,
   fieldAccessSuperAdminOnly,
-} from '../../access/accessControl'
+  usersAccess,
+} from '@/access/accessControls'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -85,6 +85,7 @@ export const Users: CollectionConfig = {
       type: 'select',
       options: [
         { label: 'Customer', value: 'customer' },
+        { label: 'Editor', value: 'editor' },
         { label: 'Agent', value: 'agent' },
         { label: 'Driver', value: 'driver' },
         { label: 'Admin', value: 'admin' },
@@ -149,7 +150,21 @@ export const Users: CollectionConfig = {
       type: 'ui',
       admin: {
         components: {
-          // Field: 'src/components/UserLocationField',
+          Field: '@/components/UserLocation',
+        },
+        // Runs in the Admin UI — must be sync and return a boolean
+        condition: (data, siblingData, { user }: any) => {
+          // If there's no admin user, hide the UI
+          if (!user) return false
+
+          // user can sometimes be a string ID only — handle that conservatively
+          if (typeof user === 'string') return false
+
+          // roles may be on the user object in the Admin UI
+          const roles = Array.isArray(user.roles) ? user.roles : []
+
+          // allow only superadmin (or expand to admin/dev)
+          return roles.includes('superadmin', 'dev')
         },
       },
     },
@@ -164,25 +179,8 @@ export const Users: CollectionConfig = {
       },
       // Only the user themselves or admins can view location data
       access: {
-        read: ({ req, id }: any) => {
-          const user = req?.user
-          if (!user) return false
-
-          // User can see their own location
-          if (user.id === id) return true
-
-          // Admins can see all locations
-          if (
-            user.roles?.includes('admin') ||
-            user.roles?.includes('superadmin') ||
-            user.roles?.includes('dev')
-          ) {
-            return true
-          }
-
-          return false
-        },
-        update: fieldAccessAdminOnly,
+        read: fieldAccessSuperAdminOnly,
+        update: fieldAccessSuperAdminOnly,
       },
       fields: [
         {

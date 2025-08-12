@@ -1,4 +1,4 @@
-import { profilesAccess } from '@/access/accessControl'
+import { profilesAccess } from '@/access/accessControls'
 import type { CollectionConfig } from 'payload'
 
 export const Profiles: CollectionConfig = {

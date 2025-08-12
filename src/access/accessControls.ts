@@ -1,4 +1,3 @@
-// src/access.ts
 import type { Access, FieldAccess } from 'payload'
 
 /**
@@ -17,8 +16,8 @@ type Where = Record<string, unknown>
 /** Role hierarchy (higher index = more permissions) */
 const ROLE_HIERARCHY = {
   customer: 0,
-  agent: 1,
-  driver: 2,
+  editor: 1,
+  agent: 2,
   admin: 3,
   superadmin: 4,
   dev: 5,
@@ -138,7 +137,7 @@ export const ownOrCreatedRecords: Access = ({ req }: any) => {
   } as any
 }
 
-export const adminOnly: Access = ({ req }: any) => {
+export const adminOrHigher: Access = ({ req }: any) => {
   const user = validateAppUser(req?.user)
   return hasRole(user, 'admin')
 }
@@ -158,9 +157,9 @@ export const agentOrHigher: Access = ({ req }: any) => {
   return hasRole(user, 'agent')
 }
 
-export const driverOrHigher: Access = ({ req }: any) => {
+export const superadminOrEditor: Access = ({ req }: any) => {
   const user = validateAppUser(req?.user)
-  return hasRole(user, 'driver')
+  return hasAnyRole(user, ['superadmin', 'editor'])
 }
 
 /**
@@ -190,48 +189,41 @@ export const fieldAccessSuperAdminOnly: FieldAccess = ({ req }: any) => {
 
 export const busTypesAccess = {
   read: agentOrHigher,
-  create: adminOnly,
-  update: adminOnly,
+  create: adminOrHigher,
+  update: adminOrHigher,
   delete: superAdminOnly,
 }
 
 export const busesAccess = {
   read: agentOrHigher,
-  create: adminOnly,
-  update: adminOnly,
+  create: adminOrHigher,
+  update: adminOrHigher,
   delete: superAdminOnly,
 }
 
 export const driversAccess = {
-  read: agentOrHigher,
-  create: adminOnly,
-  update: adminOnly,
+  read: adminOrHigher,
+  create: adminOrHigher,
+  update: adminOrHigher,
   delete: superAdminOnly,
 }
 
 export const mediaAccess = {
-  read: publicRead,
-  create: authenticated,
-  update: ownOrCreatedRecords,
-  delete: adminOnly,
+  read: superadminOrEditor,
+  create: superadminOrEditor,
+  update: superadminOrEditor,
+  delete: superAdminOnly,
 }
 
 export const postsAccess = {
-  read: publicRead,
-  create: agentOrHigher,
-  update: ({ req }: any) => {
-    const user = validateAppUser(req?.user)
-    if (!user || user.isActive === false) return false
-    if (hasRole(user, 'admin')) return true
-    return {
-      'author.id': { equals: user.id },
-    } as any
-  },
-  delete: adminOnly,
+  read: superadminOrEditor,
+  create: superadminOrEditor,
+  update: superadminOrEditor,
+  delete: superAdminOnly,
 }
 
 export const profilesAccess = {
-  read: authenticated,
+  read: agentOrHigher,
   create: agentOrHigher,
   update: ({ req }: any) => {
     const user = validateAppUser(req?.user)
@@ -245,40 +237,28 @@ export const profilesAccess = {
 }
 
 export const terminalsAccess = {
-  read: publicRead,
-  create: adminOnly,
-  update: adminOnly,
+  read: agentOrHigher,
+  create: adminOrHigher,
+  update: adminOrHigher,
   delete: superAdminOnly,
 }
 
 export const tripRecordsAccess = {
-  read: agentOrHigher,
-  create: agentOrHigher,
-  update: adminOnly,
+  read: adminOrHigher,
+  create: adminOrHigher,
+  update: superAdminOnly,
   delete: superAdminOnly,
 }
 
 export const tripSchedulesAccess = {
-  read: publicRead,
-  create: adminOnly,
-  update: adminOnly,
+  read: agentOrHigher,
+  create: adminOrHigher,
+  update: adminOrHigher,
   delete: superAdminOnly,
 }
 
 export const ticketsAccess = {
-  read: ({ req }: any) => {
-    const user = validateAppUser(req?.user)
-    if (!user || user.isActive === false) return false
-    if (hasRole(user, 'admin')) return true
-
-    if (hasExactRole(user, 'agent')) {
-      return terminalWhereForUser(user) as any
-    }
-
-    return {
-      or: [{ 'bookedBy.id': { equals: user.id } }, { 'passenger.user.id': { equals: user.id } }],
-    } as any
-  },
+  read: agentOrHigher,
   create: agentOrHigher,
   update: ({ req }: any) => {
     const user = validateAppUser(req?.user)
@@ -289,19 +269,14 @@ export const ticketsAccess = {
     }
     return false
   },
-  delete: adminOnly,
+  delete: adminOrHigher,
 }
 
 export const usersAccess = {
   read: ({ req }: any) => {
     const user = validateAppUser(req?.user)
     if (!user || user.isActive === false) return false
-    if (hasRole(user, 'admin')) return true
-    if (hasExactRole(user, 'agent')) {
-      return {
-        roles: { contains: 'customer' },
-      } as any
-    }
+    if (hasRole(user, 'agent')) return true
     return {
       id: { equals: user.id },
     } as any
@@ -320,13 +295,10 @@ export const usersAccess = {
         roles: { not_contains: 'admin' },
       } as any
     }
-    return {
-      id: { equals: user.id },
-    } as any
   },
   delete: superAdminOnly,
   admin: ({ req }: any) => {
     const user = validateAppUser(req?.user)
-    return hasRole(user, 'agent')
+    return hasRole(user, 'editor')
   },
 }

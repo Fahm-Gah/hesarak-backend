@@ -7,25 +7,18 @@ import { normalizeDateToMidnight } from './hooks/normalizeDateToMidnight'
 import { validateTripDate } from './hooks/validateTripDate'
 import { clearSeatsOnTripDateChange } from './hooks/clearSeatsOnTripDateChange'
 import { populateFromAndTo } from './hooks/populateFromAndTo'
+import { ticketsAccess } from '@/access/accessControls'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
+  access: ticketsAccess,
   enableQueryPresets: true,
   admin: {
     useAsTitle: 'ticketNumber',
-    defaultColumns: [
-      'ticketNumber',
-      'passenger',
-      'trip',
-      'date',
-      'isPaid',
-      'totalPrice',
-      'createdAt',
-    ],
+    defaultColumns: ['passenger', 'trip', 'date', 'isPaid', 'totalPrice', 'createdAt', 'bookedBy'],
     listSearchableFields: [
-      'ticketNumber',
       'passenger.fullName',
-      'trip.name',
+      'ticketNumber',
       'fromTerminalName',
       'toTerminalName',
     ],

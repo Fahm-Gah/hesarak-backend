@@ -7,7 +7,7 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import { postsAccess } from '@/access/accessControl'
+import { postsAccess } from '@/access/accessControls'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
