@@ -1,10 +1,13 @@
+import { fieldAccessAdminOnly, tripSchedulesAccess } from '@/access/accessControl'
 import { CollectionConfig } from 'payload'
 
 export const TripSchedules: CollectionConfig = {
   slug: 'trip-schedules',
+  access: tripSchedulesAccess,
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'bus', 'departureTime', 'from', 'to', 'price', 'frequency'],
+    group: 'Operations',
   },
   fields: [
     {
@@ -24,6 +27,9 @@ export const TripSchedules: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Price per seat',
+      },
+      access: {
+        update: fieldAccessAdminOnly,
       },
     },
     {
@@ -95,6 +101,9 @@ export const TripSchedules: CollectionConfig = {
       defaultValue: true,
       admin: {
         position: 'sidebar',
+      },
+      access: {
+        update: fieldAccessAdminOnly,
       },
     },
   ],

@@ -7,15 +7,15 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
+import { postsAccess } from '@/access/accessControl'
 
 export const Posts: CollectionConfig = {
-  access: {
-    read: () => true,
-  },
   slug: 'posts',
+  access: postsAccess,
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'updatedAt'],
+    group: 'Content',
   },
   fields: [
     {

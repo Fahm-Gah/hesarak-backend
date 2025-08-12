@@ -1,11 +1,14 @@
+import { profilesAccess } from '@/access/accessControl'
 import type { CollectionConfig } from 'payload'
 
 export const Profiles: CollectionConfig = {
   slug: 'profiles',
+  access: profilesAccess,
   enableQueryPresets: true,
   admin: {
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'fatherName', 'phoneNumber', 'gender'],
+    group: 'Users & Access',
   },
   fields: [
     {

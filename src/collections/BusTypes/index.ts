@@ -1,11 +1,14 @@
 import type { CollectionConfig } from 'payload'
 import { calculateCapacity } from './hooks/calculateCapacity'
+import { busTypesAccess } from '@/access/accessControl'
 
 export const BusTypes: CollectionConfig = {
   slug: 'bus-types',
+  access: busTypesAccess,
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'capacity', 'updatedAt'],
+    group: 'Fleet Management',
   },
   fields: [
     {

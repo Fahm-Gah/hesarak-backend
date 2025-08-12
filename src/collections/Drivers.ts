@@ -1,10 +1,13 @@
+import { driversAccess, fieldAccessAdminOnly } from '@/access/accessControl'
 import { CollectionConfig } from 'payload'
 
 export const Drivers: CollectionConfig = {
   slug: 'drivers',
+  access: driversAccess,
   admin: {
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'phoneNumber', 'licenseNumber', 'isActive'],
+    group: 'Fleet Management',
   },
   fields: [
     {
@@ -31,6 +34,9 @@ export const Drivers: CollectionConfig = {
       name: 'isActive',
       type: 'checkbox',
       defaultValue: true,
+      access: {
+        update: fieldAccessAdminOnly,
+      },
     },
   ],
 }

@@ -90,6 +90,6 @@ export default buildConfig({
     registerUser,
     bookTicket,
     getUserTickets,
-    updateLocation, // Add the new location endpoint
+    updateLocation,
   ],
 })

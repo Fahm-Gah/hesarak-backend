@@ -1,4 +1,3 @@
-// src/components/LocationMap/index.tsx
 'use client'
 
 import React, { useEffect, useRef, useCallback } from 'react'

@@ -33,6 +33,7 @@ export const Tickets: CollectionConfig = {
       defaultLimit: 50,
       limits: [10, 25, 50, 100, 200],
     },
+    group: 'Bookings',
   },
   disableDuplicate: true,
   fields: [

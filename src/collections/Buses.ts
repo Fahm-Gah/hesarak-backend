@@ -1,10 +1,13 @@
+import { busesAccess } from '@/access/accessControl'
 import type { CollectionConfig } from 'payload'
 
 export const Buses: CollectionConfig = {
   slug: 'buses',
+  access: busesAccess,
   admin: {
     useAsTitle: 'number',
     defaultColumns: ['number', 'type'],
+    group: 'Fleet Management',
   },
   fields: [
     {

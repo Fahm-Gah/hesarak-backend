@@ -2,13 +2,20 @@ import type { CollectionConfig } from 'payload'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import { normalizePhone } from './hooks/normalizePhone'
 import { updateLastLogin } from './hooks/updateLastLogin'
+import {
+  usersAccess,
+  fieldAccessAdminOnly,
+  fieldAccessSuperAdminOnly,
+} from '../../access/accessControl'
 
 export const Users: CollectionConfig = {
   slug: 'users',
+  access: usersAccess,
   enableQueryPresets: true,
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['profile', 'email', 'username', 'roles', 'isActive'],
+    group: 'Users & Access',
   },
   auth: {
     cookies: {
@@ -90,6 +97,11 @@ export const Users: CollectionConfig = {
       admin: {
         description: 'User roles and permissions',
       },
+      // Only admins can change roles
+      access: {
+        create: fieldAccessSuperAdminOnly,
+        update: fieldAccessSuperAdminOnly,
+      },
     },
     {
       name: 'terminal',
@@ -101,6 +113,11 @@ export const Users: CollectionConfig = {
         condition: (_, { roles }) => roles?.includes('agent'),
         description: 'Terminals where this agent works',
       },
+      // Only admins can assign terminals
+      access: {
+        create: fieldAccessAdminOnly,
+        update: fieldAccessAdminOnly,
+      },
     },
     {
       name: 'isActive',
@@ -108,6 +125,11 @@ export const Users: CollectionConfig = {
       defaultValue: true,
       admin: {
         description: 'Whether the user account is active',
+      },
+      // Only admins can activate/deactivate users
+      access: {
+        create: fieldAccessAdminOnly,
+        update: fieldAccessAdminOnly,
       },
     },
     {
@@ -127,7 +149,7 @@ export const Users: CollectionConfig = {
       type: 'ui',
       admin: {
         components: {
-          Field: './components/LocationField',
+          Field: '@/components/UserLocationField',
         },
       },
     },
@@ -139,6 +161,28 @@ export const Users: CollectionConfig = {
       admin: {
         description: 'User location data from browser or IP geolocation',
         condition: () => false, // Hide the raw fields, show only through UI component
+      },
+      // Only the user themselves or admins can view location data
+      access: {
+        read: ({ req, id }: any) => {
+          const user = req?.user
+          if (!user) return false
+
+          // User can see their own location
+          if (user.id === id) return true
+
+          // Admins can see all locations
+          if (
+            user.roles?.includes('admin') ||
+            user.roles?.includes('superadmin') ||
+            user.roles?.includes('dev')
+          ) {
+            return true
+          }
+
+          return false
+        },
+        update: fieldAccessAdminOnly,
       },
       fields: [
         {
@@ -212,6 +256,12 @@ export const Users: CollectionConfig = {
       admin: {
         description: 'Historical location data (last 10 entries)',
         hidden: true,
+      },
+      // Only admins can view location history
+      access: {
+        read: fieldAccessAdminOnly,
+        create: fieldAccessAdminOnly,
+        update: fieldAccessAdminOnly,
       },
       fields: [
         {

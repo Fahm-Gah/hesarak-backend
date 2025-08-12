@@ -17,7 +17,7 @@ interface LocationMapProps {
 // Lazy load the map component to avoid SSR issues.
 // Support both named export `LocationMap` and default export for flexibility.
 const LocationMap = lazy(() =>
-  import('../LocationMap').then((module) => ({
+  import('@/components/UserLocationFIeld/components/LocationMap').then((module) => ({
     default: (module as any).LocationMap ?? (module as any).default,
   })),
 ) as React.LazyExoticComponent<React.ComponentType<LocationMapProps>>
@@ -126,7 +126,7 @@ const getSourceDisplay = (source: any): string => {
   }
 }
 
-const LocationField: React.FC = () => {
+const UserLocationField: React.FC = () => {
   // Extract field values with type safety
   const { value: coordinates } = useField<any>({ path: 'location.coordinates' })
   const { value: accuracy } = useField<any>({ path: 'location.accuracy' })
@@ -142,7 +142,7 @@ const LocationField: React.FC = () => {
 
   // Log for debugging (only in development)
   if (process.env.NODE_ENV === 'development') {
-    console.debug('LocationField values:', {
+    console.debug('User Location Field values:', {
       coordinates,
       accuracy,
       city,
@@ -195,7 +195,7 @@ const LocationField: React.FC = () => {
       {/* Map Section - Now shown first */}
       {normalizedCoords ? (
         <div className="location-field__map-container">
-          <h4 className="location-field__map-title">🗺️ Map View</h4>
+          <h4 className="location-field__map-title">Last Known Location</h4>
           <Suspense fallback={<div className="location-field__map-loading">Loading map...</div>}>
             <LocationMap
               coordinates={normalizedCoords}
@@ -229,8 +229,6 @@ const LocationField: React.FC = () => {
 
       {/* Location Summary Card - Now shown second */}
       <div className="location-field__card">
-        <h4 className="location-field__title">📍 Location Information</h4>
-
         <div className="location-field__grid">
           <div className="location-field__item">
             <span className="location-field__label">City:</span>
@@ -319,4 +317,4 @@ const LocationField: React.FC = () => {
   )
 }
 
-export default LocationField
+export default UserLocationField

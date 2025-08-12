@@ -1,9 +1,12 @@
+import { terminalsAccess } from '@/access/accessControl'
 import type { CollectionConfig } from 'payload'
 
 export const Terminals: CollectionConfig = {
   slug: 'terminals',
+  access: terminalsAccess,
   admin: {
     useAsTitle: 'name',
+    group: 'Operations',
   },
   fields: [
     {
