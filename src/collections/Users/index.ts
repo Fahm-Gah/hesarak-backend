@@ -149,7 +149,7 @@ export const Users: CollectionConfig = {
       type: 'ui',
       admin: {
         components: {
-          Field: '@/components/UserLocationField',
+          Field: 'src/components/UserLocationField',
         },
       },
     },

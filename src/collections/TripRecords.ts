@@ -7,7 +7,7 @@ export const TripRecords: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     defaultColumns: ['date', 'driver', 'bus', 'from', 'to', 'commission'],
-    group: 'Operations',
+    group: 'Records & Finances',
   },
   fields: [
     {

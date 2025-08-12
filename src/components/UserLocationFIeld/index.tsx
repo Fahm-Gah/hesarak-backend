@@ -17,7 +17,7 @@ interface LocationMapProps {
 // Lazy load the map component to avoid SSR issues.
 // Support both named export `LocationMap` and default export for flexibility.
 const LocationMap = lazy(() =>
-  import('./components/LocationMap').then((module) => ({
+  import('src/components/UserLocationField/components/LocationMap').then((module) => ({
     default: (module as any).LocationMap ?? (module as any).default,
   })),
 ) as React.LazyExoticComponent<React.ComponentType<LocationMapProps>>

@@ -7,7 +7,7 @@ export const Buses: CollectionConfig = {
   admin: {
     useAsTitle: 'number',
     defaultColumns: ['number', 'type'],
-    group: 'Fleet Management',
+    group: 'Operations',
   },
   fields: [
     {

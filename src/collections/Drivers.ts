@@ -7,7 +7,7 @@ export const Drivers: CollectionConfig = {
   admin: {
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'phoneNumber', 'licenseNumber', 'isActive'],
-    group: 'Fleet Management',
+    group: 'Records & Finances',
   },
   fields: [
     {

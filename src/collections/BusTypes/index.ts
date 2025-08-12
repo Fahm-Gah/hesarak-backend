@@ -8,7 +8,7 @@ export const BusTypes: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'capacity', 'updatedAt'],
-    group: 'Fleet Management',
+    group: 'Operations',
   },
   fields: [
     {
