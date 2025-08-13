@@ -32,6 +32,12 @@
     font-family: var(--font-body);
     overflow: hidden;
     position: relative;
+    direction: ltr !important;
+
+    * {
+      direction: ltr !important;
+      text-align: left !important;
+    }
 
     &:focus-within {
       outline: none;

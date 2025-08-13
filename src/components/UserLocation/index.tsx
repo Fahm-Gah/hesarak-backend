@@ -203,7 +203,6 @@ const UserLocation: React.FC = () => {
       {/* Map Section - Now shown first */}
       {normalizedCoords ? (
         <div className="location-field__map-container">
-          <h4 className="location-field__map-title">Last Known Location</h4>
           <Suspense fallback={<div className="location-field__map-loading">Loading map...</div>}>
             <LocationMap
               coordinates={normalizedCoords}

@@ -1,6 +1,8 @@
 import React, { useMemo, memo } from 'react'
 import { X } from 'lucide-react'
 import { useFormFields } from '@payloadcms/ui'
+import { useLanguage } from '@/hooks/useLanguage'
+import { getSeatSelectorTranslations } from '@/utils/seatSelectorTranslations'
 import type { Trip } from '../../types'
 import './index.scss'
 
@@ -14,7 +16,9 @@ interface SelectedSeatsListProps {
 
 export const SelectedSeatsList = memo<SelectedSeatsListProps>(
   ({ selectedSeatIds, trip, removeSeat, clearAll, readOnly = false }) => {
-    // read the form-level override price (if admin/agent set it)
+    const lang = useLanguage()
+    const t = getSeatSelectorTranslations(lang)
+
     const priceField = useFormFields(([fields]) => fields?.pricePerTicket)
     const rawOverride = priceField?.value
 
@@ -42,15 +46,12 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
 
     const getSeatNumber = (id: string) => seatNumberMap.get(id) || 'N/A'
 
-    // Determine effective per-seat price (priority: override -> trip.price -> 0)
     const effectivePerSeatPrice = useMemo(() => {
       if (typeof parsedOverride === 'number') return parsedOverride
       if (trip && typeof trip.price === 'number') return trip.price
-      // fallback
       return 0
     }, [parsedOverride, trip])
 
-    // total is sum of per-seat prices (supports future per-seat variance)
     const totalPrice = useMemo(() => {
       return selectedSeatIds.reduce((acc) => acc + effectivePerSeatPrice, 0)
     }, [selectedSeatIds, effectivePerSeatPrice])
@@ -60,15 +61,17 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
     return (
       <div className="selected-seats-list">
         <div className="selected-seats-list__header">
-          <h4>Selected Seats ({selectedSeatIds.length})</h4>
+          <h4>
+            {t.labels.selectedSeats} ({selectedSeatIds.length})
+          </h4>
           {!readOnly && selectedSeatIds.length > 0 && (
             <button
               type="button"
               className="selected-seats-list__clear-button"
               onClick={clearAll}
-              aria-label="Clear all selected seats"
+              aria-label={t.labels.clearAll}
             >
-              Clear All
+              {t.labels.clearAll}
             </button>
           )}
         </div>
@@ -93,7 +96,9 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
               }
             >
               <div className="selected-seats-list__seat-details">
-                <span className="selected-seats-list__seat-number">Seat {getSeatNumber(id)}</span>
+                <span className="selected-seats-list__seat-number">
+                  {t.seatTypes.seat} {getSeatNumber(id)}
+                </span>
                 <span className="selected-seats-list__seat-price">
                   AFN {effectivePerSeatPrice.toLocaleString()}
                 </span>
@@ -106,7 +111,7 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
                     e.stopPropagation()
                     removeSeat(id)
                   }}
-                  aria-label={`Remove seat ${getSeatNumber(id)}`}
+                  aria-label={`${t.labels.removeSeat} ${getSeatNumber(id)}`}
                 >
                   <X size={16} />
                 </button>
@@ -116,7 +121,7 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
         </div>
 
         <div className="selected-seats-list__total">
-          <span>Total Price:</span>
+          <span>{t.labels.totalPrice}:</span>
           <strong>AFN {totalPrice.toLocaleString()}</strong>
         </div>
       </div>

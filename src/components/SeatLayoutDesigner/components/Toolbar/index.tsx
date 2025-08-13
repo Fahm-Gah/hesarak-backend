@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useModal } from '@payloadcms/ui'
 import { useLayoutStore } from '../../store'
 import { Undo, Redo, Square, Lock, Trash2, RotateCcw } from 'lucide-react'
+import { useLanguage } from '@/hooks/useLanguage'
+import { getSeatLayoutDesignerTranslations } from '@/utils/seatLayoutDesignerTranslations'
 
 interface ToolbarProps {
   selectedIds: Set<string>
@@ -17,6 +19,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onDeleteSelected,
 }) => {
   const { openModal } = useModal()
+  const lang = useLanguage()
+  const t = getSeatLayoutDesignerTranslations(lang)
+
   const [temporalState, setTemporalState] = useState({
     canUndo: false,
     canRedo: false,
@@ -67,7 +72,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         onClick={handleUndo}
         disabled={!temporalState.canUndo}
         className="seat-maker__btn"
-        title="Undo (Ctrl+Z)"
+        title={`${t.toolbar.undo} (Ctrl+Z)`}
       >
         <Undo size={16} />
       </button>
@@ -77,7 +82,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         onClick={handleRedo}
         disabled={!temporalState.canRedo}
         className="seat-maker__btn"
-        title="Redo (Ctrl+Y)"
+        title={`${t.toolbar.redo} (Ctrl+Y)`}
       >
         <Redo size={16} />
       </button>
@@ -91,7 +96,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         title="Select All (Ctrl+A)"
       >
         <Square size={16} />
-        <span>All</span>
+        <span>{t.toolbar.all}</span>
       </button>
 
       <button
@@ -102,7 +107,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         title={`Toggle Disabled (${selectedCount} selected)`}
       >
         <Lock size={16} />
-        <span>Disable</span>
+        <span>{t.toolbar.disable}</span>
       </button>
 
       <button
@@ -113,7 +118,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         title={`Delete ${selectedCount} selected (Delete)`}
       >
         <Trash2 size={16} />
-        <span>Delete</span>
+        <span>{t.toolbar.delete}</span>
       </button>
 
       <button
@@ -123,7 +128,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         title="Clear All"
       >
         <RotateCcw size={16} />
-        <span>Clear</span>
+        <span>{t.toolbar.clear}</span>
       </button>
     </div>
   )

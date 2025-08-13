@@ -4,39 +4,49 @@ import type { ElementType } from './types'
 export interface Tool {
   type: ElementType
   label: string
+  labelFa?: string // Persian label
   icon: LucideIcon
   shortcut?: string
   description?: string
+  descriptionFa?: string // Persian description
 }
 
 export const TOOLS: Tool[] = [
   {
     type: 'seat',
     label: 'Seat',
+    labelFa: 'صندلی',
     icon: Users,
     shortcut: 'S',
     description: 'Passenger seat',
+    descriptionFa: 'صندلی مسافر',
   },
   {
     type: 'wc',
     label: 'WC',
+    labelFa: 'دستشویی',
     icon: Toilet,
     shortcut: 'W',
     description: 'Restroom',
+    descriptionFa: 'سرویس بهداشتی',
   },
   {
     type: 'driver',
     label: 'Driver',
+    labelFa: 'راننده',
     icon: User,
     shortcut: 'D',
     description: 'Driver seat',
+    descriptionFa: 'صندلی راننده',
   },
   {
     type: 'door',
     label: 'Door',
+    labelFa: 'دروازه',
     icon: DoorOpen,
     shortcut: 'O',
     description: 'Entry/exit door',
+    descriptionFa: 'دروازه ورود/خروج',
   },
 ] as const
 

@@ -4,7 +4,7 @@
 export type SeatStatus =
   | 'available' // Seat is open for booking
   | 'selected' // Seat is selected in current session (new selection)
-  | 'current-ticket' // Seat belongs to the ticket being edited (editable)
+  | 'currentTicket' // Seat belongs to the ticket being edited (editable)
   | 'booked' // Seat is paid and confirmed by others
   | 'unpaid' // Seat is reserved but unpaid by others
 

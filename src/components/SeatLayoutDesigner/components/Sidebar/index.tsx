@@ -1,7 +1,9 @@
 import React from 'react'
 import { useLayoutStore } from '../../store'
 import { TOOLS, MAX_ELEMENT_SIZE } from '../../constants'
+import { useLanguage } from '@/hooks/useLanguage'
 import type { ElementType } from '../../types'
+import { getSeatLayoutDesignerTranslations } from '@/utils/seatLayoutDesignerTranslations'
 
 interface SidebarProps {
   selectedTool: ElementType
@@ -19,6 +21,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onDimensionChange,
 }) => {
   const { dimensions } = useLayoutStore()
+  const lang = useLanguage()
+  const t = getSeatLayoutDesignerTranslations(lang)
 
   const handleElementSizeChange = (dimension: 'rowSpan' | 'colSpan', value: string) => {
     const numValue = parseInt(value, 10)
@@ -43,10 +47,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div className="seat-maker__sidebar">
       <div className="seat-maker__section">
-        <h4>Add Element</h4>
+        <h4>{t.sidebar.addElement}</h4>
         <div className="seat-maker__tools">
           {TOOLS.map((tool) => {
             const Icon = tool.icon
+            const label = lang === 'fa' ? tool.labelFa || tool.label : tool.label
+            const description =
+              lang === 'fa' ? tool.descriptionFa || tool.description : tool.description
+
             return (
               <button
                 type="button"
@@ -55,10 +63,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className={`seat-maker__tool ${
                   selectedTool === tool.type ? 'seat-maker__tool--active' : ''
                 }`}
-                title={tool.description}
+                title={description}
               >
                 <Icon size={18} />
-                <span>{tool.label}</span>
+                <span>{label}</span>
               </button>
             )
           })}
@@ -66,10 +74,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="seat-maker__section">
-        <h4>Element Size</h4>
+        <h4>{t.sidebar.elementSize}</h4>
         <div className="seat-maker__size-controls">
           <div className="seat-maker__size-input">
-            <label htmlFor="element-rows">Rows</label>
+            <label htmlFor="element-rows">{t.sidebar.rows}</label>
             <input
               id="element-rows"
               type="number"
@@ -80,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           </div>
           <div className="seat-maker__size-input">
-            <label htmlFor="element-cols">Cols</label>
+            <label htmlFor="element-cols">{t.sidebar.cols}</label>
             <input
               id="element-cols"
               type="number"
@@ -94,10 +102,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="seat-maker__section">
-        <h4>Grid Size</h4>
+        <h4>{t.sidebar.gridSize}</h4>
         <div className="seat-maker__size-controls">
           <div className="seat-maker__size-input">
-            <label htmlFor="grid-rows">Rows</label>
+            <label htmlFor="grid-rows">{t.sidebar.rows}</label>
             <input
               id="grid-rows"
               type="number"
@@ -108,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           </div>
           <div className="seat-maker__size-input">
-            <label htmlFor="grid-cols">Cols</label>
+            <label htmlFor="grid-cols">{t.sidebar.cols}</label>
             <input
               id="grid-cols"
               type="number"
@@ -122,15 +130,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="seat-maker__section seat-maker__tips">
-        <h4>Tips</h4>
+        <h4>{t.sidebar.tips}</h4>
         <ul>
-          <li>Click empty cells to add</li>
-          <li>Drag elements to move</li>
-          <li>Shift+click for range select</li>
-          <li>Ctrl+click to add to selection</li>
-          <li>Double-click seats to edit</li>
-          <li>Arrow keys move selected</li>
-          <li>Delete key removes selected</li>
+          {t.sidebar.tipsList.map((tip, index) => (
+            <li key={index}>{tip}</li>
+          ))}
         </ul>
       </div>
     </div>

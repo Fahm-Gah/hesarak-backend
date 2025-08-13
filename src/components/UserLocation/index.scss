@@ -67,16 +67,6 @@
     margin-bottom: var(--base); // Changed from margin-top to margin-bottom
   }
 
-  &__map-title {
-    margin: 0 0 calc(var(--base) * 0.5) 0;
-    font-weight: var(--font-weight-semibold);
-    font-size: var(--font-size-base);
-    color: var(--theme-text);
-    display: flex;
-    align-items: center;
-    gap: calc(var(--base) * 0.25);
-  }
-
   &__map-loading {
     height: 300px;
     display: flex;

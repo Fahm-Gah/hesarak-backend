@@ -43,7 +43,7 @@ const extractSeatId = (seatData: any): string | null => {
   return null
 }
 
-type BookingStatus = 'available' | 'booked' | 'unpaid' | 'current-ticket'
+type BookingStatus = 'available' | 'booked' | 'unpaid' | 'currentTicket'
 
 interface UseSeatSelectorProps {
   path: unknown
@@ -445,7 +445,7 @@ export const useSeatSelector = ({
       }
 
       if (currentTicketId && currentTicketOriginalSeats.has(seatId)) {
-        return 'current-ticket'
+        return 'currentTicket'
       }
 
       return 'available'
@@ -483,8 +483,8 @@ export const useSeatSelector = ({
         return 'selected'
       }
 
-      if (bookingStatus === 'current-ticket') {
-        return 'current-ticket'
+      if (bookingStatus === 'currentTicket') {
+        return 'currentTicket'
       }
 
       return 'available'

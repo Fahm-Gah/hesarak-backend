@@ -1,9 +1,13 @@
 import React, { useMemo } from 'react'
 import { Bus } from 'lucide-react'
 import { useLayoutStore } from '../../store'
+import { useLanguage } from '@/hooks/useLanguage'
+import { getSeatLayoutDesignerTranslations } from '@/utils/seatLayoutDesignerTranslations'
 
 export const Header: React.FC = () => {
   const elements = useLayoutStore((s) => s.elements)
+  const lang = useLanguage()
+  const t = getSeatLayoutDesignerTranslations(lang)
 
   const stats = useMemo(() => {
     if (!elements || !Array.isArray(elements)) {
@@ -22,11 +26,11 @@ export const Header: React.FC = () => {
     <div className="seat-maker__header">
       <div className="seat-maker__title">
         <Bus size={20} />
-        <span>Seat Layout Designer</span>
+        <span>{t.header.title}</span>
       </div>
       <div className="seat-maker__stats">
-        Seats: <strong>{stats.total}</strong> | Available: <strong>{stats.available}</strong> |
-        Disabled: <strong>{stats.disabled}</strong>
+        {t.header.seats}: <strong>{stats.total}</strong> | {t.header.available}:{' '}
+        <strong>{stats.available}</strong> |{t.header.disabled}: <strong>{stats.disabled}</strong>
       </div>
     </div>
   )

@@ -4,6 +4,8 @@ import React, { useCallback, useMemo } from 'react'
 import { useFormFields, toast } from '@payloadcms/ui'
 import type { FieldClientComponent } from 'payload'
 import { useSeatSelector } from './hooks/useSeatSelector'
+import { useLanguage } from '@/hooks/useLanguage'
+import { getSeatSelectorTranslations } from '@/utils/seatSelectorTranslations'
 
 import { Legend } from './components/Legend'
 import { SelectedSeatsList } from './components/SelectedSeatsList'
@@ -14,6 +16,9 @@ import { StateDisplay } from './components/StateDisplay'
 import './index.scss'
 
 export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false }) => {
+  const lang = useLanguage()
+  const t = getSeatSelectorTranslations(lang)
+
   const { tripId, travelDate } = useFormFields(([f]) => ({
     tripId: f.trip?.value as string | undefined,
     travelDate: f.date?.value as string | undefined,
@@ -39,23 +44,24 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
     (seatId: string) => {
       if (readOnly) return
       const status = getSeatStatus(seatId)
-      if (status === 'available' || status === 'selected' || status === 'current-ticket') {
+      if (status === 'available' || status === 'selected' || status === 'currentTicket') {
         toggleSeat(seatId)
         return
       }
       const booking = getBookingForSeat(seatId)
       if (!booking) return
       const name = booking.passenger?.fullName || 'another passenger'
+      const statusText = status === 'booked' ? t.messages.seatBookedBy : t.messages.seatReservedBy
       const msg = (
         <div>
-          Seat {status === 'booked' ? 'booked' : 'reserved'} by <strong>{name}</strong>
+          {t.seatTypes.seat} {statusText} <strong>{name}</strong>
           <br />
-          Ticket: {booking.ticketNumber}
+          {t.messages.ticket}: {booking.ticketNumber}
         </div>
       )
       status === 'booked' ? toast.error(msg) : toast.warning(msg)
     },
-    [getSeatStatus, toggleSeat, getBookingForSeat, readOnly],
+    [getSeatStatus, toggleSeat, getBookingForSeat, readOnly, t],
   )
 
   const seatMap = useMemo(() => {
@@ -103,7 +109,7 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
   if (!tripId || !travelDate) {
     return (
       <StateDisplay type="info">
-        <p>Please select a trip and travel date to view the seat map.</p>
+        <p>{t.messages.selectTripDate}</p>
       </StateDisplay>
     )
   }
@@ -111,7 +117,7 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
   if (loading && !trip) {
     return (
       <StateDisplay type="loading">
-        <p>Loading seat map…</p>
+        <p>{t.messages.loadingSeatMap}</p>
       </StateDisplay>
     )
   }
@@ -142,6 +148,7 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
               style={{
                 gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(45px, 1fr))`,
                 gridTemplateColumns: `repeat(${gridDimensions.cols}, minmax(45px, 1fr))`,
+                direction: 'ltr', // Force LTR for seat grid
               }}
               role="grid"
               aria-label="Bus seat map"
@@ -163,7 +170,7 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
         ) : (
           !readOnly && (
             <div className="seat-selector__instructions">
-              <p>Click on available seats to select them for booking.</p>
+              <p>{t.messages.clickToSelect}</p>
             </div>
           )
         )}
