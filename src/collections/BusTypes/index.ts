@@ -27,7 +27,7 @@ export const BusTypes: CollectionConfig = {
     {
       name: 'name',
       label: {
-        en: 'name',
+        en: 'Name',
         fa: 'نام',
       },
       type: 'text',
@@ -42,7 +42,7 @@ export const BusTypes: CollectionConfig = {
     {
       name: 'amenities',
       label: {
-        en: 'amenities',
+        en: 'Amenities',
         fa: 'امکانات',
       },
       type: 'text',
@@ -51,7 +51,7 @@ export const BusTypes: CollectionConfig = {
     {
       name: 'seats',
       label: {
-        en: 'seats',
+        en: 'Seats',
         fa: 'صندلی ها',
       },
       type: 'json',
@@ -65,7 +65,7 @@ export const BusTypes: CollectionConfig = {
     {
       name: 'capacity',
       label: {
-        en: 'capacity',
+        en: 'Capacity',
         fa: 'ظرفیت',
       },
       type: 'number',

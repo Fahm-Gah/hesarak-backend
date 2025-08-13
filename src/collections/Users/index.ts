@@ -96,7 +96,7 @@ export const Users: CollectionConfig = {
     {
       name: 'profile',
       label: {
-        en: 'profile',
+        en: 'Profile',
         fa: 'پروفایل',
       },
       type: 'relationship',
@@ -112,7 +112,7 @@ export const Users: CollectionConfig = {
     {
       name: 'roles',
       label: {
-        en: 'roles',
+        en: 'Roles',
         fa: 'وظایف',
       },
       type: 'select',
@@ -143,7 +143,7 @@ export const Users: CollectionConfig = {
     {
       name: 'isActive',
       label: {
-        en: 'is active',
+        en: 'Is Active',
         fa: 'فعال',
       },
       type: 'checkbox',
@@ -163,7 +163,7 @@ export const Users: CollectionConfig = {
     {
       name: 'lastLoginAt',
       label: {
-        en: 'last login at',
+        en: 'Last Login At',
         fa: 'آخرین ورود در',
       },
       type: 'date',

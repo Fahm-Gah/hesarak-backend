@@ -24,11 +24,11 @@ const getSeatTypeLabels = (lang: 'en' | 'fa'): Record<string, string> => ({
 
 // Bilingual status labels
 const getStatusLabels = (lang: 'en' | 'fa'): Record<string, string> => ({
-  available: lang === 'fa' ? 'موجود' : 'Available',
+  available: lang === 'fa' ? 'خالی' : 'Available',
   selected: lang === 'fa' ? 'انتخاب شده' : 'Selected',
-  currentTicket: lang === 'fa' ? 'رزرو فعلی شما' : 'Your existing booking',
-  booked: lang === 'fa' ? 'رزرو شده' : 'Booked',
-  unpaid: lang === 'fa' ? 'رزرو موقت' : 'Reserved',
+  currentTicket: lang === 'fa' ? 'تکت فعلی شما' : 'Your existing booking',
+  booked: lang === 'fa' ? 'بوک شده' : 'Booked',
+  unpaid: lang === 'fa' ? 'قید شده' : 'Reserved',
 })
 
 /**

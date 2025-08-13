@@ -3,8 +3,8 @@ export const getSeatSelectorTranslations = (lang: 'en' | 'fa' = 'en') => {
     statuses: {
       available: lang === 'fa' ? 'موجود' : 'Available',
       selected: lang === 'fa' ? 'انتخاب شده' : 'Selected',
-      booked: lang === 'fa' ? 'رزرو شده' : 'Booked',
-      unpaid: lang === 'fa' ? 'رزرو موقت' : 'Reserved',
+      booked: lang === 'fa' ? 'بوک شده' : 'Booked',
+      unpaid: lang === 'fa' ? 'قید شده' : 'Reserved',
       currentTicket: lang === 'fa' ? 'تکت فعلی' : 'Current Ticket',
     },
     seatTypes: {
@@ -19,14 +19,14 @@ export const getSeatSelectorTranslations = (lang: 'en' | 'fa' = 'en') => {
           ? 'لطفاً یک سفر و تاریخ سفر را برای مشاهده نقشه صندلی انتخاب کنید.'
           : 'Please select a trip and travel date to view the seat map.',
       loadingSeatMap: lang === 'fa' ? 'در حال بارگذاری نقشه صندلی...' : 'Loading seat map…',
-      seatBookedBy: lang === 'fa' ? 'رزرو شده توسط' : 'booked by',
-      seatReservedBy: lang === 'fa' ? 'رزرو موقت توسط' : 'reserved by',
+      seatBookedBy: lang === 'fa' ? 'بوک شده توسط' : 'booked by',
+      seatReservedBy: lang === 'fa' ? 'قید شده توسط' : 'reserved by',
       ticket: lang === 'fa' ? 'تکت' : 'Ticket',
       clickToSelect:
         lang === 'fa'
           ? 'برای انتخاب، روی صندلی‌های موجود کلیک کنید.'
           : 'Click on available seats to select them for booking.',
-      yourExistingBooking: lang === 'fa' ? 'رزرو فعلی شما' : 'Your existing booking',
+      yourExistingBooking: lang === 'fa' ? 'تکت فعلی شما' : 'Your existing booking',
     },
     labels: {
       selectedSeats: lang === 'fa' ? 'صندلی‌های انتخاب شده' : 'Selected Seats',

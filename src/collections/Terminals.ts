@@ -25,7 +25,7 @@ export const Terminals: CollectionConfig = {
     {
       name: 'name',
       label: {
-        en: 'name',
+        en: 'Name',
         fa: 'نام',
       },
       type: 'text',
@@ -34,7 +34,7 @@ export const Terminals: CollectionConfig = {
     {
       name: 'province',
       label: {
-        en: 'province',
+        en: 'Province',
         fa: 'ولایت',
       },
       type: 'text',
@@ -43,7 +43,7 @@ export const Terminals: CollectionConfig = {
     {
       name: 'address',
       label: {
-        en: 'address',
+        en: 'Address',
         fa: 'آدرس',
       },
       type: 'textarea',

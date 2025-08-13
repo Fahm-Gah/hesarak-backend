@@ -37,8 +37,8 @@ export const Tickets: CollectionConfig = {
       limits: [10, 25, 50, 100, 200],
     },
     group: {
-      en: 'Bookings',
-      fa: 'رزروها',
+      en: 'Bookings & Reservation System',
+      fa: 'سیستم بوکینگ و قید کردن تکت',
     },
   },
   disableDuplicate: true,
@@ -46,7 +46,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'ticketNumber',
       label: {
-        en: 'ticket number',
+        en: 'Ticket Number',
         fa: 'شماره تکت',
       },
       type: 'text',
@@ -59,7 +59,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'passenger',
       label: {
-        en: 'passenger',
+        en: 'Passenger',
         fa: 'مسافر',
       },
       type: 'relationship',
@@ -72,7 +72,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'trip',
       label: {
-        en: 'trip',
+        en: 'Trip',
         fa: 'سفر',
       },
       type: 'relationship',
@@ -87,7 +87,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'from',
       label: {
-        en: 'from',
+        en: 'From',
         fa: 'مبدأ',
       },
       type: 'relationship',
@@ -102,7 +102,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'to',
       label: {
-        en: 'to',
+        en: 'To',
         fa: 'مقصد',
       },
       type: 'relationship',
@@ -136,7 +136,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'date',
       label: {
-        en: 'date',
+        en: 'Date',
         fa: 'تاریخ',
       },
       type: 'date',
@@ -172,7 +172,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'pricePerTicket',
       label: {
-        en: 'price per ticket',
+        en: 'Price Per Ticket',
         fa: 'قیمت هر تکت',
       },
       type: 'number',
@@ -187,7 +187,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'totalPrice',
       label: {
-        en: 'total price',
+        en: 'Total Price',
         fa: 'قیمت مجموعه',
       },
       type: 'number',
@@ -204,7 +204,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'isPaid',
       label: {
-        en: 'is paid',
+        en: 'Is Paid',
         fa: 'پرداخت شده',
       },
       type: 'checkbox',
@@ -217,7 +217,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'isCancelled',
       label: {
-        en: 'is cancelled',
+        en: 'Is Cancelled',
         fa: 'لغو شده',
       },
       type: 'checkbox',
@@ -234,7 +234,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'bookedBy',
       label: {
-        en: 'booked by',
+        en: 'Booked By',
         fa: 'لغو شده',
       },
       type: 'relationship',
@@ -247,7 +247,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'paymentDeadline',
       label: {
-        en: 'payment deadline',
+        en: 'Payment Deadline',
         fa: 'مهلت پرداخت',
       },
       type: 'date',

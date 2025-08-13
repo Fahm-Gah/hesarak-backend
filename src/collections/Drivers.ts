@@ -26,7 +26,7 @@ export const Drivers: CollectionConfig = {
     {
       name: 'fullName',
       label: {
-        en: 'full name',
+        en: 'Full Name',
         fa: 'نام کامل',
       },
       type: 'text',
@@ -35,7 +35,7 @@ export const Drivers: CollectionConfig = {
     {
       name: 'fatherName',
       label: {
-        en: 'father name',
+        en: 'Father Name',
         fa: 'نام پدر',
       },
       type: 'text',
@@ -43,7 +43,7 @@ export const Drivers: CollectionConfig = {
     {
       name: 'phoneNumber',
       label: {
-        en: 'phone number',
+        en: 'Phone Number',
         fa: 'شماره تلفن',
       },
       type: 'text',
@@ -53,7 +53,7 @@ export const Drivers: CollectionConfig = {
     {
       name: 'licenseNumber',
       label: {
-        en: 'license number',
+        en: 'License Number',
         fa: 'شماره لایسنس',
       },
       type: 'text',
@@ -62,7 +62,7 @@ export const Drivers: CollectionConfig = {
     {
       name: 'isActive',
       label: {
-        en: 'isActive',
+        en: 'Is Active',
         fa: 'فعال',
       },
       type: 'checkbox',

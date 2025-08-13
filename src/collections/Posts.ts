@@ -34,7 +34,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'title',
       label: {
-        en: 'title',
+        en: 'Title',
         fa: 'عنوان',
       },
       type: 'text',
@@ -43,7 +43,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'image',
       label: {
-        en: 'image',
+        en: 'Image',
         fa: 'عکس',
       },
       type: 'upload',
@@ -75,7 +75,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'author',
       label: {
-        en: 'author',
+        en: 'Author',
         fa: 'نویسنده',
       },
       type: 'relationship',
@@ -87,7 +87,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'publishedAt',
       label: {
-        en: 'published at',
+        en: 'Published At',
         fa: 'منتشر شده در',
       },
       type: 'date',

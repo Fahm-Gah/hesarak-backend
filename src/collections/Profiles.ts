@@ -19,15 +19,15 @@ export const Profiles: CollectionConfig = {
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'fatherName', 'phoneNumber', 'gender'],
     group: {
-      en: 'Bookings',
-      fa: 'رزروها',
+      en: 'Bookings & Reservation System',
+      fa: 'سیستم بوکینگ و قید کردن تکت',
     },
   },
   fields: [
     {
       name: 'fullName',
       label: {
-        en: 'full name',
+        en: 'Full Name',
         fa: 'نام کامل',
       },
       type: 'text',
@@ -38,7 +38,7 @@ export const Profiles: CollectionConfig = {
     {
       name: 'fatherName',
       label: {
-        en: 'father name',
+        en: 'Father Name',
         fa: 'نام پدر',
       },
       type: 'text',
@@ -48,7 +48,7 @@ export const Profiles: CollectionConfig = {
     {
       name: 'phoneNumber',
       label: {
-        en: 'phone number',
+        en: 'Phone Number',
         fa: 'شماره تلفن',
       },
       type: 'text',
@@ -57,7 +57,7 @@ export const Profiles: CollectionConfig = {
     {
       name: 'gender',
       label: {
-        en: 'gender',
+        en: 'Gender',
         fa: 'جنسیت',
       },
       type: 'select',

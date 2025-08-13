@@ -26,7 +26,7 @@ export const Buses: CollectionConfig = {
     {
       name: 'number',
       label: {
-        en: 'number',
+        en: 'Number',
         fa: 'شماره',
       },
       type: 'text',
@@ -35,7 +35,7 @@ export const Buses: CollectionConfig = {
     {
       name: 'type',
       label: {
-        en: 'type',
+        en: 'Type',
         fa: 'نوع',
       },
       type: 'relationship',
@@ -45,7 +45,7 @@ export const Buses: CollectionConfig = {
     {
       name: 'images',
       label: {
-        en: 'images',
+        en: 'Images',
         fa: 'عکس ها',
       },
       type: 'upload',

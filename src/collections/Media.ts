@@ -24,7 +24,7 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       label: {
-        en: 'alt',
+        en: 'Alt',
         fa: 'شرح تصویر',
       },
       type: 'text',
