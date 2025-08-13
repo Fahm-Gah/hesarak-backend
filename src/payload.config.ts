@@ -7,6 +7,9 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
+import { en } from '@payloadcms/translations/languages/en'
+import { fa } from '@payloadcms/translations/languages/fa'
+
 import { Users } from './collections/Users'
 import { Profiles } from './collections/Profiles'
 import { Media } from './collections/Media'
@@ -36,6 +39,16 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+  },
+  // i18n configuration with Persian as default
+  i18n: {
+    // Set Persian as the fallback (default) language
+    fallbackLanguage: 'fa',
+    // Support both Persian and English
+    supportedLanguages: {
+      fa: fa as any,
+      en: en as any,
     },
   },
   collections: [

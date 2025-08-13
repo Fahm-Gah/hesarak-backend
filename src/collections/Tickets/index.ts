@@ -11,6 +11,16 @@ import { ticketsAccess } from '@/access/accessControls'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
+  labels: {
+    singular: {
+      en: 'Ticket',
+      fa: 'تکت',
+    },
+    plural: {
+      en: 'Tickets',
+      fa: 'تکت‌ها',
+    },
+  },
   access: ticketsAccess,
   enableQueryPresets: true,
   admin: {
@@ -23,15 +33,22 @@ export const Tickets: CollectionConfig = {
       'toTerminalName',
     ],
     pagination: {
-      defaultLimit: 50,
+      defaultLimit: 10,
       limits: [10, 25, 50, 100, 200],
     },
-    group: 'Bookings',
+    group: {
+      en: 'Bookings',
+      fa: 'رزروها',
+    },
   },
   disableDuplicate: true,
   fields: [
     {
       name: 'ticketNumber',
+      label: {
+        en: 'ticket number',
+        fa: 'شماره تکت',
+      },
       type: 'text',
       unique: true,
       admin: {
@@ -41,6 +58,10 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: 'passenger',
+      label: {
+        en: 'passenger',
+        fa: 'مسافر',
+      },
       type: 'relationship',
       relationTo: 'profiles',
       required: true,
@@ -50,6 +71,10 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: 'trip',
+      label: {
+        en: 'trip',
+        fa: 'سفر',
+      },
       type: 'relationship',
       relationTo: 'trip-schedules',
       required: true,
@@ -61,6 +86,10 @@ export const Tickets: CollectionConfig = {
     // Hidden relationship fields for database queries and joins
     {
       name: 'from',
+      label: {
+        en: 'from',
+        fa: 'مبدأ',
+      },
       type: 'relationship',
       relationTo: 'terminals',
       required: false,
@@ -72,6 +101,10 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: 'to',
+      label: {
+        en: 'to',
+        fa: 'مقصد',
+      },
       type: 'relationship',
       relationTo: 'terminals',
       required: false,
@@ -102,6 +135,10 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: 'date',
+      label: {
+        en: 'date',
+        fa: 'تاریخ',
+      },
       type: 'date',
       required: true,
       validate: validateTripDate,
@@ -134,24 +171,42 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: 'pricePerTicket',
+      label: {
+        en: 'price per ticket',
+        fa: 'قیمت هر تکت',
+      },
       type: 'number',
       admin: {
-        description: "Override price per seat (leave empty to use the trip's default price)",
+        description: {
+          en: "Override price per seat (leave empty to use the trip's default price)",
+          fa: 'قیمت سفارشی برای هر صندلی (خالی بگذارید تا قیمت پیش‌فرض سفر استفاده شود)',
+        },
         position: 'sidebar',
       },
     },
     {
       name: 'totalPrice',
+      label: {
+        en: 'total price',
+        fa: 'قیمت مجموعه',
+      },
       type: 'number',
       admin: {
         readOnly: true,
-        description: 'Automatically calculated based on seats and price',
+        description: {
+          en: 'Automatically calculated based on seats and price',
+          fa: 'به صورت خودکار بر اساس صندلی‌ها و قیمت محاسبه می‌شود',
+        },
         position: 'sidebar',
       },
       index: true,
     },
     {
       name: 'isPaid',
+      label: {
+        en: 'is paid',
+        fa: 'پرداخت شده',
+      },
       type: 'checkbox',
       defaultValue: true,
       admin: {
@@ -161,16 +216,27 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: 'isCancelled',
+      label: {
+        en: 'is cancelled',
+        fa: 'لغو شده',
+      },
       type: 'checkbox',
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description: 'Mark as cancelled (keeps record but frees seats)',
+        description: {
+          en: 'Mark as cancelled (keeps record but frees seats)',
+          fa: 'علامت‌گذاری به عنوان لغو شده (سابقه حفظ می‌شود اما صندلی‌ها آزاد می‌شوند)',
+        },
       },
       index: true,
     },
     {
       name: 'bookedBy',
+      label: {
+        en: 'booked by',
+        fa: 'لغو شده',
+      },
       type: 'relationship',
       relationTo: 'users',
       admin: {
@@ -180,11 +246,18 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: 'paymentDeadline',
+      label: {
+        en: 'payment deadline',
+        fa: 'مهلت پرداخت',
+      },
       type: 'date',
       admin: {
         position: 'sidebar',
         condition: (data) => !data.isPaid,
-        description: 'Payment deadline for unpaid tickets',
+        description: {
+          en: 'Payment deadline for unpaid tickets',
+          fa: 'مهلت پرداخت برای تکت‌های پرداخت نشده',
+        },
         hidden: true,
       },
     },

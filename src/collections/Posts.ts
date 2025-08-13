@@ -11,24 +11,48 @@ import { postsAccess } from '@/access/accessControls'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
+  labels: {
+    singular: {
+      en: 'Post',
+      fa: 'پست',
+    },
+    plural: {
+      en: 'Posts',
+      fa: 'پست‌ها',
+    },
+  },
   access: postsAccess,
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'updatedAt'],
-    group: 'Content',
+    group: {
+      en: 'Content',
+      fa: 'محتوا',
+    },
   },
   fields: [
     {
       name: 'title',
+      label: {
+        en: 'title',
+        fa: 'عنوان',
+      },
       type: 'text',
       required: true,
     },
     {
       name: 'image',
+      label: {
+        en: 'image',
+        fa: 'عکس',
+      },
       type: 'upload',
       relationTo: 'media',
       admin: {
-        description: 'Upload an image for the post',
+        description: {
+          en: 'Upload an image for the post',
+          fa: 'بارگذاری تصویر برای پست',
+        },
       },
     },
     {
@@ -50,6 +74,10 @@ export const Posts: CollectionConfig = {
     },
     {
       name: 'author',
+      label: {
+        en: 'author',
+        fa: 'نویسنده',
+      },
       type: 'relationship',
       admin: {
         position: 'sidebar',
@@ -58,6 +86,10 @@ export const Posts: CollectionConfig = {
     },
     {
       name: 'publishedAt',
+      label: {
+        en: 'published at',
+        fa: 'منتشر شده در',
+      },
       type: 'date',
       admin: {
         date: {

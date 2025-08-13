@@ -172,10 +172,6 @@ export interface User {
    */
   roles: ('customer' | 'editor' | 'agent' | 'driver' | 'admin' | 'superadmin' | 'dev')[];
   /**
-   * Terminals where this agent works
-   */
-  terminal?: (string | Terminal)[] | null;
-  /**
    * Whether the user account is active
    */
   isActive?: boolean | null;
@@ -217,11 +213,8 @@ export interface User {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Account creation date
-   */
-  createdAt: string;
   updatedAt: string;
+  createdAt: string;
   email?: string | null;
   /**
    * Phone number in E.164 format (automatically normalized to AF)
@@ -252,18 +245,6 @@ export interface Profile {
   fatherName?: string | null;
   phoneNumber?: string | null;
   gender?: ('male' | 'female') | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "terminals".
- */
-export interface Terminal {
-  id: string;
-  name: string;
-  province: string;
-  address: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -355,6 +336,18 @@ export interface BusType {
     | boolean
     | null;
   capacity?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "terminals".
+ */
+export interface Terminal {
+  id: string;
+  name: string;
+  province: string;
+  address: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -709,7 +702,6 @@ export interface UsersSelect<T extends boolean = true> {
   normalizedPhone?: T;
   profile?: T;
   roles?: T;
-  terminal?: T;
   isActive?: T;
   lastLoginAt?: T;
   location?:
@@ -737,8 +729,8 @@ export interface UsersSelect<T extends boolean = true> {
         timestamp?: T;
         id?: T;
       };
-  createdAt?: T;
   updatedAt?: T;
+  createdAt?: T;
   email?: T;
   username?: T;
   resetPasswordToken?: T;

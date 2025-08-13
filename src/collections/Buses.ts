@@ -3,31 +3,59 @@ import type { CollectionConfig } from 'payload'
 
 export const Buses: CollectionConfig = {
   slug: 'buses',
+  labels: {
+    singular: {
+      en: 'Bus',
+      fa: 'بس',
+    },
+    plural: {
+      en: 'Buses',
+      fa: 'بس‌ها',
+    },
+  },
   access: busesAccess,
   admin: {
     useAsTitle: 'number',
     defaultColumns: ['number', 'type'],
-    group: 'Operations',
+    group: {
+      en: 'Operations',
+      fa: 'عملیات',
+    },
   },
   fields: [
     {
       name: 'number',
+      label: {
+        en: 'number',
+        fa: 'شماره',
+      },
       type: 'text',
       required: true,
     },
     {
       name: 'type',
+      label: {
+        en: 'type',
+        fa: 'نوع',
+      },
       type: 'relationship',
       required: true,
       relationTo: 'bus-types',
     },
     {
       name: 'images',
+      label: {
+        en: 'images',
+        fa: 'عکس ها',
+      },
       type: 'upload',
       relationTo: 'media',
       hasMany: true,
       admin: {
-        description: 'Images of the Bus',
+        description: {
+          en: 'Images of the Bus',
+          fa: 'تصاویر بس',
+        },
       },
     },
   ],

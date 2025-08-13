@@ -10,12 +10,25 @@ import {
 
 export const Users: CollectionConfig = {
   slug: 'users',
+  labels: {
+    singular: {
+      en: 'User',
+      fa: 'کاربر',
+    },
+    plural: {
+      en: 'Users',
+      fa: 'کاربران',
+    },
+  },
   access: usersAccess,
   enableQueryPresets: true,
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['profile', 'email', 'username', 'roles', 'isActive'],
-    group: 'Users & Access',
+    group: {
+      en: 'Users & Access',
+      fa: 'کاربران و دسترسی',
+    },
   },
   auth: {
     cookies: {
@@ -33,13 +46,19 @@ export const Users: CollectionConfig = {
   fields: [
     {
       name: 'username',
-      label: 'Phone Number',
+      label: {
+        en: 'Phone Number',
+        fa: 'شماره تلفن',
+      },
       type: 'text',
       required: true,
       unique: true,
       index: true,
       admin: {
-        description: 'Phone number in E.164 format (automatically normalized to AF)',
+        description: {
+          en: 'Phone number in E.164 format (automatically normalized to AF)',
+          fa: 'شماره تلفن به فرمت E.164 (به صورت خودکار به AF نرمال می‌شود)',
+        },
       },
       validate: (value: any) => {
         if (!value) return 'Phone number is required'
@@ -66,37 +85,54 @@ export const Users: CollectionConfig = {
       unique: true,
       index: true,
       admin: {
-        readOnly: true,
-        description: 'E.164 formatted phone number (auto-generated)',
+        hidden: true,
+        description: {
+          en: 'E.164 formatted phone number (auto-generated)',
+          fa: 'شماره تلفن به فرمت E.164 (تولید خودکار)',
+        },
         position: 'sidebar',
       },
     },
     {
       name: 'profile',
+      label: {
+        en: 'profile',
+        fa: 'پروفایل',
+      },
       type: 'relationship',
       relationTo: 'profiles',
       required: false,
       admin: {
-        description: 'User profile information',
+        description: {
+          en: 'User profile information',
+          fa: 'اطلاعات پروفایل کاربر',
+        },
       },
     },
     {
       name: 'roles',
+      label: {
+        en: 'roles',
+        fa: 'وظایف',
+      },
       type: 'select',
       options: [
-        { label: 'Customer', value: 'customer' },
-        { label: 'Editor', value: 'editor' },
-        { label: 'Agent', value: 'agent' },
-        { label: 'Driver', value: 'driver' },
-        { label: 'Admin', value: 'admin' },
-        { label: 'Super Admin', value: 'superadmin' },
-        { label: 'Developer', value: 'dev' },
+        { label: { en: 'Customer', fa: 'مشتری' }, value: 'customer' },
+        { label: { en: 'Editor', fa: 'ویرایشگر' }, value: 'editor' },
+        { label: { en: 'Agent', fa: 'نماینده' }, value: 'agent' },
+        { label: { en: 'Driver', fa: 'راننده' }, value: 'driver' },
+        { label: { en: 'Admin', fa: 'مدیر' }, value: 'admin' },
+        { label: { en: 'Super Admin', fa: 'مدیر ارشد' }, value: 'superadmin' },
+        { label: { en: 'Developer', fa: 'مدیر وب سایت' }, value: 'dev' },
       ],
       defaultValue: 'customer',
       required: true,
       hasMany: true,
       admin: {
-        description: 'User roles and permissions',
+        description: {
+          en: 'User roles and permissions',
+          fa: 'نقش‌ها و دسترسی‌های کاربر',
+        },
       },
       // Only admins can change roles
       access: {
@@ -105,36 +141,31 @@ export const Users: CollectionConfig = {
       },
     },
     {
-      name: 'terminal',
-      type: 'relationship',
-      relationTo: 'terminals',
-      required: false,
-      hasMany: true,
-      admin: {
-        condition: (_, { roles }) => roles?.includes('agent'),
-        description: 'Terminals where this agent works',
-      },
-      // Only admins can assign terminals
-      access: {
-        create: fieldAccessAdminOnly,
-        update: fieldAccessAdminOnly,
-      },
-    },
-    {
       name: 'isActive',
+      label: {
+        en: 'is active',
+        fa: 'فعال',
+      },
       type: 'checkbox',
       defaultValue: true,
       admin: {
-        description: 'Whether the user account is active',
+        description: {
+          en: 'Whether the user account is active',
+          fa: 'آیا حساب کاربری فعال است',
+        },
       },
       // Only admins can activate/deactivate users
       access: {
-        create: fieldAccessAdminOnly,
-        update: fieldAccessAdminOnly,
+        create: fieldAccessSuperAdminOnly,
+        update: fieldAccessSuperAdminOnly,
       },
     },
     {
       name: 'lastLoginAt',
+      label: {
+        en: 'last login at',
+        fa: 'آخرین ورود در',
+      },
       type: 'date',
       admin: {
         readOnly: true,
@@ -152,19 +183,11 @@ export const Users: CollectionConfig = {
         components: {
           Field: '@/components/UserLocation',
         },
-        // Runs in the Admin UI — must be sync and return a boolean
         condition: (data, siblingData, { user }: any) => {
-          // If there's no admin user, hide the UI
           if (!user) return false
-
-          // user can sometimes be a string ID only — handle that conservatively
           if (typeof user === 'string') return false
-
-          // roles may be on the user object in the Admin UI
           const roles = Array.isArray(user.roles) ? user.roles : []
-
-          // allow only superadmin (or expand to admin/dev)
-          return roles.includes('superadmin', 'dev')
+          return roles.includes('superadmin') || roles.includes('dev')
         },
       },
     },
@@ -172,10 +195,16 @@ export const Users: CollectionConfig = {
     {
       name: 'location',
       type: 'group',
-      label: 'Location Information',
+      label: {
+        en: 'Location Information',
+        fa: 'اطلاعات موقعیت',
+      },
       admin: {
-        description: 'User location data from browser or IP geolocation',
-        condition: () => false, // Hide the raw fields, show only through UI component
+        description: {
+          en: 'User location data from browser or IP geolocation',
+          fa: 'داده‌های موقعیت کاربر از مرورگر یا موقعیت IP',
+        },
+        condition: () => false, // Hide the raw fields
       },
       // Only the user themselves or admins can view location data
       access: {
@@ -186,63 +215,96 @@ export const Users: CollectionConfig = {
         {
           name: 'coordinates',
           type: 'point',
-          label: 'Geographic Coordinates',
+          label: {
+            en: 'Geographic Coordinates',
+            fa: 'مختصات جغرافیایی',
+          },
         },
         {
           name: 'accuracy',
           type: 'number',
-          label: 'Location Accuracy (meters)',
+          label: {
+            en: 'Location Accuracy (meters)',
+            fa: 'دقت موقعیت (متر)',
+          },
         },
         {
           name: 'city',
           type: 'text',
-          label: 'City',
+          label: {
+            en: 'City',
+            fa: 'شهر',
+          },
         },
         {
           name: 'region',
           type: 'text',
-          label: 'Region/State',
+          label: {
+            en: 'Region/State',
+            fa: 'منطقه/ولایت',
+          },
         },
         {
           name: 'country',
           type: 'text',
-          label: 'Country',
+          label: {
+            en: 'Country',
+            fa: 'کشور',
+          },
         },
         {
           name: 'countryCode',
           type: 'text',
-          label: 'Country Code',
+          label: {
+            en: 'Country Code',
+            fa: 'کد کشور',
+          },
           maxLength: 2,
         },
         {
           name: 'timezone',
           type: 'text',
-          label: 'Timezone',
+          label: {
+            en: 'Timezone',
+            fa: 'منطقه زمانی',
+          },
         },
         {
           name: 'source',
           type: 'select',
-          label: 'Location Source',
+          label: {
+            en: 'Location Source',
+            fa: 'منبع موقعیت',
+          },
           options: [
-            { label: 'Browser Geolocation', value: 'browser' },
-            { label: 'IP Geolocation', value: 'ip' },
-            { label: 'Manual Entry', value: 'manual' },
+            { label: { en: 'Browser Geolocation', fa: 'موقعیت مرورگر' }, value: 'browser' },
+            { label: { en: 'IP Geolocation', fa: 'موقعیت IP' }, value: 'ip' },
+            { label: { en: 'Manual Entry', fa: 'ورود دستی' }, value: 'manual' },
           ],
         },
         {
           name: 'ipAddress',
           type: 'text',
-          label: 'IP Address',
+          label: {
+            en: 'IP Address',
+            fa: 'آدرس IP',
+          },
         },
         {
           name: 'lastUpdated',
           type: 'date',
-          label: 'Location Last Updated',
+          label: {
+            en: 'Location Last Updated',
+            fa: 'آخرین بروزرسانی موقعیت',
+          },
         },
         {
           name: 'permissionGranted',
           type: 'checkbox',
-          label: 'Location Permission Granted',
+          label: {
+            en: 'Location Permission Granted',
+            fa: 'اجازه موقعیت داده شده',
+          },
           defaultValue: false,
         },
       ],
@@ -250,9 +312,15 @@ export const Users: CollectionConfig = {
     {
       name: 'locationHistory',
       type: 'array',
-      label: 'Location History',
+      label: {
+        en: 'Location History',
+        fa: 'تاریخچه موقعیت',
+      },
       admin: {
-        description: 'Historical location data (last 10 entries)',
+        description: {
+          en: 'Historical location data (last 10 entries)',
+          fa: 'داده‌های تاریخی موقعیت (آخرین ۱۰ مورد)',
+        },
         hidden: true,
       },
       // Only admins can view location history
@@ -265,42 +333,45 @@ export const Users: CollectionConfig = {
         {
           name: 'coordinates',
           type: 'point',
-          label: 'Coordinates',
+          label: {
+            en: 'Coordinates',
+            fa: 'مختصات',
+          },
         },
         {
           name: 'city',
           type: 'text',
-          label: 'City',
+          label: {
+            en: 'City',
+            fa: 'شهر',
+          },
         },
         {
           name: 'country',
           type: 'text',
-          label: 'Country',
+          label: {
+            en: 'Country',
+            fa: 'کشور',
+          },
         },
         {
           name: 'source',
           type: 'select',
           options: [
-            { label: 'Browser', value: 'browser' },
-            { label: 'IP', value: 'ip' },
+            { label: { en: 'Browser', fa: 'مرورگر' }, value: 'browser' },
+            { label: { en: 'IP', fa: 'IP' }, value: 'ip' },
           ],
         },
         {
           name: 'timestamp',
           type: 'date',
-          label: 'Recorded At',
+          label: {
+            en: 'Recorded At',
+            fa: 'ثبت شده در',
+          },
         },
       ],
       maxRows: 10,
-    },
-    {
-      name: 'createdAt',
-      type: 'date',
-      admin: {
-        readOnly: true,
-        description: 'Account creation date',
-        position: 'sidebar',
-      },
     },
   ],
   hooks: {
