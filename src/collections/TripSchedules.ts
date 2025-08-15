@@ -78,6 +78,9 @@ export const TripSchedules: CollectionConfig = {
         date: {
           pickerAppearance: 'timeOnly',
         },
+        components: {
+          Field: '@/components/PersianDatePickerField',
+        },
         description: {
           en: 'Departure time (recurring)',
           fa: 'زمان حرکت (تکرار شونده)',
@@ -133,6 +136,9 @@ export const TripSchedules: CollectionConfig = {
           admin: {
             date: {
               pickerAppearance: 'timeOnly',
+            },
+            components: {
+              Field: '@/components/PersianDatePickerField',
             },
           },
           required: true,

@@ -58,32 +58,19 @@ export const TripRecords: CollectionConfig = {
     },
     {
       name: 'date',
+      type: 'date',
       label: {
         en: 'Date',
         fa: 'تاریخ',
       },
-      type: 'date',
-      required: true,
-    },
-    {
-      name: 'from',
-      label: {
-        en: 'From',
-        fa: 'مبدا',
+      admin: {
+        components: {
+          Field: '@/components/PersianDatePickerField',
+        },
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
       },
-      type: 'relationship',
-      relationTo: 'terminals',
-      required: true,
-    },
-    {
-      name: 'to',
-      label: {
-        en: 'To',
-        fa: 'مقصد',
-      },
-      type: 'relationship',
-      relationTo: 'terminals',
-      required: true,
     },
   ],
 }

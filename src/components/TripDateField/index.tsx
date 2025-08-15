@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
-import { DateTimeField, useFormFields } from '@payloadcms/ui'
+import { useFormFields, useField, useTranslation } from '@payloadcms/ui'
 import type { DateFieldClientComponent } from 'payload'
+import { PersianDatePicker } from '../PersianDatePickerField'
 
 interface TripSchedule {
   id: string
@@ -12,8 +13,10 @@ interface TripSchedule {
 }
 
 const TripDateFieldClient: DateFieldClientComponent = (props) => {
-  const { field, path } = props
+  const { path, field, readOnly = false } = props
   const tripField = useFormFields(([fields]) => fields.trip)
+  const { value, setValue } = useField<string | null>({ path })
+  const { i18n } = useTranslation()
   const [tripSchedule, setTripSchedule] = useState<TripSchedule | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -34,24 +37,21 @@ const TripDateFieldClient: DateFieldClientComponent = (props) => {
       setLoading(true)
       try {
         const response = await fetch(`/api/trip-schedules/${tripId}?depth=0`, {
-          signal: abortController.signal, // Allow request cancellation
+          signal: abortController.signal,
         })
 
         if (response.ok) {
           const data = await response.json()
 
-          // Only update state if component is still mounted and request wasn't aborted
           if (isMounted && !abortController.signal.aborted) {
             setTripSchedule(data)
           }
         }
       } catch (error) {
-        // Don't log errors for aborted requests (normal cleanup)
         if (error instanceof Error && error.name !== 'AbortError') {
           console.error('Error fetching trip schedule:', error)
         }
       } finally {
-        // Only update loading state if component is still mounted
         if (isMounted) {
           setLoading(false)
         }
@@ -60,23 +60,19 @@ const TripDateFieldClient: DateFieldClientComponent = (props) => {
 
     fetchTripSchedule()
 
-    // Cleanup function - runs when effect cleans up
     return () => {
       isMounted = false
-      abortController.abort() // Cancel the ongoing request
+      abortController.abort()
     }
   }, [tripId])
 
-  // Create a custom filter function for react-datepicker
   const filterDate = useCallback(
     (date: Date): boolean => {
       if (!tripSchedule) return true
       if (!tripSchedule.isActive) return false
 
-      // Allow all dates if daily
       if (tripSchedule.frequency === 'daily') return true
 
-      // Check specific days
       if (tripSchedule.frequency === 'specific-days' && tripSchedule.days) {
         const dayOfWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][date.getDay()]
         return tripSchedule.days.includes(dayOfWeek)
@@ -87,36 +83,47 @@ const TripDateFieldClient: DateFieldClientComponent = (props) => {
     [tripSchedule],
   )
 
-  // Create enhanced field - cast to any to bypass TypeScript restrictions
-  const enhancedField = useMemo(() => {
-    const fieldCopy = { ...field } as any
+  const handleDateChange = useCallback(
+    (date: Date | null) => {
+      if (date) {
+        setValue(date.toISOString())
+      } else {
+        setValue(null)
+      }
+    },
+    [setValue],
+  )
 
-    // Ensure admin object exists
-    if (!fieldCopy.admin) fieldCopy.admin = {}
+  const dateValue = useMemo(() => {
+    return value ? new Date(value) : null
+  }, [value])
 
-    // Ensure date object exists
-    if (!fieldCopy.admin.date) fieldCopy.admin.date = {}
-
-    // Ensure overrides object exists
-    if (!fieldCopy.admin.date.overrides) fieldCopy.admin.date.overrides = {}
-
-    // Add our custom overrides
-    fieldCopy.admin.date.overrides = {
-      ...fieldCopy.admin.date.overrides,
-      filterDate,
-      minDate: new Date(),
-      placeholderText: loading
-        ? 'Loading schedule...'
-        : !tripId
-          ? 'Select a trip first'
-          : 'Select date',
-      disabled: !tripId || loading,
-    }
-
-    return fieldCopy
-  }, [field, filterDate, loading, tripId])
-
-  return <DateTimeField {...props} field={enhancedField} />
+  return (
+    <PersianDatePicker
+      path={path}
+      field={field as any}
+      value={dateValue}
+      onChange={handleDateChange}
+      filterDate={filterDate}
+      minDate={new Date()}
+      disabled={!tripId || loading}
+      readOnly={readOnly}
+      placeholderText={
+        loading
+          ? i18n.language === 'fa'
+            ? 'در حال بارگذاری برنامه...'
+            : 'Loading schedule...'
+          : !tripId
+            ? i18n.language === 'fa'
+              ? 'ابتدا سفری را انتخاب کنید'
+              : 'Select a trip first'
+            : i18n.language === 'fa'
+              ? 'تاریخ را انتخاب کنید'
+              : 'Select date'
+      }
+      pickerAppearance={(field?.admin as any)?.date?.pickerAppearance || 'dayOnly'}
+    />
+  )
 }
 
 export default TripDateFieldClient

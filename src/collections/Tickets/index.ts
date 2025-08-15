@@ -259,6 +259,12 @@ export const Tickets: CollectionConfig = {
           fa: 'مهلت پرداخت برای تکت‌های پرداخت نشده',
         },
         hidden: true,
+        components: {
+          Field: '@/components/PersianDatePickerField',
+        },
+        date: {
+          pickerAppearance: 'timeOnly',
+        },
       },
     },
   ],

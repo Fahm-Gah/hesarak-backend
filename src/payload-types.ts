@@ -437,9 +437,7 @@ export interface TripRecord {
   driver: string | Driver;
   bus: string | Bus;
   commission: number;
-  date: string;
-  from: string | Terminal;
-  to: string | Terminal;
+  date?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -881,8 +879,6 @@ export interface TripRecordsSelect<T extends boolean = true> {
   bus?: T;
   commission?: T;
   date?: T;
-  from?: T;
-  to?: T;
   updatedAt?: T;
   createdAt?: T;
 }

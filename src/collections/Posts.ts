@@ -95,6 +95,9 @@ export const Posts: CollectionConfig = {
         date: {
           pickerAppearance: 'dayAndTime',
         },
+        components: {
+          Field: '@/components/PersianDatePickerField',
+        },
         position: 'sidebar',
       },
       hooks: {

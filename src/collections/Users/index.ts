@@ -2,11 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import { normalizePhone } from './hooks/normalizePhone'
 import { updateLastLogin } from './hooks/updateLastLogin'
-import {
-  fieldAccessAdminOnly,
-  fieldAccessSuperAdminOnly,
-  usersAccess,
-} from '@/access/accessControls'
+import { fieldAccessSuperAdminOnly, usersAccess } from '@/access/accessControls'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -173,6 +169,9 @@ export const Users: CollectionConfig = {
         date: {
           pickerAppearance: 'dayAndTime',
         },
+        components: {
+          Field: '@/components/PersianDatePickerField',
+        },
       },
     },
     // Location UI Field for Admin Panel
@@ -204,7 +203,7 @@ export const Users: CollectionConfig = {
           en: 'User location data from browser or IP geolocation',
           fa: 'داده‌های موقعیت کاربر از مرورگر یا موقعیت IP',
         },
-        condition: () => false, // Hide the raw fields
+        // condition: () => false, // Hide the raw fields
       },
       // Only the user themselves or admins can view location data
       access: {
@@ -293,6 +292,15 @@ export const Users: CollectionConfig = {
         {
           name: 'lastUpdated',
           type: 'date',
+          admin: {
+            components: {
+              Field: '@/components/PersianDatePickerField',
+            },
+            date: {
+              pickerAppearance: 'dayAndTime',
+            },
+            readOnly: true,
+          },
           label: {
             en: 'Location Last Updated',
             fa: 'آخرین بروزرسانی موقعیت',
@@ -325,9 +333,9 @@ export const Users: CollectionConfig = {
       },
       // Only admins can view location history
       access: {
-        read: fieldAccessAdminOnly,
-        create: fieldAccessAdminOnly,
-        update: fieldAccessAdminOnly,
+        read: fieldAccessSuperAdminOnly,
+        create: fieldAccessSuperAdminOnly,
+        update: fieldAccessSuperAdminOnly,
       },
       fields: [
         {
@@ -368,6 +376,14 @@ export const Users: CollectionConfig = {
           label: {
             en: 'Recorded At',
             fa: 'ثبت شده در',
+          },
+          admin: {
+            components: {
+              Field: '@/components/TripDateField',
+            },
+            date: {
+              pickerAppearance: 'dayAndTime',
+            },
           },
         },
       ],
