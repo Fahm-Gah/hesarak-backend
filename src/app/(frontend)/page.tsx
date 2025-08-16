@@ -1,9 +1,10 @@
 import React from 'react'
-
-import config from '@/payload.config'
+import { HeroSection } from '@/components/HeroSection'
 
 export default async function HomePage() {
-  const payloadConfig = await config
-
-  return <div className="home"></div>
+  return (
+    <div className="min-h-screen">
+      <HeroSection />
+    </div>
+  )
 }

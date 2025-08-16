@@ -1,0 +1,23 @@
+/* Custom styles for the trip search form */
+
+/* Date input styling for webkit browsers */
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+/* Focus states for better accessibility */
+.focus-ring:focus {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+}
+
+/* Custom select dropdown arrow styling */
+select {
+  background-image: none;
+}
+
+/* Ensure proper hover states */
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
