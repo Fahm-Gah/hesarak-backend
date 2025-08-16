@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getClientSideURL } from '../../../../utils/getURL'
+import { getClientSideURL } from '@/utils/getURL'
 
 export const LogoutClient = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false)

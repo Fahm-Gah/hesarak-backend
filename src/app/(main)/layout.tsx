@@ -1,7 +1,7 @@
 import React from 'react'
 import { NavBar } from '@/components/NavBar'
 
-import './globals.css'
+import '../globals.css'
 
 export const metadata = {
   description: 'A blank template using Payload in a Next.js app.',

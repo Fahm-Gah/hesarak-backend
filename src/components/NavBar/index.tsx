@@ -1,5 +1,5 @@
 import React from 'react'
-import { getMeUser } from '../../utils/getMeUser'
+import { getMeUser } from '@/utils/getMeUser'
 import { NavBarClient } from './index.client'
 
 export const NavBar = async () => {

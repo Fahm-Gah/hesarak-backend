@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import type { User } from '../../payload-types'
+import type { User } from '@/payload-types'
 
 interface NavBarClientProps {
   user?: User | null
