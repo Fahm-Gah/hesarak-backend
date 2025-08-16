@@ -29,7 +29,11 @@ import { updateLocation } from './endpoints/updateLocation'
 import { TripRecords } from './collections/TripRecords'
 import { Drivers } from './collections/Drivers'
 
-const allowedOrigins = ['http://localhost:3000', 'https://hesarak-backend.vercel.app']
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://hesarak-backend.vercel.app',
+  'https://gheyasi.com',
+]
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
