@@ -303,17 +303,15 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
 
             {/* Account Details */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Account Details</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-3 border-b border-gray-200">
-                  <span className="text-sm font-medium text-gray-700">Email:</span>
-                  <span className="text-gray-900 font-medium">
-                    {currentUser.email || 'Not provided'}
-                  </span>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2 pb-3 border-b border-gray-200">
+                Account Details
+              </h3>
+              <div>
+                <div className="py-3">
+                  <span className="text-gray-900">{currentUser.email || 'Not provided'}</span>
                 </div>
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-sm font-medium text-gray-700">Phone Number:</span>
-                  <span className="text-gray-900 font-medium">
+                <div className="py-3">
+                  <span className="text-gray-900">
                     {userProfile?.phoneNumber ? userProfile.phoneNumber : 'Not provided'}
                   </span>
                 </div>
@@ -428,8 +426,8 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                               ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                               : 'border-gray-300 hover:border-gray-400 focus:ring-orange-500 focus:border-orange-500'
                           } ${
-                            isLoading 
-                              ? 'bg-gray-50 cursor-not-allowed' 
+                            isLoading
+                              ? 'bg-gray-50 cursor-not-allowed'
                               : 'bg-white hover:bg-gray-50'
                           }`}
                         >
