@@ -25,7 +25,7 @@ interface UseLocationCaptureOptions {
 
 export const useLocationCapture = (userId?: string, options: UseLocationCaptureOptions = {}) => {
   const {
-    autoCapture = true,
+    autoCapture = false, // Changed default to false - manual trigger recommended
     cacheTimeout = 300000, // 5 minutes default
   } = options
 
@@ -117,7 +117,7 @@ export const useLocationCapture = (userId?: string, options: UseLocationCaptureO
           const position = await new Promise<GeolocationPosition>((resolve, reject) => {
             const timeout = setTimeout(() => {
               reject(new Error('Geolocation timeout'))
-            }, 10000) // 10 second timeout
+            }, 8000) // 8 second timeout for better UX
 
             navigator.geolocation.getCurrentPosition(
               (pos) => {
@@ -129,16 +129,17 @@ export const useLocationCapture = (userId?: string, options: UseLocationCaptureO
                 // Set permission status based on error code
                 if (err.code === GeolocationPositionError.PERMISSION_DENIED) {
                   setPermissionStatus('denied')
+                  console.log('Location permission denied by user')
                 } else if (err.code === GeolocationPositionError.TIMEOUT) {
-                  console.warn('Geolocation timeout, falling back to IP')
+                  console.log('Geolocation timeout, falling back to IP')
                 } else if (err.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
-                  console.warn('Position unavailable, falling back to IP')
+                  console.log('Position unavailable, falling back to IP')
                 }
                 reject(err)
               },
               {
-                enableHighAccuracy: false, // Faster response
-                timeout: 10000,
+                enableHighAccuracy: false, // Faster response, less battery
+                timeout: 8000,
                 maximumAge: cacheTimeout,
               },
             )
@@ -222,12 +223,25 @@ export const useLocationCapture = (userId?: string, options: UseLocationCaptureO
     }
   }, [userId, location, autoCapture, captureLocation])
 
+  // Silent background capture with minimal UI impact
+  const captureLocationSilently = useCallback(async (): Promise<boolean> => {
+    try {
+      await captureLocation(false)
+      return true
+    } catch (error) {
+      // Silent failure for background operations
+      console.log('Silent location capture failed:', error)
+      return false
+    }
+  }, [captureLocation])
+
   return {
     location,
     loading,
     error,
     permissionStatus,
     captureLocation,
+    captureLocationSilently,
     refresh: () => captureLocation(true),
   }
 }

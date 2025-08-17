@@ -91,6 +91,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
+  // Helper function to capture location silently in background
+  const captureLocationSilently = useCallback(async () => {
+    try {
+      // Try browser geolocation first with timeout
+      if (window.isSecureContext && navigator.geolocation) {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error('Geolocation timeout'))
+          }, 5000) // 5 second timeout for login
+
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              clearTimeout(timeout)
+              resolve(pos)
+            },
+            (err) => {
+              clearTimeout(timeout)
+              reject(err)
+            },
+            {
+              enableHighAccuracy: false,
+              timeout: 5000,
+              maximumAge: 300000, // 5 minutes
+            },
+          )
+        })
+
+        // Send precise location to server
+        await fetch(`${getClientSideURL()}/api/update-location`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          }),
+        })
+      } else {
+        // Fallback to IP geolocation
+        await fetch(`${getClientSideURL()}/api/update-location`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            useFallback: true,
+          }),
+        })
+      }
+    } catch (error) {
+      // Silent failure - location capture shouldn't interfere with login
+      console.log('Background location capture failed:', error)
+    }
+  }, [])
+
   const login = useCallback(async (credentials: LoginCredentials) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
 
@@ -126,6 +185,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isLoading: false,
           error: null,
         }))
+        
+        // Capture location in background after successful login
+        setTimeout(() => {
+          captureLocationSilently()
+        }, 100)
+        
         console.log(data.user)
         return { success: true, user: data.user }
       } else {
@@ -154,7 +219,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { success: false, error: errorMessage }
     }
-  }, [])
+  }, [captureLocationSilently])
 
   const register = useCallback(
     async (data: RegisterData) => {
@@ -190,6 +255,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             })
 
             if (loginResult.success) {
+              // Location capture will be triggered by the login function
               return { success: true, user: loginResult.user }
             } else {
               // Registration succeeded but login failed - user can login manually

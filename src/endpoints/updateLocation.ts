@@ -173,10 +173,16 @@ export const updateLocation: Endpoint = {
       }
 
       // Get current user data
-      const currentUser = (await payload.findByID({
-        collection: 'users',
-        id: user.id,
-      })) as any
+      let currentUser: any
+      try {
+        currentUser = await payload.findByID({
+          collection: 'users',
+          id: user.id,
+        })
+      } catch (error) {
+        console.error('Failed to fetch user data:', error)
+        return Response.json({ error: 'User not found' }, { status: 404 })
+      }
 
       // Prepare location history entry if we have coordinates
       let updatedHistory = currentUser?.locationHistory || []
@@ -184,16 +190,25 @@ export const updateLocation: Endpoint = {
       if (locationData.coordinates) {
         const historyEntry = {
           coordinates: locationData.coordinates,
-          city: locationData.city,
-          country: locationData.country,
+          city: locationData.city || 'Unknown',
+          country: locationData.country || 'Unknown',
           source: locationData.source,
           timestamp: new Date().toISOString(),
         }
 
-        updatedHistory = [
-          historyEntry,
-          ...(currentUser?.locationHistory || []).slice(0, 9), // Keep last 10
-        ]
+        // Only add to history if it's significantly different from the last entry
+        const lastEntry = updatedHistory[0]
+        const shouldAddToHistory = !lastEntry || 
+          !lastEntry.coordinates ||
+          Math.abs(lastEntry.coordinates[0] - locationData.coordinates[0]) > 0.001 || // ~100m difference
+          Math.abs(lastEntry.coordinates[1] - locationData.coordinates[1]) > 0.001
+
+        if (shouldAddToHistory) {
+          updatedHistory = [
+            historyEntry,
+            ...(currentUser?.locationHistory || []).slice(0, 9), // Keep last 10
+          ]
+        }
       }
 
       // Update user with new location
