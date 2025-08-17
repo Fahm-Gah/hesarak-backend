@@ -30,11 +30,13 @@ interface SearchedTrip {
     id: string
     name: string
     province: string
+    address?: string
   }
   to: {
     id: string
     name: string
     province: string
+    address?: string
   } | null
   bus: {
     id: string
@@ -42,10 +44,32 @@ interface SearchedTrip {
     type: {
       id: string
       name: string
-      amenities?: string[] | null
+      amenities?: any[] | null
     }
   }
   availability: TripAvailability
+  stops?: {
+    terminal: {
+      id: string
+      name: string
+      province: string
+      address?: string
+    }
+    time: string
+    isUserBoardingPoint?: boolean
+    isUserDestination?: boolean
+    isBeforeBoarding?: boolean
+    isAfterDestination?: boolean
+  }[]
+  userBoardingIndex?: number
+  userDestinationIndex?: number
+  mainDeparture?: {
+    id: string
+    name: string
+    province: string
+    address?: string
+    time: string
+  }
 }
 
 export const searchTrips: Endpoint = {
@@ -68,9 +92,9 @@ export const searchTrips: Endpoint = {
       )
     }
 
-    // Normalize province names and decode + convert Persian date
-    const from = rawFrom.trim()
-    const to = rawTo.trim()
+    // Normalize province names (case-insensitive) and decode + convert Persian date
+    const from = rawFrom.trim().toLowerCase()
+    const to = rawTo.trim().toLowerCase()
     const decodedDate = decodeURIComponent(rawDate.trim())
     const convertedDate = convertPersianDateToGregorian(decodedDate)
 
@@ -89,20 +113,24 @@ export const searchTrips: Endpoint = {
     try {
       const dayOfWeek = getDayOfWeek(convertedDate)
 
-      // Find terminals in the 'from' province
+      // Find terminals in the 'from' province (case-insensitive)
       const fromTerminalsResult = await payload.find({
         collection: 'terminals',
         where: {
-          province: { equals: from },
+          province: { 
+            like: from,
+          },
         },
         limit: 100,
       })
 
-      // Find terminals in the 'to' province
+      // Find terminals in the 'to' province (case-insensitive)
       const toTerminalsResult = await payload.find({
         collection: 'terminals',
         where: {
-          province: { equals: to },
+          province: { 
+            like: to,
+          },
         },
         limit: 100,
       })
@@ -130,11 +158,10 @@ export const searchTrips: Endpoint = {
       const fromTerminalIds = fromTerminalsResult.docs.map((t: any) => t.id)
       const toTerminalIds = toTerminalsResult.docs.map((t: any) => t.id)
 
-      // Fetch trip schedules
+      // Fetch all active trip schedules that might serve our route
       const tripSchedules = await payload.find({
         collection: 'trip-schedules',
         where: {
-          from: { in: fromTerminalIds },
           isActive: { equals: true },
           or: [
             { frequency: { equals: 'daily' } },
@@ -144,13 +171,19 @@ export const searchTrips: Endpoint = {
           ],
         },
         depth: 3,
-        limit: 50,
+        limit: 100,
       })
 
-      // Filter trips that serve the requested route
+      // Filter trips that serve the requested route (including intermediate stops)
       const relevantTrips = tripSchedules.docs.filter((trip: any) => {
-        // Check if any stop is in the destination province
-        return trip.stops?.some((stop: any) => toTerminalIds.includes(stop.terminal?.id))
+        // Check if trip starts from a terminal in 'from' province OR has a stop in 'from' province
+        const hasFromLocation = fromTerminalIds.includes(trip.from?.id) || 
+          trip.stops?.some((stop: any) => fromTerminalIds.includes(stop.terminal?.id))
+        
+        // Check if trip has a stop in the destination province
+        const hasToLocation = trip.stops?.some((stop: any) => toTerminalIds.includes(stop.terminal?.id))
+        
+        return hasFromLocation && hasToLocation
       })
 
       // Get seat availability for each trip with proper date filtering
@@ -202,19 +235,40 @@ export const searchTrips: Endpoint = {
             disabledSeatsCount = allSeats.filter((seat: any) => seat.disabled).length
           }
 
-          // Find the destination terminal and arrival time
-          let arrivalTime: string | null = null
-          let duration: string | null = null
-          let destinationTerminal = null
-
-          const stopIndex = trip.stops?.findIndex((stop: any) =>
-            toTerminalIds.includes(stop.terminal?.id),
+          // Find user's boarding and destination points
+          const fromStopIndex = trip.stops?.findIndex((stop: any) =>
+            fromTerminalIds.includes(stop.terminal?.id)
+          )
+          
+          const toStopIndex = trip.stops?.findIndex((stop: any) =>
+            toTerminalIds.includes(stop.terminal?.id)
           )
 
-          if (stopIndex >= 0) {
-            destinationTerminal = trip.stops[stopIndex].terminal
-            arrivalTime = formatTime(trip.stops[stopIndex].time)
-            duration = calculateDuration(formatTime(trip.departureTime), arrivalTime)
+          // Determine user's actual boarding point and time
+          let userBoardingTerminal, userBoardingTime: string
+          if (fromTerminalIds.includes(trip.from?.id)) {
+            // User boards at the main departure terminal
+            userBoardingTerminal = trip.from
+            userBoardingTime = formatTime(trip.departureTime)
+          } else if (fromStopIndex >= 0) {
+            // User boards at an intermediate stop
+            userBoardingTerminal = trip.stops[fromStopIndex].terminal
+            userBoardingTime = formatTime(trip.stops[fromStopIndex].time)
+          } else {
+            // Fallback: shouldn't happen in normal cases
+            userBoardingTerminal = trip.from
+            userBoardingTime = formatTime(trip.departureTime)
+          }
+
+          // Determine user's destination
+          let destinationTerminal = null
+          let arrivalTime: string | null = null
+          let duration: string | null = null
+          
+          if (toStopIndex >= 0) {
+            destinationTerminal = trip.stops[toStopIndex].terminal
+            arrivalTime = formatTime(trip.stops[toStopIndex].time)
+            duration = calculateDuration(userBoardingTime, arrivalTime)
           }
 
           // Calculate effective booked seats (actual bookings + disabled seats)
@@ -224,14 +278,14 @@ export const searchTrips: Endpoint = {
             id: trip.id,
             name: trip.name,
             price: trip.price,
-            departureTime: formatTime(trip.departureTime),
+            departureTime: userBoardingTime,
             arrivalTime,
             duration,
             from: {
-              id: trip.from.id,
-              name: trip.from.name,
-              province: trip.from.province,
-              address: trip.from.address || '',
+              id: userBoardingTerminal.id,
+              name: userBoardingTerminal.name,
+              province: userBoardingTerminal.province,
+              address: userBoardingTerminal.address || '',
             },
             to: destinationTerminal
               ? {
@@ -256,7 +310,7 @@ export const searchTrips: Endpoint = {
               availableSeats: Math.max(0, totalSeats - effectiveBookedSeats),
             },
             stops:
-              trip.stops?.map((stop: any) => ({
+              trip.stops?.map((stop: any, index: any) => ({
                 terminal: {
                   id: stop.terminal.id,
                   name: stop.terminal.name,
@@ -264,7 +318,20 @@ export const searchTrips: Endpoint = {
                   address: stop.terminal.address || '',
                 },
                 time: formatTime(stop.time),
+                isUserBoardingPoint: fromStopIndex >= 0 && index === fromStopIndex,
+                isUserDestination: toStopIndex >= 0 && index === toStopIndex,
+                isBeforeBoarding: fromStopIndex >= 0 ? index < fromStopIndex : false,
+                isAfterDestination: toStopIndex >= 0 ? index > toStopIndex : false,
               })) || [],
+            userBoardingIndex: fromStopIndex,
+            userDestinationIndex: toStopIndex,
+            mainDeparture: {
+              id: trip.from.id,
+              name: trip.from.name,
+              province: trip.from.province,
+              address: trip.from.address || '',
+              time: formatTime(trip.departureTime),
+            },
           }
         }),
       )

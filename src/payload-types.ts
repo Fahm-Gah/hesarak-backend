@@ -325,7 +325,12 @@ export interface BusType {
    * Name of the bus type (e.g., "VIP 2+1", "Standard 2+2")
    */
   name: string;
-  amenities?: string[] | null;
+  amenities?:
+    | {
+        amenity: string;
+        id?: string | null;
+      }[]
+    | null;
   seats:
     | {
         [k: string]: unknown;
@@ -807,7 +812,12 @@ export interface BusesSelect<T extends boolean = true> {
  */
 export interface BusTypesSelect<T extends boolean = true> {
   name?: T;
-  amenities?: T;
+  amenities?:
+    | T
+    | {
+        amenity?: T;
+        id?: T;
+      };
   seats?: T;
   capacity?: T;
   updatedAt?: T;

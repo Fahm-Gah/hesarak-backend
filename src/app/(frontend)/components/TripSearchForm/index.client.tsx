@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import moment from 'moment-jalaali'
-import { JalaaliDatePicker } from '../../app/(frontend)/components/JalaaliDatePicker'
+import { JalaaliDatePicker } from '../JalaaliDatePicker'
 
 interface TripSearchFormClientProps {
   provinces: string[]

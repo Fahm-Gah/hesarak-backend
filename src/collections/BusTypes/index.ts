@@ -45,8 +45,14 @@ export const BusTypes: CollectionConfig = {
         en: 'Amenities',
         fa: 'امکانات',
       },
-      type: 'text',
-      hasMany: true,
+      type: 'array',
+      fields: [
+        {
+          name: 'amenity',
+          type: 'text',
+          required: true,
+        },
+      ],
     },
     {
       name: 'seats',

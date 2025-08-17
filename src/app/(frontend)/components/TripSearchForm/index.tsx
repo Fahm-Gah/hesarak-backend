@@ -1,6 +1,6 @@
 import React from 'react'
-import { getClientSideURL } from '../../utils/getURL'
 import { TripSearchFormClient } from './index.client'
+import { getClientSideURL } from '@/utils/getURL'
 
 interface Province {
   success: boolean
