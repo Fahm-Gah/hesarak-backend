@@ -54,6 +54,8 @@ const validateAppUser = (raw: unknown): AppUser | null => {
 }
 
 /** Helpers using the small AppUser shape */
+export const anyone: Access = () => true
+
 export const hasRole = (user: AppUser | null | undefined, minRole: RoleKey): boolean => {
   if (!user?.roles) return false
   if (user.isActive === false) return false
@@ -209,14 +211,14 @@ export const driversAccess = {
 }
 
 export const mediaAccess = {
-  read: superadminOrEditor,
+  read: anyone,
   create: superadminOrEditor,
   update: superadminOrEditor,
   delete: superAdminOnly,
 }
 
 export const postsAccess = {
-  read: superadminOrEditor,
+  read: anyone,
   create: superadminOrEditor,
   update: superadminOrEditor,
   delete: superAdminOnly,
@@ -243,7 +245,8 @@ export const profilesAccess = {
 
         if (userDoc?.profile) {
           // Handle both string ID and populated relationship object
-          const profileId = typeof userDoc.profile === 'string' ? userDoc.profile : userDoc.profile.id
+          const profileId =
+            typeof userDoc.profile === 'string' ? userDoc.profile : userDoc.profile.id
           return {
             id: { equals: profileId },
           } as any
@@ -270,7 +273,8 @@ export const profilesAccess = {
         id: user.id,
       })
 
-      const userProfileId = typeof userDoc?.profile === 'string' ? userDoc.profile : userDoc?.profile?.id
+      const userProfileId =
+        typeof userDoc?.profile === 'string' ? userDoc.profile : userDoc?.profile?.id
 
       // If this is the user's own profile, allow it
       if (userProfileId === id) {
@@ -283,19 +287,19 @@ export const profilesAccess = {
         const targetProfileUsers = await req.payload.find({
           collection: 'users',
           where: {
-            profile: { equals: id }
+            profile: { equals: id },
           },
           limit: 1,
         })
 
         if (targetProfileUsers.docs.length > 0) {
           const targetUser = targetProfileUsers.docs[0]
-          
+
           // Only superadmins can edit profiles of users with elevated roles (non-customer)
           if (targetUser.roles && targetUser.roles.some((role: string) => role !== 'customer')) {
             return false // Agents cannot edit profiles of other agents/admins/etc.
           }
-          
+
           // Agents can edit customer profiles
           return true
         }
