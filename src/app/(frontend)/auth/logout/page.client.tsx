@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/AuthContext'
-import { Logo } from '@/components/Logo'
+import { Logo } from '@/app/(frontend)/components/Logo'
 
 export const LogoutClient = () => {
   const [isSuccess, setIsSuccess] = useState(false)

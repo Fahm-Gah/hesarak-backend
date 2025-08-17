@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/providers/AuthContext'
 import { validateRegisterData, type RegisterFormData } from '@/validations/auth'
-import { Logo } from '@/components/Logo'
+import { Logo } from '@/app/(frontend)/components/Logo'
 
 export const RegisterClient = () => {
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -101,7 +101,12 @@ export const RegisterClient = () => {
       <div className="max-w-md w-full">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8">
           {/* Logo */}
-          <Logo variant="auth" size="lg" title="Create Account" subtitle="Join Hesaarak to get started." />
+          <Logo
+            variant="auth"
+            size="lg"
+            title="Create Account"
+            subtitle="Join Hesaarak to get started."
+          />
 
           {/* Error Message */}
           {error && (

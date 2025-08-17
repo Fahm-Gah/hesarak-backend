@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import type { User } from '@/payload-types'
-import { Logo } from '@/components/Logo'
+import { Logo } from '@/app/(frontend)/components/Logo'
 
 interface NavBarClientProps {
   user?: User | null

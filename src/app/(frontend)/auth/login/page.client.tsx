@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/providers/AuthContext'
 import { validateLoginData, type LoginFormData } from '@/validations/auth'
-import { Logo } from '@/components/Logo'
+import { Logo } from '@/app/(frontend)/components/Logo'
 
 export const LoginClient = () => {
   const [formData, setFormData] = useState<LoginFormData>({
