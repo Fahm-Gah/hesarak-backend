@@ -223,15 +223,89 @@ export const postsAccess = {
 }
 
 export const profilesAccess = {
-  read: agentOrHigher,
-  create: agentOrHigher,
-  update: ({ req }: any) => {
+  read: async ({ req }: any) => {
     const user = validateAppUser(req?.user)
     if (!user || user.isActive === false) return false
+
+    // Superadmins and admins can read all profiles
     if (hasRole(user, 'admin')) return true
-    return {
-      'user.id': { equals: user.id },
-    } as any
+
+    // Agents and customers can read all profiles
+    if (hasRole(user, 'agent') || hasExactRole(user, 'customer')) return true
+
+    // Editors can only read their own profile
+    if (hasExactRole(user, 'editor')) {
+      try {
+        const userDoc = await req.payload.findByID({
+          collection: 'users',
+          id: user.id,
+        })
+
+        if (userDoc?.profile) {
+          // Handle both string ID and populated relationship object
+          const profileId = typeof userDoc.profile === 'string' ? userDoc.profile : userDoc.profile.id
+          return {
+            id: { equals: profileId },
+          } as any
+        }
+      } catch (error) {
+        console.error('Error checking editor profile access:', error)
+      }
+    }
+
+    return false
+  },
+  create: agentOrHigher,
+  update: async ({ req, id }: any) => {
+    const user = validateAppUser(req?.user)
+    if (!user || user.isActive === false) return false
+
+    // Superadmins can update all profiles
+    if (hasRole(user, 'superadmin')) return true
+
+    try {
+      // Check if user is trying to update their own profile
+      const userDoc = await req.payload.findByID({
+        collection: 'users',
+        id: user.id,
+      })
+
+      const userProfileId = typeof userDoc?.profile === 'string' ? userDoc.profile : userDoc?.profile?.id
+
+      // If this is the user's own profile, allow it
+      if (userProfileId === id) {
+        return true
+      }
+
+      // For editing other profiles, check the target profile's user roles
+      if (hasRole(user, 'agent')) {
+        // Find the user who owns the target profile
+        const targetProfileUsers = await req.payload.find({
+          collection: 'users',
+          where: {
+            profile: { equals: id }
+          },
+          limit: 1,
+        })
+
+        if (targetProfileUsers.docs.length > 0) {
+          const targetUser = targetProfileUsers.docs[0]
+          
+          // Only superadmins can edit profiles of users with elevated roles (non-customer)
+          if (targetUser.roles && targetUser.roles.some((role: string) => role !== 'customer')) {
+            return false // Agents cannot edit profiles of other agents/admins/etc.
+          }
+          
+          // Agents can edit customer profiles
+          return true
+        }
+      }
+
+      return false
+    } catch (error) {
+      console.error('Error checking profile update access:', error)
+      return false
+    }
   },
   delete: superAdminOnly,
 }

@@ -3,55 +3,65 @@
 import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { getClientSideURL } from '@/utils/getURL'
+import { useAuth } from '@/providers/AuthContext'
+import { validateLoginData, type LoginFormData } from '@/validations/auth'
+import { Logo } from '@/components/Logo'
 
 export const LoginClient = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
   })
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const { login, isLoading, error, clearError } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/'
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: keyof LoginFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-    if (error) setError(null) // Clear error when user starts typing
+    // Clear field-specific error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }))
+    }
+    if (error) clearError() // Clear auth error when user starts typing
     if (success) setSuccess(false) // Clear success when user starts typing
+  }
+
+  const validateForm = () => {
+    const validation = validateLoginData(formData)
+    if (!validation.isValid) {
+      setErrors(validation.errors)
+      return false
+    }
+    setErrors({})
+    return true
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+
+    // Validate form first
+    if (!validateForm()) {
+      return
+    }
+
     setSuccess(false)
 
     try {
-      const response = await fetch(`${getClientSideURL()}/api/users/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
+      const result = await login({
+        email: formData.email,
+        password: formData.password,
       })
 
-      const data = await response.json()
-
-      if (response.ok && data.user) {
+      if (result.success && result.user) {
         // Login successful - show success message
         setSuccess(true)
-        setIsLoading(false)
 
         const hasAdminRoles =
-          data.user.roles && data.user.roles.some((role: string) => role !== 'customer')
+          result.user.roles && result.user.roles.some((role: string) => role !== 'customer')
         const defaultRedirect = hasAdminRoles ? '/admin' : '/'
 
         // Use redirect parameter or default based on user role
@@ -62,19 +72,10 @@ export const LoginClient = () => {
           router.push(finalRedirect)
           router.refresh() // Refresh to update auth state
         }, 1500)
-      } else {
-        // Login failed
-        setError(
-          data.errors?.[0]?.message ||
-            data.message ||
-            'Login failed. Please check your credentials.',
-        )
-        setIsLoading(false)
       }
+      // Error handling is done in the AuthContext
     } catch (err) {
       console.error('Login error:', err)
-      setError('Network error. Please try again.')
-      setIsLoading(false)
     }
   }
 
@@ -85,15 +86,7 @@ export const LoginClient = () => {
       <div className="max-w-md w-full">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8">
           {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
-              <span className="text-white font-bold text-xl">H</span>
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent mb-2">
-              Hesaarak
-            </h1>
-            <p className="text-gray-600">Welcome back! Please sign in to your account.</p>
-          </div>
+          <Logo variant="auth" size="lg" subtitle="Welcome back! Please sign in to your account." />
 
           {/* Error Message */}
           {error && (
@@ -148,11 +141,16 @@ export const LoginClient = () => {
                 type="text"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 bg-white/80"
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 bg-white/80 ${
+                  errors.email
+                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
+                }`}
                 placeholder="Enter your email or phone number"
                 required
                 autoComplete="username"
               />
+              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
             </div>
 
             {/* Password Field */}
@@ -163,7 +161,11 @@ export const LoginClient = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 bg-white/80"
+                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 bg-white/80 ${
+                    errors.password
+                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
+                  }`}
                   placeholder="Enter your password"
                   required
                   autoComplete="current-password"
@@ -200,6 +202,7 @@ export const LoginClient = () => {
                   )}
                 </button>
               </div>
+              {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
             </div>
 
             {/* Submit Button */}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { AuthProvider } from '@/providers/AuthContext'
 
 import '../../globals.css'
 
@@ -13,7 +14,9 @@ export default async function AuthLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <main>{children}</main>
+        <AuthProvider>
+          <main>{children}</main>
+        </AuthProvider>
       </body>
     </html>
   )

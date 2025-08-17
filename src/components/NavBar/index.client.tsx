@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import type { User } from '@/payload-types'
+import { Logo } from '@/components/Logo'
 
 interface NavBarClientProps {
   user?: User | null
@@ -47,16 +48,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link href="/" className="group flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-orange-600 to-red-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-                <span className="text-white font-bold text-sm">H</span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
-                Hesaarak
-              </span>
-            </Link>
-          </div>
+          <Logo variant="nav" size="sm" linkTo="/" />
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">

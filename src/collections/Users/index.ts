@@ -21,6 +21,7 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['profile', 'email', 'username', 'roles', 'isActive'],
+    listSearchableFields: ['email', 'profile.fullName', 'profile.phoneNumber'],
     group: {
       en: 'Users & Access',
       fa: 'کاربران و دسترسی',

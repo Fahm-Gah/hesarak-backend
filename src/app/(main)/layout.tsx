@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavBar } from '@/components/NavBar'
+import { AuthProvider } from '@/providers/AuthContext'
 
 import '../globals.css'
 
@@ -14,8 +15,10 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <NavBar />
-        <main>{children}</main>
+        <AuthProvider>
+          <NavBar />
+          <main>{children}</main>
+        </AuthProvider>
       </body>
     </html>
   )

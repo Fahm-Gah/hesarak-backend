@@ -2,32 +2,24 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getClientSideURL } from '@/utils/getURL'
+import { useAuth } from '@/providers/AuthContext'
+import { Logo } from '@/components/Logo'
 
 export const LogoutClient = () => {
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [localError, setLocalError] = useState<string | null>(null)
+  const { logout, isLoading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     const performLogout = async () => {
-      setIsLoggingOut(true)
-      setError(null)
+      setLocalError(null)
 
       try {
-        const response = await fetch(`${getClientSideURL()}/api/users/logout`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+        const result = await logout()
 
-        if (response.ok || response.status === 401) {
+        if (result.success) {
           // Logout successful, show success state
-          // Note: 401 status sometimes occurs after successful logout when token is already invalidated
-          setIsLoggingOut(false)
           setIsSuccess(true)
 
           // Redirect to home page after showing success message
@@ -36,28 +28,19 @@ export const LogoutClient = () => {
             router.refresh() // Refresh to update auth state
           }, 2000)
         } else {
-          // Only show error for actual server errors (5xx) or client errors other than 401
-          try {
-            const errorData = await response.json()
-            setError(errorData.message || 'Logout failed. Please try again.')
-          } catch {
-            setError('Logout failed. Please try again.')
-          }
-          setIsLoggingOut(false)
+          setLocalError(result.error || 'Logout failed. Please try again.')
         }
       } catch (err) {
         console.error('Logout error:', err)
-        setError('Network error. Please try again.')
-        setIsLoggingOut(false)
+        setLocalError('Network error. Please try again.')
       }
     }
 
     performLogout()
-  }, [router])
+  }, [logout, router])
 
   const handleRetry = () => {
-    setError(null)
-    setIsLoggingOut(true)
+    setLocalError(null)
     window.location.reload()
   }
 
@@ -66,16 +49,9 @@ export const LogoutClient = () => {
       <div className="max-w-md w-full">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8 text-center">
           {/* Logo */}
-          <div className="mb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
-              <span className="text-white font-bold text-xl">H</span>
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
-              Hesaarak
-            </h1>
-          </div>
+          <Logo variant="auth" size="lg" />
 
-          {isLoggingOut ? (
+          {isLoading ? (
             <>
               {/* Loading State */}
               <div className="mb-6">
@@ -86,7 +62,7 @@ export const LogoutClient = () => {
                 Please wait while we securely log you out of your account.
               </p>
             </>
-          ) : error ? (
+          ) : localError ? (
             <>
               {/* Error State */}
               <div className="mb-6">
@@ -107,7 +83,7 @@ export const LogoutClient = () => {
                 </div>
               </div>
               <h2 className="text-xl font-semibold text-gray-800 mb-2">Logout Failed</h2>
-              <p className="text-gray-600 mb-6">{error}</p>
+              <p className="text-gray-600 mb-6">{localError}</p>
               <div className="space-y-3">
                 <button
                   onClick={handleRetry}

@@ -40,10 +40,10 @@ export const registerUser: Endpoint = {
       return Response.json({ error: 'Invalid email format' }, { status: 400 })
     }
 
-    // Validate password strength (minimum 6 characters)
-    if (password.length < 6) {
+    // Validate password strength (minimum 8 characters)
+    if (password.length < 8) {
       return Response.json(
-        { error: 'Password must be at least 6 characters long' },
+        { error: 'Password must be at least 8 characters long' },
         { status: 400 },
       )
     }
