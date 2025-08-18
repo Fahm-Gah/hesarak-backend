@@ -114,11 +114,13 @@ export const SearchPageClient = () => {
 
   const navigateToTripDetails = (tripId: string) => {
     // Pass the search date to the trip details page
-    const searchDate = date || (() => {
-      const tomorrow = new Date()
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      return tomorrow.toISOString().split('T')[0] // YYYY-MM-DD format
-    })()
+    const searchDate =
+      date ||
+      (() => {
+        const tomorrow = new Date()
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        return tomorrow.toISOString().split('T')[0] // YYYY-MM-DD format
+      })()
     router.push(`/trip/${tripId}?date=${encodeURIComponent(searchDate)}`)
   }
 
@@ -230,10 +232,7 @@ export const SearchPageClient = () => {
 
   const { data } = searchResult
 
-  const breadcrumbItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Search Results' }
-  ]
+  const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Search Results' }]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">

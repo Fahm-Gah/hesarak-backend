@@ -1,0 +1,80 @@
+/* Performance-optimized styles for SeatLayout component */
+
+.seatGrid {
+  display: grid;
+  justify-content: center;
+  padding: 16px;
+  gap: 12px;
+  /* Performance optimizations */
+  will-change: contents;
+  contain: layout style;
+}
+
+.seatSelected {
+  animation: seatGlow 1.5s ease-in-out infinite alternate;
+  /* Hardware acceleration */
+  will-change: box-shadow;
+  transform: translateZ(0);
+}
+
+@keyframes seatGlow {
+  0% {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.seatHover {
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Performance optimizations */
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.seatHover:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05) translateZ(0);
+}
+
+.seatHover:active:not(:disabled) {
+  transform: translateY(1px) scale(0.95) translateZ(0);
+  transition-duration: 0.1s;
+}
+
+.seatHover:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .seatHover {
+    transition: none;
+    will-change: auto;
+  }
+
+  .seatSelected {
+    animation: none;
+    will-change: auto;
+    box-shadow: 0 0 25px rgba(249, 115, 22, 0.5);
+  }
+}
+
+/* Performance optimizations for different screen sizes */
+@media (max-width: 768px) {
+  .seatGrid {
+    gap: 10px;
+    padding: 12px;
+  }
+}
+
+/* GPU acceleration hint for modern browsers */
+@supports (will-change: transform) {
+  .seatHover {
+    will-change: transform, box-shadow;
+  }
+}

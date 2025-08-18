@@ -28,6 +28,7 @@
     "@payloadcms/translations": "^3.48.0",
     "@payloadcms/ui": "3.48.0",
     "@types/moment-jalaali": "^0.7.9",
+    "clsx": "^2.1.1",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
     "graphql": "^16.8.1",

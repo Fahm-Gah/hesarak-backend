@@ -104,7 +104,7 @@ interface TripDetailsClientProps {
 export const TripDetailsClient = ({
   tripDetails,
   user,
-  isAuthenticated
+  isAuthenticated,
 }: TripDetailsClientProps) => {
   const router = useRouter()
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
@@ -117,31 +117,32 @@ export const TripDetailsClient = ({
   const canBookMoreSeats = tripDetails.userBookingInfo?.canBookMoreSeats ?? true
   // Allow seat selection for both authenticated and unauthenticated users
   const canSelectMoreSeats = canBookMoreSeats && selectedSeats.length < maxAllowedSeats
-  
-  
 
-  const handleSeatSelect = useCallback((seatId: string) => {
-    setError(null)
+  const handleSeatSelect = useCallback(
+    (seatId: string) => {
+      setError(null)
 
-    setSelectedSeats(prev => {
-      const isCurrentlySelected = prev.includes(seatId)
-      
-      if (isCurrentlySelected) {
-        // Deselect seat
-        return prev.filter(id => id !== seatId)
-      } else {
-        // Check if user can select more seats
-        const maxSeats = tripDetails.userBookingInfo?.remainingSeatsAllowed ?? 2
-        if (prev.length >= maxSeats) {
-          setError(`You can only select up to ${maxSeats} seats`)
-          return prev
+      setSelectedSeats((prev) => {
+        const isCurrentlySelected = prev.includes(seatId)
+
+        if (isCurrentlySelected) {
+          // Deselect seat
+          return prev.filter((id) => id !== seatId)
+        } else {
+          // Check if user can select more seats
+          const maxSeats = tripDetails.userBookingInfo?.remainingSeatsAllowed ?? 2
+          if (prev.length >= maxSeats) {
+            setError(`You can only select up to ${maxSeats} seats`)
+            return prev
+          }
+
+          // Select seat
+          return [...prev, seatId]
         }
-        
-        // Select seat
-        return [...prev, seatId]
-      }
-    })
-  }, [isAuthenticated, tripDetails.userBookingInfo?.remainingSeatsAllowed])
+      })
+    },
+    [isAuthenticated, tripDetails.userBookingInfo?.remainingSeatsAllowed],
+  )
 
   const handleClearSelection = useCallback(() => {
     setSelectedSeats([])
@@ -168,7 +169,6 @@ export const TripDetailsClient = ({
         const checkoutUrl = `/checkout?tripId=${tripDetails.id}&date=${encodeURIComponent(tripDetails.searchDate)}&seats=${selectedSeats.join(',')}`
         router.push(checkoutUrl)
       }
-      
     } catch (err) {
       console.error('Booking error:', err)
       setError('Failed to proceed with booking. Please try again.')
@@ -177,13 +177,13 @@ export const TripDetailsClient = ({
     }
   }, [isAuthenticated, selectedSeats, router, tripDetails.id, tripDetails.searchDate])
 
-  // Build search URL with parameters to maintain search context  
+  // Build search URL with parameters to maintain search context
   const searchUrl = `/search?from=${encodeURIComponent(tripDetails.from.province)}&to=${encodeURIComponent(tripDetails.to?.province || '')}&date=${encodeURIComponent(tripDetails.searchDate)}`
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
     { label: 'Search Results', href: searchUrl },
-    { label: 'Trip Details' }
+    { label: 'Trip Details' },
   ]
 
   return (
@@ -193,7 +193,6 @@ export const TripDetailsClient = ({
         <div className="mb-6">
           <Breadcrumbs items={breadcrumbItems} />
         </div>
-
 
         {/* Error Message */}
         {error && (
@@ -215,26 +214,15 @@ export const TripDetailsClient = ({
           {/* Right Column - Seat Selection and Booking Summary */}
           <div className="xl:col-span-1 space-y-6">
             {/* Seat Selection */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-800">Select Your Seats</h3>
-                {selectedSeats.length > 0 && (
-                  <div className="text-sm text-gray-600">
-                    {selectedSeats.length} seat{selectedSeats.length > 1 ? 's' : ''} selected
-                  </div>
-                )}
-              </div>
-              
-              <SeatLayout
-                busLayout={tripDetails.busLayout}
-                selectedSeats={selectedSeats}
-                onSeatSelect={handleSeatSelect}
-                canSelectMoreSeats={canSelectMoreSeats}
-                maxSeatsAllowed={Math.max(maxAllowedSeats, 1)}
-                currentSelectedCount={selectedSeats.length}
-                isAuthenticated={isAuthenticated}
-              />
-            </div>
+            <SeatLayout
+              busLayout={tripDetails.busLayout}
+              selectedSeats={selectedSeats}
+              onSeatSelect={handleSeatSelect}
+              canSelectMoreSeats={canSelectMoreSeats}
+              maxSeatsAllowed={Math.max(maxAllowedSeats, 1)}
+              currentSelectedCount={selectedSeats.length}
+              isAuthenticated={isAuthenticated}
+            />
 
             {/* Booking Summary */}
             <div className="sticky top-6">
@@ -253,38 +241,79 @@ export const TripDetailsClient = ({
         </div>
 
         {/* Additional Information */}
-        <div className="mt-8 bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Important Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
-            <div>
-              <h4 className="font-medium text-gray-700 mb-2">Booking Policy</h4>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Maximum {tripDetails.userBookingInfo?.maxSeatsPerUser || 2} seats per user</li>
-                <li>Payment required within 24 hours</li>
-                <li>Cancellation allowed up to 24 hours before departure</li>
-                <li>Refund processing takes 3-5 business days</li>
-              </ul>
+        <div className="mt-8 bg-gradient-to-br from-white via-orange-50/20 to-red-50/20 rounded-3xl shadow-xl border border-orange-200/50 p-8 backdrop-blur-sm">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
+            <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              Important Information
+            </h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl p-6 border border-orange-200/30 backdrop-blur-sm">
+              <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <div className="w-1.5 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
+                Booking Policy
+              </h4>
+              <div className="space-y-3 text-sm text-gray-700">
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Maximum <span className="font-semibold text-orange-700">{tripDetails.userBookingInfo?.maxSeatsPerUser || 2}</span> seats per user</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Payment required within <span className="font-semibold text-orange-700">24 hours</span></span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Cancellation allowed up to <span className="font-semibold text-orange-700">24 hours</span> before departure</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Refund processing takes <span className="font-semibold text-orange-700">3-5 business days</span></span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 className="font-medium text-gray-700 mb-2">Travel Requirements</h4>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Valid ID required for boarding</li>
-                <li>Arrive 30 minutes before departure</li>
-                <li>No smoking or alcohol on board</li>
-                <li>Luggage weight limit: 20kg per passenger</li>
-              </ul>
+            
+            <div className="bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl p-6 border border-orange-200/30 backdrop-blur-sm">
+              <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <div className="w-1.5 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
+                Travel Requirements
+              </h4>
+              <div className="space-y-3 text-sm text-gray-700">
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span><span className="font-semibold text-orange-700">Valid ID</span> required for boarding</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Arrive <span className="font-semibold text-orange-700">30 minutes</span> before departure</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span><span className="font-semibold text-orange-700">No smoking or alcohol</span> on board</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Luggage weight limit: <span className="font-semibold text-orange-700">20kg per passenger</span></span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Contact Information */}
-        <div className="mt-6 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl border border-orange-200 p-6">
-          <div className="flex items-center">
-            <Phone className="w-6 h-6 text-orange-600 mr-3" />
+        <div className="mt-8 bg-gradient-to-r from-orange-100/80 via-orange-50/90 to-red-100/80 rounded-3xl border border-orange-200/50 p-8 backdrop-blur-sm shadow-xl">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+              <Phone className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h4 className="font-medium text-orange-800">Need Help?</h4>
-              <p className="text-orange-700 text-sm">
-                Contact our support team for assistance with your booking or travel questions.
+              <h4 className="text-lg font-bold bg-gradient-to-r from-orange-700 to-red-700 bg-clip-text text-transparent mb-2">
+                Need Help?
+              </h4>
+              <p className="text-orange-800 text-sm leading-relaxed">
+                Contact our support team for assistance with your booking or travel questions. We're here to make your journey smooth and comfortable.
               </p>
             </div>
           </div>

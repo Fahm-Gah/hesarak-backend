@@ -17,7 +17,7 @@ async function fetchTripDetails(tripId: string, date: string) {
       `${getClientSideURL()}/api/trips/${tripId}/date/${encodeURIComponent(date)}`,
       {
         cache: 'no-store',
-      }
+      },
     )
 
     if (!response.ok) {
@@ -56,11 +56,5 @@ export default async function TripDetailsPage({ params, searchParams }: TripDeta
     // User is not authenticated, continue without user data
   }
 
-  return (
-    <TripDetailsClient 
-      tripDetails={tripDetails} 
-      user={user}
-      isAuthenticated={!!user}
-    />
-  )
+  return <TripDetailsClient tripDetails={tripDetails} user={user} isAuthenticated={!!user} />
 }

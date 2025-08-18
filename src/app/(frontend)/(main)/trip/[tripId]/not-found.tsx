@@ -6,7 +6,7 @@ export default function TripNotFound() {
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
     { label: 'Search Results', href: '/search' },
-    { label: 'Trip Not Found' }
+    { label: 'Trip Not Found' },
   ]
 
   return (
@@ -20,16 +20,27 @@ export default function TripNotFound() {
         {/* Not Found Content */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 text-center">
           <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-8 h-8 text-red-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
-          
+
           <h1 className="text-3xl font-bold text-gray-800 mb-4">Trip Not Found</h1>
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            The trip you're looking for doesn't exist or is no longer available. This could be because:
+            The trip you're looking for doesn't exist or is no longer available. This could be
+            because:
           </p>
-          
+
           <div className="text-left max-w-md mx-auto mb-8">
             <ul className="space-y-2 text-gray-600">
               <li className="flex items-start">

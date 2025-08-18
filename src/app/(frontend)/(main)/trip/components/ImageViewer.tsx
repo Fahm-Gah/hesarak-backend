@@ -45,13 +45,13 @@ export const ImageViewer = ({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
-      
+
       // Add a history entry when opening the image viewer
       const currentUrl = window.location.href
       const baseUrl = currentUrl.split('#')[0] // Remove any existing hash
       const imageViewerUrl = baseUrl + '#image-viewer'
       window.history.pushState({ imageViewer: true }, '', imageViewerUrl)
-      
+
       // Handle popstate (back button)
       const handlePopState = (event: PopStateEvent) => {
         // Close the image viewer when navigating back
@@ -61,11 +61,11 @@ export const ImageViewer = ({
       }
 
       window.addEventListener('popstate', handlePopState)
-      
+
       return () => {
         window.removeEventListener('popstate', handlePopState)
         document.body.style.overflow = 'unset'
-        
+
         // Clean up URL if component unmounts while open
         if (window.location.hash === '#image-viewer') {
           const cleanUrl = window.location.href.split('#')[0]
@@ -74,7 +74,7 @@ export const ImageViewer = ({
       }
     } else {
       document.body.style.overflow = 'unset'
-      
+
       // Clean up URL when closing
       if (window.location.hash === '#image-viewer') {
         const cleanUrl = window.location.href.split('#')[0]
@@ -107,7 +107,6 @@ export const ImageViewer = ({
       handleClose()
     }
   }, [handleClose])
-
 
   if (!isOpen) return null
 
@@ -159,12 +158,14 @@ export const ImageViewer = ({
           centeredSlides={true}
           loop={images.length > 1}
           className="w-full h-full"
-          style={{
-            '--swiper-navigation-color': '#fff',
-            '--swiper-pagination-color': '#f97316',
-            '--swiper-pagination-bullet-inactive-color': '#fff',
-            '--swiper-pagination-bullet-inactive-opacity': '0.5',
-          } as React.CSSProperties}
+          style={
+            {
+              '--swiper-navigation-color': '#fff',
+              '--swiper-pagination-color': '#f97316',
+              '--swiper-pagination-bullet-inactive-color': '#fff',
+              '--swiper-pagination-bullet-inactive-opacity': '0.5',
+            } as React.CSSProperties
+          }
         >
           {images.map((image, index) => (
             <SwiperSlide key={image.id} className="flex items-center justify-center">
@@ -192,7 +193,6 @@ export const ImageViewer = ({
           )}
         </Swiper>
       </div>
-
     </div>
   )
 }

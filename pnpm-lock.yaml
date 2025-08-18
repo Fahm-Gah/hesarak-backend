@@ -38,6 +38,9 @@ importers:
       '@types/moment-jalaali':
         specifier: ^0.7.9
         version: 0.7.9
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
