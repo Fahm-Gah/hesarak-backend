@@ -28,7 +28,6 @@ export const Media: CollectionConfig = {
         fa: 'شرح تصویر',
       },
       type: 'text',
-      required: true,
     },
   ],
   upload: true,

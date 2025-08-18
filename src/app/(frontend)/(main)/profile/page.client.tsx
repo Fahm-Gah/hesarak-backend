@@ -3,11 +3,8 @@
 import React, { useState, useCallback } from 'react'
 import { useAuth } from '@/providers/AuthContext'
 import { getClientSideURL } from '@/utils/getURL'
-import {
-  normalizePhoneNumber,
-  validateProfileData,
-  type ProfileUpdateData,
-} from '@/validations/auth'
+import { validateProfileData, type ProfileUpdateData } from '@/validations/auth'
+import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
 
 interface User {
   id: string
@@ -174,11 +171,17 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
     }
   }, [showGenderDropdown])
 
+  const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Profile' }]
+
   // If user doesn't have a profile, show error message
   if (!userProfile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
         <div className="max-w-4xl mx-auto px-4">
+          {/* Breadcrumbs */}
+          <div className="mb-4">
+            <Breadcrumbs items={breadcrumbItems} />
+          </div>
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8">
             <div className="text-center">
               <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -217,6 +220,11 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
+        {/* Breadcrumbs */}
+        <div className="mb-4">
+          <Breadcrumbs items={breadcrumbItems} />
+        </div>
+
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8 mb-8">
           <div className="flex items-center justify-between">

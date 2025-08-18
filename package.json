@@ -41,8 +41,11 @@
     "payload": "3.48.0",
     "react": "19.1.0",
     "react-hotkeys-hook": "^4.4.1",
+    "react-image-gallery": "^1.4.0",
     "sharp": "0.34.2",
+    "swiper": "^11.2.10",
     "swr": "^2.3.4",
+    "use-history-state": "^0.1.5",
     "zundo": "^2.0.0",
     "zustand": "^4.5.0"
   },

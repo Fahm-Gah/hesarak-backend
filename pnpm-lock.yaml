@@ -77,12 +77,21 @@ importers:
       react-hotkeys-hook:
         specifier: ^4.4.1
         version: 4.6.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-image-gallery:
+        specifier: ^1.4.0
+        version: 1.4.0(react@19.1.0)
       sharp:
         specifier: 0.34.2
         version: 0.34.2
+      swiper:
+        specifier: ^11.2.10
+        version: 11.2.10
       swr:
         specifier: ^2.3.4
         version: 2.3.4(react@19.1.0)
+      use-history-state:
+        specifier: ^0.1.5
+        version: 0.1.5(react@19.1.0)
       zundo:
         specifier: ^2.0.0
         version: 2.3.0(zustand@4.5.7(@types/react@19.1.0)(immer@10.1.1)(react@19.1.0))
@@ -3848,6 +3857,11 @@ packages:
     peerDependencies:
       react: '>=16.13.1'
 
+  react-image-gallery@1.4.0:
+    resolution: {integrity: sha512-m7xLq7+g6/xh+BhVMAxvRU0132sNcEFglYsVsgthrnItl9VtLE7MuVvVWD9pvzcI+WBP5+p9HvnRwIiyhPkBDg==}
+    peerDependencies:
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -4164,6 +4178,10 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  swiper@11.2.10:
+    resolution: {integrity: sha512-RMeVUUjTQH+6N3ckimK93oxz6Sn5la4aDlgPzB+rBrG/smPdCTicXyhxa+woIpopz+jewEloiEE3lKo1h9w2YQ==}
+    engines: {node: '>= 4.7.0'}
+
   swr@2.3.4:
     resolution: {integrity: sha512-bYd2lrhc+VarcpkgWclcUi92wYCpOgMws9Sd1hG1ntAu0NEy+14CbotuFjshBU2kt9rYj9TSmDcybpxpeTU1fg==}
     peerDependencies:
@@ -4379,6 +4397,11 @@ packages:
     peerDependencies:
       react: '>=18.0.0'
       scheduler: '>=0.19.0'
+
+  use-history-state@0.1.5:
+    resolution: {integrity: sha512-Bpk/GnHOwFqwg3VcSMtYobX4XWMxw8oJsBOszBlWPh/zzlj2PkcE5M6biNfZppcnEx+R19WEqNfOJpEWY+dQOw==}
+    peerDependencies:
+      react: ^16.8.0
 
   use-isomorphic-layout-effect@1.2.1:
     resolution: {integrity: sha512-tpZZ+EX0gaghDAiFR37hj5MgY6ZN55kLiPkJsKxBMZ6GZdOSPJXiOzPM984oPYZ5AnehYx5WQp1+ME8I/P/pRA==}
@@ -9198,6 +9221,10 @@ snapshots:
     dependencies:
       react: 19.1.0
 
+  react-image-gallery@1.4.0(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+
   react-is@16.13.1: {}
 
   react-is@17.0.2: {}
@@ -9598,6 +9625,8 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
+  swiper@11.2.10: {}
+
   swr@2.3.4(react@19.1.0):
     dependencies:
       dequal: 2.0.3
@@ -9831,6 +9860,10 @@ snapshots:
     dependencies:
       react: 19.1.0
       scheduler: 0.25.0
+
+  use-history-state@0.1.5(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   use-isomorphic-layout-effect@1.2.1(@types/react@19.1.0)(react@19.1.0):
     dependencies:

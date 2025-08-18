@@ -1,1 +1,49 @@
 @import 'tailwindcss';
+
+/* Custom scrollbar for image gallery */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 6px;
+}
+
+.scrollbar-track-gray-100::-webkit-scrollbar-track {
+  background-color: #f3f4f6;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+/* Enhanced seat animations */
+@keyframes seat-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-4px);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
+}
+
+.seat-selected {
+  animation: seat-bounce 0.6s ease-in-out;
+}
+
+/* Glass morphism effect for bus container */
+.bus-glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Glowing seat effect */
+.seat-glow {
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+}

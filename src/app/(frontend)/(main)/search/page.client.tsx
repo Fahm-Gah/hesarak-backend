@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { getClientSideURL } from '@/utils/getURL'
+import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
 
 interface Trip {
   id: string
@@ -91,6 +92,7 @@ const formatTo12Hour = (time24: string): string => {
 
 export const SearchPageClient = () => {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -108,6 +110,16 @@ export const SearchPageClient = () => {
       newExpanded.add(tripId)
     }
     setExpandedTrips(newExpanded)
+  }
+
+  const navigateToTripDetails = (tripId: string) => {
+    // Pass the search date to the trip details page
+    const searchDate = date || (() => {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      return tomorrow.toISOString().split('T')[0] // YYYY-MM-DD format
+    })()
+    router.push(`/trip/${tripId}?date=${encodeURIComponent(searchDate)}`)
   }
 
   useEffect(() => {
@@ -218,9 +230,19 @@ export const SearchPageClient = () => {
 
   const { data } = searchResult
 
+  const breadcrumbItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Search Results' }
+  ]
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
       <div className="max-w-6xl mx-auto">
+        {/* Breadcrumbs */}
+        <div className="mb-4">
+          <Breadcrumbs items={breadcrumbItems} />
+        </div>
+
         {/* Search Summary */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -448,6 +470,7 @@ export const SearchPageClient = () => {
                     {trip.price.toLocaleString()} AF
                   </p>
                   <button
+                    onClick={() => navigateToTripDetails(trip.id)}
                     disabled={trip.availability.availableSeats === 0}
                     className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
                       trip.availability.availableSeats > 0

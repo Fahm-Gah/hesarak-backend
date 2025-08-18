@@ -71,6 +71,8 @@ export const getTripDetails: Endpoint = {
         )
       }
 
+      console.log(trip.bus.images)
+
       // Get booked tickets for this trip and date with proper date range
       const dateObj = new Date(convertedDate)
       const startOfDay = new Date(dateObj)
@@ -286,6 +288,9 @@ export const getTripDetails: Endpoint = {
                 id: img.id,
                 url: img.url,
                 filename: img.filename,
+                alt: img.alt || '',
+                width: img.width || 800,
+                height: img.height || 600,
               })) || [],
             type: {
               id: busType?.id || '',

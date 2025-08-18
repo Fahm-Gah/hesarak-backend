@@ -254,7 +254,7 @@ export interface Profile {
  */
 export interface Media {
   id: string;
-  alt: string;
+  alt?: string | null;
   _key?: string | null;
   updatedAt: string;
   createdAt: string;
