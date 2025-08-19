@@ -34,8 +34,8 @@ export const populateFromAndTo: CollectionBeforeChangeHook = async ({ data, req,
       return data
     }
 
-    // Extract from terminal
-    if (tripSchedule.from) {
+    // Only populate from terminal if not already set (respect user-provided terminals)
+    if (!data.from && tripSchedule.from) {
       const fromTerminal =
         typeof tripSchedule.from === 'string' ? tripSchedule.from : tripSchedule.from.id
 
@@ -48,8 +48,13 @@ export const populateFromAndTo: CollectionBeforeChangeHook = async ({ data, req,
       }
     }
 
-    // Extract to terminal (last stop)
-    if (tripSchedule.stops && Array.isArray(tripSchedule.stops) && tripSchedule.stops.length > 0) {
+    // Only populate to terminal if not already set (respect user-provided terminals)
+    if (
+      !data.to &&
+      tripSchedule.stops &&
+      Array.isArray(tripSchedule.stops) &&
+      tripSchedule.stops.length > 0
+    ) {
       const lastStop = tripSchedule.stops[tripSchedule.stops.length - 1]
 
       if (lastStop?.terminal) {
@@ -66,8 +71,8 @@ export const populateFromAndTo: CollectionBeforeChangeHook = async ({ data, req,
       }
     }
 
-    // If terminal names weren't populated above (e.g., if they were just IDs),
-    // fetch them separately for the denormalized fields
+    // Always ensure terminal names are populated for search functionality
+    // This handles both user-provided terminals and trip defaults
     if (!data.fromTerminalName && data.from) {
       try {
         const fromTerminalDoc = await req.payload.findByID({
@@ -93,12 +98,21 @@ export const populateFromAndTo: CollectionBeforeChangeHook = async ({ data, req,
     }
 
     if (process.env.NODE_ENV === 'development') {
+      // Determine if terminals were user-provided by checking if they were set before trip defaults
+      const hasUserProvidedTerminals = Boolean(
+        data.from &&
+          tripSchedule.from &&
+          data.from !==
+            (typeof tripSchedule.from === 'string' ? tripSchedule.from : tripSchedule.from.id),
+      )
+
       console.debug('populateFromAndTo: Successfully populated', {
         tripId: data.trip,
         from: data.from,
         fromName: data.fromTerminalName,
         to: data.to,
         toName: data.toTerminalName,
+        hasUserTerminals: hasUserProvidedTerminals,
       })
     }
   } catch (error) {

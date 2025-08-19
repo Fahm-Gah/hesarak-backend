@@ -426,6 +426,7 @@ export interface Ticket {
    */
   isCancelled?: boolean | null;
   bookedBy?: (string | null) | User;
+  paymentMethod?: ('cash' | 'card' | 'mobile') | null;
   /**
    * Payment deadline for unpaid tickets
    */
@@ -876,6 +877,7 @@ export interface TicketsSelect<T extends boolean = true> {
   isPaid?: T;
   isCancelled?: T;
   bookedBy?: T;
+  paymentMethod?: T;
   paymentDeadline?: T;
   updatedAt?: T;
   createdAt?: T;

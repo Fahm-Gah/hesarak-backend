@@ -174,7 +174,7 @@ const PersianDatePicker: React.FC<PersianDatePickerComponentProps> = (props) => 
       const m = moment(newValue)
       setSelectedHour(m.hour())
       setSelectedMinute(m.minute())
-      
+
       // Only update current month/year if the calendar is not open (user is not navigating)
       if (!isOpen) {
         setCurrentYear(m.jYear())
@@ -750,7 +750,10 @@ const PersianDatePicker: React.FC<PersianDatePickerComponentProps> = (props) => 
                             ? `${monthNames[currentMonth - 1]} ${toPersianDigits(currentYear)}`
                             : `${monthNames[currentMonth - 1]} ${currentYear}`}
                         </h2>
-                        <div className="react-datepicker__header__dropdown react-datepicker__header__dropdown--select" style={{ direction: 'ltr' }}>
+                        <div
+                          className="react-datepicker__header__dropdown react-datepicker__header__dropdown--select"
+                          style={{ direction: 'ltr' }}
+                        >
                           <select
                             className="react-datepicker__month-select"
                             value={currentMonth - 1}

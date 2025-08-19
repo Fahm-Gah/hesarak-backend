@@ -1,11 +1,6 @@
 import type { Endpoint } from 'payload'
-import { convertPersianDateToGregorian, validateDate } from '../utils/dateUtils'
-
-interface BookingRequest {
-  tripId: string
-  date: string
-  seatIds: string[]
-}
+import { convertPersianDateToGregorian } from '../utils/dateUtils'
+import { validateBookingRequest, validateBookingConstraints } from '../validations/booking'
 
 export const bookTicket: Endpoint = {
   path: '/book-ticket',
@@ -14,41 +9,66 @@ export const bookTicket: Endpoint = {
     const { payload, user } = req
 
     if (!user) {
-      return Response.json({ error: 'Authentication required' }, { status: 401 })
-    }
-
-    let body: BookingRequest
-    try {
-      body = (await req.json?.()) || req.body
-    } catch (e) {
-      return Response.json({ error: 'Invalid request body' }, { status: 400 })
-    }
-
-    const { tripId, date, seatIds } = body
-
-    if (!tripId || !date || !seatIds || !Array.isArray(seatIds) || seatIds.length === 0) {
       return Response.json(
         {
-          error: 'Missing required fields: tripId, date, and seatIds are required',
+          success: false,
+          error: 'Authentication required',
+        },
+        { status: 401 },
+      )
+    }
+
+    let requestBody: unknown
+    try {
+      requestBody = (await req.json?.()) || req.body
+    } catch (e) {
+      return Response.json(
+        {
+          success: false,
+          error: 'Invalid JSON in request body',
         },
         { status: 400 },
       )
     }
 
-    const dateValidation = validateDate(date)
-    if (!dateValidation.isValid) {
-      return Response.json({ error: dateValidation.error }, { status: 400 })
+    // Validate request using our validation schema
+    const validation = validateBookingRequest(requestBody)
+    if (!validation.isValid) {
+      return Response.json(
+        {
+          success: false,
+          error: 'Validation failed',
+          details: validation.errors,
+        },
+        { status: 400 },
+      )
     }
+
+    const bookingData = validation.data!
+
+    // Validate business constraints
+    const constraintValidation = validateBookingConstraints(bookingData)
+    if (!constraintValidation.isValid) {
+      return Response.json(
+        {
+          success: false,
+          error: 'Booking constraints violated',
+          details: constraintValidation.errors,
+        },
+        { status: 400 },
+      )
+    }
+
+    const {
+      tripId,
+      date,
+      seatIds,
+      paymentMethod = 'cash',
+      fromTerminalId,
+      toTerminalId,
+    } = bookingData
     const normalizedDate = convertPersianDateToGregorian(date)
-
     const uniqueSeatIds = [...new Set(seatIds)]
-    if (uniqueSeatIds.length !== seatIds.length) {
-      return Response.json({ error: 'Duplicate seat IDs provided' }, { status: 400 })
-    }
-
-    if (uniqueSeatIds.length > 2) {
-      return Response.json({ error: 'Maximum 2 seats per booking' }, { status: 400 })
-    }
 
     try {
       // Get user with profile
@@ -59,12 +79,19 @@ export const bookTicket: Endpoint = {
       })) as any
 
       if (!authUser?.isActive) {
-        return Response.json({ error: 'User account is inactive' }, { status: 401 })
+        return Response.json(
+          {
+            success: false,
+            error: 'User account is inactive',
+          },
+          { status: 401 },
+        )
       }
 
       if (!authUser.profile || typeof authUser.profile === 'string') {
         return Response.json(
           {
+            success: false,
             error: 'Profile required. Please complete your profile before booking tickets.',
           },
           { status: 400 },
@@ -79,13 +106,25 @@ export const bookTicket: Endpoint = {
       })) as any
 
       if (!trip?.isActive) {
-        return Response.json({ error: 'Trip not found or no longer available' }, { status: 404 })
+        return Response.json(
+          {
+            success: false,
+            error: 'Trip not found or no longer available',
+          },
+          { status: 404 },
+        )
       }
 
       // Validate seats exist in bus configuration
       const busType = trip.bus?.type
       if (!busType || !busType.seats) {
-        return Response.json({ error: 'Bus configuration not found' }, { status: 500 })
+        return Response.json(
+          {
+            success: false,
+            error: 'Bus configuration not found',
+          },
+          { status: 500 },
+        )
       }
 
       const validSeats = busType.seats.filter(
@@ -98,6 +137,7 @@ export const bookTicket: Endpoint = {
         )
         return Response.json(
           {
+            success: false,
             error: `Invalid or disabled seat IDs: ${invalidIds.join(', ')}`,
           },
           { status: 400 },
@@ -181,6 +221,7 @@ export const bookTicket: Endpoint = {
 
         return Response.json(
           {
+            success: false,
             error: `The following seats are already booked: ${conflictedSeats.join(', ')}`,
           },
           { status: 409 },
@@ -195,6 +236,7 @@ export const bookTicket: Endpoint = {
         const remainingSeats = Math.max(0, maxSeatsPerUser - userExistingSeats)
         return Response.json(
           {
+            success: false,
             error: `Booking limit exceeded. You already have ${userExistingSeats} seat(s) booked for this trip. You can only book ${remainingSeats} more seat(s). Maximum ${maxSeatsPerUser} seats per user per trip.`,
           },
           { status: 400 },
@@ -205,6 +247,7 @@ export const bookTicket: Endpoint = {
       if (userExistingSeats >= maxSeatsPerUser) {
         return Response.json(
           {
+            success: false,
             error: `You have already reached the maximum limit of ${maxSeatsPerUser} seats for this trip.`,
           },
           { status: 400 },
@@ -239,6 +282,7 @@ export const bookTicket: Endpoint = {
       if (finalUserSeatCount + uniqueSeatIds.length > maxSeatsPerUser) {
         return Response.json(
           {
+            success: false,
             error: `You have already booked ${finalUserSeatCount} seat(s) for this trip. You can only book a maximum of ${maxSeatsPerUser} seats per trip.`,
           },
           { status: 400 },
@@ -249,23 +293,84 @@ export const bookTicket: Endpoint = {
       const pricePerSeat = trip.price
       const totalPrice = pricePerSeat * uniqueSeatIds.length
 
+      // Determine payment status based on payment method
+      const isPaid = paymentMethod !== 'cash' // Only paid if not cash payment
+
+      // Calculate payment deadline: 2 hours before departure time
+      let paymentDeadline: Date | undefined = undefined
+      if (paymentMethod === 'cash' && trip.departureTime) {
+        const departureTime = new Date(trip.departureTime)
+        // Combine trip date with departure time
+        const tripDate = new Date(normalizedDate)
+        const departureDateTime = new Date(
+          tripDate.getFullYear(),
+          tripDate.getMonth(),
+          tripDate.getDate(),
+          departureTime.getHours(),
+          departureTime.getMinutes(),
+          departureTime.getSeconds(),
+        )
+        // Set deadline to 2 hours before departure
+        paymentDeadline = new Date(departureDateTime.getTime() - 2 * 60 * 60 * 1000)
+
+        // Ensure deadline is not in the past
+        if (paymentDeadline <= new Date()) {
+          paymentDeadline = new Date(Date.now() + 30 * 60 * 1000) // 30 minutes from now as fallback
+        }
+      }
+
       // Create ticket with simplified bookedSeats format
+      const ticketData: any = {
+        passenger: authUser.profile.id,
+        trip: tripId,
+        date: normalizedDate,
+        bookedSeats: validSeats.map((seat: any) => ({
+          seat: seat.id, // Store only the seat ID
+        })),
+        pricePerTicket: pricePerSeat,
+        totalPrice,
+        isPaid,
+        isCancelled: false,
+        bookedBy: user.id,
+        paymentMethod,
+        paymentDeadline: paymentDeadline?.toISOString(),
+      }
+
+      // Add user-specified from/to terminals if provided
+      if (fromTerminalId) {
+        ticketData.from = fromTerminalId
+      }
+      if (toTerminalId) {
+        ticketData.to = toTerminalId
+      }
+
+      // Debug logging
+      if (process.env.NODE_ENV === 'development') {
+        console.log('bookTicket - Creating ticket with terminals:', {
+          tripId,
+          fromTerminalId,
+          toTerminalId,
+          hasFromTerminal: !!fromTerminalId,
+          hasToTerminal: !!toTerminalId,
+        })
+      }
+
       const ticket = (await payload.create({
         collection: 'tickets',
-        data: {
-          passenger: authUser.profile.id,
-          trip: tripId,
-          date: normalizedDate,
-          bookedSeats: validSeats.map((seat: any) => ({
-            seat: seat.id, // Store only the seat ID
-          })),
-          pricePerTicket: pricePerSeat,
-          totalPrice,
-          isPaid: true,
-          isCancelled: false,
-          bookedBy: user.id,
-        },
+        data: ticketData,
       })) as any
+
+      // Debug logging for created ticket
+      if (process.env.NODE_ENV === 'development') {
+        console.log('bookTicket - Ticket created with:', {
+          ticketId: ticket.id,
+          ticketNumber: ticket.ticketNumber,
+          from: ticket.from,
+          to: ticket.to,
+          fromTerminalName: ticket.fromTerminalName,
+          toTerminalName: ticket.toTerminalName,
+        })
+      }
 
       return Response.json(
         {
@@ -285,6 +390,24 @@ export const bookTicket: Endpoint = {
               id: trip.id,
               name: trip.name,
               price: trip.price,
+              from:
+                ticket.from && typeof ticket.from === 'object'
+                  ? {
+                      id: ticket.from.id,
+                      name: ticket.from.name,
+                      province: ticket.from.province,
+                      address: ticket.from.address || '',
+                    }
+                  : null,
+              to:
+                ticket.to && typeof ticket.to === 'object'
+                  ? {
+                      id: ticket.to.id,
+                      name: ticket.to.name,
+                      province: ticket.to.province,
+                      address: ticket.to.address || '',
+                    }
+                  : null,
             },
             booking: {
               date: normalizedDate,
@@ -298,6 +421,7 @@ export const bookTicket: Endpoint = {
             },
             status: {
               isPaid: ticket.isPaid,
+              paymentMethod: ticket.paymentMethod || paymentMethod,
               paymentDeadline: ticket.paymentDeadline || '',
             },
           },
@@ -308,6 +432,7 @@ export const bookTicket: Endpoint = {
       console.error('Booking error:', error)
       return Response.json(
         {
+          success: false,
           error: 'Booking failed due to an internal error. Please try again.',
         },
         { status: 500 },

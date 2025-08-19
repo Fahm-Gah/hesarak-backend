@@ -28,6 +28,11 @@ interface SeatLayoutProps {
   maxSeatsAllowed?: number
   currentSelectedCount?: number
   isAuthenticated: boolean
+  seatAvailability?: {
+    totalSeats: number
+    availableSeats: number
+    bookedSeats: number
+  }
   className?: string
 }
 
@@ -49,18 +54,20 @@ const seatStyles = {
     ring: 'ring-2 ring-orange-300/70 ring-offset-2 ring-offset-white/50',
   },
   bookedByUser: {
-    bg: 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700',
-    shadow: 'shadow-blue-500/40',
-    border: 'border-blue-300/60',
-    text: 'text-white drop-shadow-sm',
+    bg: 'bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800',
+    shadow: 'shadow-emerald-600/60',
+    border: 'border-emerald-400/80',
+    text: 'text-white drop-shadow-sm font-bold',
     cursor: 'cursor-not-allowed',
+    ring: 'ring-2 ring-emerald-300/70 ring-offset-2 ring-offset-white/50',
   },
   bookedByUserPending: {
-    bg: 'bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600',
-    shadow: 'shadow-blue-400/40',
-    border: 'border-blue-300/60',
-    text: 'text-white drop-shadow-sm',
+    bg: 'bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600',
+    shadow: 'shadow-amber-500/60',
+    border: 'border-amber-400/80',
+    text: 'text-white drop-shadow-sm font-bold',
     cursor: 'cursor-not-allowed',
+    ring: 'ring-2 ring-amber-300/70 ring-offset-2 ring-offset-white/50',
   },
   booked: {
     bg: 'bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700',
@@ -85,6 +92,7 @@ const SeatButton = memo<{
   canClick: boolean
   currentSelectedCount: number
   effectiveMaxSeats: number
+  canSelectMoreSeats: boolean
   onSeatSelect: (seatId: string) => void
   gridStyle: React.CSSProperties
 }>(
@@ -94,6 +102,7 @@ const SeatButton = memo<{
     canClick,
     currentSelectedCount,
     effectiveMaxSeats,
+    canSelectMoreSeats,
     onSeatSelect,
     gridStyle,
   }) => {
@@ -113,7 +122,11 @@ const SeatButton = memo<{
         return seatStyles.selected
       }
 
-      if (currentSelectedCount >= effectiveMaxSeats && !isSelected) {
+      // Check if user has reached maximum selection limit or can't book more seats
+      if (
+        (!canSelectMoreSeats && !isSelected) ||
+        (currentSelectedCount >= effectiveMaxSeats && !isSelected)
+      ) {
         return seatStyles.disabled
       }
 
@@ -125,6 +138,7 @@ const SeatButton = memo<{
       isSelected,
       currentSelectedCount,
       effectiveMaxSeats,
+      canSelectMoreSeats,
     ])
 
     const styleConfig = getSeatStyleConfig()
@@ -139,8 +153,8 @@ const SeatButton = memo<{
       styleConfig.border,
       styleConfig.text,
       styleConfig.cursor,
-      // Selected state
-      isSelected && 'ring' in styleConfig && styleConfig.ring,
+      // Ring styles for selected and user-booked seats
+      (isSelected || element.isBookedByCurrentUser) && 'ring' in styleConfig && styleConfig.ring,
       isSelected && styles.seatSelected,
     )
 
@@ -160,7 +174,7 @@ const SeatButton = memo<{
         return `Seat ${element.seatNumber} - Selected, click to deselect`
       }
 
-      if (currentSelectedCount >= effectiveMaxSeats) {
+      if (!canSelectMoreSeats || currentSelectedCount >= effectiveMaxSeats) {
         return `Seat ${element.seatNumber} - Cannot select, maximum seats reached`
       }
 
@@ -173,6 +187,7 @@ const SeatButton = memo<{
       isSelected,
       currentSelectedCount,
       effectiveMaxSeats,
+      canSelectMoreSeats,
     ])
 
     return (
@@ -206,19 +221,19 @@ const FacilityElement = memo<{
         return {
           icon: <User className="w-5 h-5 drop-shadow-sm" />,
           className:
-            'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 border-slate-600/60 text-white cursor-default shadow-slate-800/50',
+            'bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-amber-400/60 text-amber-900 cursor-default shadow-amber-500/50',
         }
       case 'wc':
         return {
           icon: <Toilet className="w-5 h-5 drop-shadow-sm" />,
           className:
-            'bg-gradient-to-br from-sky-100 via-sky-200 to-sky-300 border-sky-300/60 text-sky-700 cursor-default shadow-sky-200/40',
+            'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 border-gray-300/60 text-gray-700 cursor-default shadow-gray-300/40',
         }
       case 'door':
         return {
           icon: <DoorOpen className="w-5 h-5 drop-shadow-sm" />,
           className:
-            'bg-gradient-to-br from-amber-100 via-amber-200 to-amber-300 border-amber-300/60 text-amber-700 cursor-default shadow-amber-200/40',
+            'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 border-gray-300/60 text-gray-700 cursor-default shadow-gray-300/40',
         }
       default:
         return null
@@ -252,6 +267,7 @@ export const SeatLayout = memo<SeatLayoutProps>(
     maxSeatsAllowed = 2,
     currentSelectedCount = 0,
     isAuthenticated,
+    seatAvailability,
     className = '',
   }) => {
     // Memoize expensive calculations
@@ -346,7 +362,8 @@ export const SeatLayout = memo<SeatLayoutProps>(
         if (element.type === 'seat') {
           const isSelected = selectedSeatsSet.has(element.id)
           const canClick =
-            !element.isBooked && (isSelected || currentSelectedCount < effectiveMaxSeats)
+            !element.isBooked &&
+            (isSelected || (canSelectMoreSeats && currentSelectedCount < effectiveMaxSeats))
 
           return (
             <SeatButton
@@ -356,6 +373,7 @@ export const SeatLayout = memo<SeatLayoutProps>(
               canClick={canClick}
               currentSelectedCount={currentSelectedCount}
               effectiveMaxSeats={effectiveMaxSeats}
+              canSelectMoreSeats={canSelectMoreSeats}
               onSeatSelect={memoizedOnSeatSelect}
               gridStyle={gridStyle}
             />
@@ -364,7 +382,14 @@ export const SeatLayout = memo<SeatLayoutProps>(
 
         return <FacilityElement key={element.id} element={element} gridStyle={gridStyle} />
       })
-    }, [busLayout, selectedSeatsSet, currentSelectedCount, effectiveMaxSeats, memoizedOnSeatSelect])
+    }, [
+      busLayout,
+      selectedSeatsSet,
+      currentSelectedCount,
+      effectiveMaxSeats,
+      canSelectMoreSeats,
+      memoizedOnSeatSelect,
+    ])
 
     return (
       <div
@@ -415,13 +440,22 @@ export const SeatLayout = memo<SeatLayoutProps>(
               <span className="text-xs font-medium text-gray-700">Booked</span>
             </div>
             {hasUserBookedSeats && (
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm border border-blue-300/50"
-                  aria-hidden="true"
-                />
-                <span className="text-xs font-medium text-gray-700">Yours</span>
-              </div>
+              <>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg shadow-sm border border-emerald-400/50 ring-1 ring-emerald-300/40"
+                    aria-hidden="true"
+                  />
+                  <span className="text-xs font-medium text-gray-700">Yours (Paid)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg shadow-sm border border-amber-400/50 ring-1 ring-amber-300/40"
+                    aria-hidden="true"
+                  />
+                  <span className="text-xs font-medium text-gray-700">Yours (Pending)</span>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -447,6 +481,29 @@ export const SeatLayout = memo<SeatLayoutProps>(
             {renderedElements}
           </div>
         </div>
+
+        {/* Seat Availability Info */}
+        {seatAvailability && (
+          <div className="px-8 py-6 bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 border-t border-orange-200/30 backdrop-blur-sm">
+            <div className="flex items-center justify-center gap-8 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg shadow-sm border border-orange-200/40" />
+                <span className="font-medium text-gray-700">
+                  Available:{' '}
+                  <span className="font-bold text-orange-700">
+                    {seatAvailability.availableSeats}
+                  </span>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-gray-700">
+                  Total:{' '}
+                  <span className="font-bold text-gray-800">{seatAvailability.totalSeats}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   },

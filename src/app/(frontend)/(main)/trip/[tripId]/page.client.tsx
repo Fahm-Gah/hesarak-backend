@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
 import { SeatLayout } from '../components/SeatLayout'
 import { TripInfo } from '../components/TripInfo'
 import { BookingSummary } from '../components/BookingSummary'
-import { XCircle, Phone } from 'lucide-react'
+import { Phone } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 interface BusLayoutElement {
   id: string
@@ -86,6 +87,33 @@ interface TripDetails {
     totalBookedSeats: number
     maxSeatsPerUser: number
   } | null
+  userJourney?: {
+    boardingTerminal: {
+      id: string
+      name: string
+      province: string
+      address?: string
+    }
+    boardingTime: string
+    destinationTerminal: {
+      id: string
+      name: string
+      province: string
+      address?: string
+    } | null
+    arrivalTime: string | null
+    duration: string | null
+  }
+  originalTrip?: {
+    from: {
+      id: string
+      name: string
+      province: string
+      address?: string
+    }
+    departureTime: string
+    isUserBoardingAtMainTerminal: boolean
+  }
 }
 
 interface User {
@@ -99,17 +127,73 @@ interface TripDetailsClientProps {
   tripDetails: TripDetails
   user: User | null
   isAuthenticated: boolean
+  initialError?: string | null
+  originalSearchParams?: {
+    fromProvince?: string
+    toProvince?: string
+    date?: string
+  }
 }
 
 export const TripDetailsClient = ({
   tripDetails,
   user,
   isAuthenticated,
+  initialError,
+  originalSearchParams,
 }: TripDetailsClientProps) => {
   const router = useRouter()
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
   const [isBookingLoading, setIsBookingLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+
+  // Debug logging for client-side
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('TripDetailsClient - Received data:', {
+        tripDetails: {
+          id: tripDetails.id,
+          from: tripDetails.from,
+          to: tripDetails.to,
+          departureTime: tripDetails.departureTime,
+          arrivalTime: tripDetails.arrivalTime,
+          userJourney: tripDetails.userJourney,
+          originalTrip: tripDetails.originalTrip,
+        },
+        originalSearchParams,
+      })
+    }
+  }, [tripDetails, originalSearchParams])
+
+  // Handle initial error from URL parameters
+  useEffect(() => {
+    if (initialError) {
+      switch (initialError) {
+        case 'booking_limit_exceeded':
+          toast.error(
+            'You have already booked the maximum number of seats allowed for this trip. Please manage your existing bookings if you need to make changes.',
+          )
+          break
+        case 'too_many_seats':
+          toast.error('You are trying to book more seats than allowed for this trip.')
+          break
+        default:
+          toast.error('An error occurred while processing your booking.')
+      }
+      setSelectedSeats([]) // Clear any selected seats
+    }
+  }, [initialError])
+
+  // Only clear selected seats if user can't book more, but don't show error message automatically
+  useEffect(() => {
+    if (
+      isAuthenticated &&
+      tripDetails.userBookingInfo &&
+      !tripDetails.userBookingInfo.canBookMoreSeats &&
+      !initialError
+    ) {
+      setSelectedSeats([]) // Clear any selected seats silently
+    }
+  }, [isAuthenticated, tripDetails.userBookingInfo, initialError])
 
   // Calculate if user can select more seats
   // Default to 2 seats if userBookingInfo is not available (for unauthenticated users or when API doesn't return it)
@@ -120,8 +204,6 @@ export const TripDetailsClient = ({
 
   const handleSeatSelect = useCallback(
     (seatId: string) => {
-      setError(null)
-
       setSelectedSeats((prev) => {
         const isCurrentlySelected = prev.includes(seatId)
 
@@ -129,10 +211,22 @@ export const TripDetailsClient = ({
           // Deselect seat
           return prev.filter((id) => id !== seatId)
         } else {
+          // Check if user can book more seats at all
+          if (
+            isAuthenticated &&
+            tripDetails.userBookingInfo &&
+            !tripDetails.userBookingInfo.canBookMoreSeats
+          ) {
+            toast.error(
+              'You have already booked the maximum number of seats allowed for this trip.',
+            )
+            return prev
+          }
+
           // Check if user can select more seats
           const maxSeats = tripDetails.userBookingInfo?.remainingSeatsAllowed ?? 2
           if (prev.length >= maxSeats) {
-            setError(`You can only select up to ${maxSeats} seats`)
+            toast.error(`You can only select up to ${maxSeats} seats`)
             return prev
           }
 
@@ -146,39 +240,102 @@ export const TripDetailsClient = ({
 
   const handleClearSelection = useCallback(() => {
     setSelectedSeats([])
-    setError(null)
+    toast.success('Selection cleared')
   }, [])
 
   const handleProceedToBooking = useCallback(async () => {
     if (selectedSeats.length === 0) {
-      setError('Please select at least one seat')
+      toast.error('Please select at least one seat')
       return
     }
 
+    // Check if authenticated user can book the selected number of seats
+    if (isAuthenticated && tripDetails.userBookingInfo) {
+      const { canBookMoreSeats, remainingSeatsAllowed } = tripDetails.userBookingInfo
+
+      if (!canBookMoreSeats) {
+        toast.error('You have already booked the maximum number of seats allowed for this trip.')
+        return
+      }
+
+      if (selectedSeats.length > remainingSeatsAllowed) {
+        toast.error(
+          `You can only book ${remainingSeatsAllowed} more seat${remainingSeatsAllowed === 1 ? '' : 's'} for this trip.`,
+        )
+        return
+      }
+    }
+
     setIsBookingLoading(true)
-    setError(null)
 
     try {
       if (!isAuthenticated) {
-        // Create checkout URL with selected seats and trip details
-        const checkoutUrl = `/checkout?tripId=${tripDetails.id}&date=${encodeURIComponent(tripDetails.searchDate)}&seats=${selectedSeats.join(',')}`
+        // Create checkout URL with selected seats and trip details - use originalDate to maintain Persian format
+        const checkoutParams = new URLSearchParams()
+        checkoutParams.append('tripId', tripDetails.id)
+        checkoutParams.append('date', tripDetails.originalDate)
+        checkoutParams.append('seats', selectedSeats.join(','))
+        // Include user's specific from/to terminals
+        checkoutParams.append('from', tripDetails.from.id)
+        if (tripDetails.to) {
+          checkoutParams.append('to', tripDetails.to.id)
+        }
+
+        // Also include original search parameters for breadcrumb navigation
+        if (originalSearchParams?.fromProvince) {
+          checkoutParams.append('fromProvince', originalSearchParams.fromProvince)
+        }
+        if (originalSearchParams?.toProvince) {
+          checkoutParams.append('toProvince', originalSearchParams.toProvince)
+        }
+
+        const checkoutUrl = `/checkout?${checkoutParams.toString()}`
         const loginUrl = '/auth/login?redirect=' + encodeURIComponent(checkoutUrl)
         router.push(loginUrl)
       } else {
-        // Navigate directly to checkout for authenticated users
-        const checkoutUrl = `/checkout?tripId=${tripDetails.id}&date=${encodeURIComponent(tripDetails.searchDate)}&seats=${selectedSeats.join(',')}`
+        // Navigate directly to checkout for authenticated users - use originalDate to maintain Persian format
+        const checkoutParams = new URLSearchParams()
+        checkoutParams.append('tripId', tripDetails.id)
+        checkoutParams.append('date', tripDetails.originalDate)
+        checkoutParams.append('seats', selectedSeats.join(','))
+        // Include user's specific from/to terminals
+        checkoutParams.append('from', tripDetails.from.id)
+        if (tripDetails.to) {
+          checkoutParams.append('to', tripDetails.to.id)
+        }
+
+        // Also include original search parameters for breadcrumb navigation
+        if (originalSearchParams?.fromProvince) {
+          checkoutParams.append('fromProvince', originalSearchParams.fromProvince)
+        }
+        if (originalSearchParams?.toProvince) {
+          checkoutParams.append('toProvince', originalSearchParams.toProvince)
+        }
+
+        const checkoutUrl = `/checkout?${checkoutParams.toString()}`
         router.push(checkoutUrl)
       }
     } catch (err) {
       console.error('Booking error:', err)
-      setError('Failed to proceed with booking. Please try again.')
-    } finally {
+      toast.error('Failed to proceed with booking. Please try again.')
       setIsBookingLoading(false)
     }
-  }, [isAuthenticated, selectedSeats, router, tripDetails.id, tripDetails.searchDate])
+  }, [
+    isAuthenticated,
+    selectedSeats,
+    router,
+    tripDetails.id,
+    tripDetails.originalDate,
+    tripDetails.userBookingInfo,
+  ])
 
-  // Build search URL with parameters to maintain search context
-  const searchUrl = `/search?from=${encodeURIComponent(tripDetails.from.province)}&to=${encodeURIComponent(tripDetails.to?.province || '')}&date=${encodeURIComponent(tripDetails.searchDate)}`
+  // Build search URL with original search parameters to maintain search context
+  // Use original search provinces if available, otherwise fall back to terminal provinces
+  const searchFromProvince = originalSearchParams?.fromProvince || tripDetails.from.province
+  const searchToProvince = originalSearchParams?.toProvince || tripDetails.to?.province || ''
+  const searchDate = originalSearchParams?.date || tripDetails.originalDate
+
+  const searchUrl = `/search?from=${encodeURIComponent(searchFromProvince)}&to=${encodeURIComponent(searchToProvince)}&date=${encodeURIComponent(searchDate)}`
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
@@ -193,16 +350,6 @@ export const TripDetailsClient = ({
         <div className="mb-6">
           <Breadcrumbs items={breadcrumbItems} />
         </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-center">
-              <XCircle className="w-5 h-5 text-red-500 mr-2" />
-              <span className="text-red-700 text-sm">{error}</span>
-            </div>
-          </div>
-        )}
 
         {/* Main Content */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -222,6 +369,7 @@ export const TripDetailsClient = ({
               maxSeatsAllowed={Math.max(maxAllowedSeats, 1)}
               currentSelectedCount={selectedSeats.length}
               isAuthenticated={isAuthenticated}
+              seatAvailability={tripDetails.seatAvailability}
             />
 
             {/* Booking Summary */}
@@ -248,7 +396,7 @@ export const TripDetailsClient = ({
               Important Information
             </h3>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl p-6 border border-orange-200/30 backdrop-blur-sm">
               <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -258,23 +406,38 @@ export const TripDetailsClient = ({
               <div className="space-y-3 text-sm text-gray-700">
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Maximum <span className="font-semibold text-orange-700">{tripDetails.userBookingInfo?.maxSeatsPerUser || 2}</span> seats per user</span>
+                  <span>
+                    Maximum{' '}
+                    <span className="font-semibold text-orange-700">
+                      {tripDetails.userBookingInfo?.maxSeatsPerUser || 2}
+                    </span>{' '}
+                    seats per user
+                  </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Payment required within <span className="font-semibold text-orange-700">24 hours</span></span>
+                  <span>
+                    Payment required within{' '}
+                    <span className="font-semibold text-orange-700">24 hours</span>
+                  </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Cancellation allowed up to <span className="font-semibold text-orange-700">24 hours</span> before departure</span>
+                  <span>
+                    Cancellation allowed up to{' '}
+                    <span className="font-semibold text-orange-700">24 hours</span> before departure
+                  </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Refund processing takes <span className="font-semibold text-orange-700">3-5 business days</span></span>
+                  <span>
+                    Refund processing takes{' '}
+                    <span className="font-semibold text-orange-700">3-5 business days</span>
+                  </span>
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl p-6 border border-orange-200/30 backdrop-blur-sm">
               <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <div className="w-1.5 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
@@ -283,19 +446,31 @@ export const TripDetailsClient = ({
               <div className="space-y-3 text-sm text-gray-700">
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span><span className="font-semibold text-orange-700">Valid ID</span> required for boarding</span>
+                  <span>
+                    <span className="font-semibold text-orange-700">Valid ID</span> required for
+                    boarding
+                  </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Arrive <span className="font-semibold text-orange-700">30 minutes</span> before departure</span>
+                  <span>
+                    Arrive <span className="font-semibold text-orange-700">30 minutes</span> before
+                    departure
+                  </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span><span className="font-semibold text-orange-700">No smoking or alcohol</span> on board</span>
+                  <span>
+                    <span className="font-semibold text-orange-700">No smoking or alcohol</span> on
+                    board
+                  </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Luggage weight limit: <span className="font-semibold text-orange-700">20kg per passenger</span></span>
+                  <span>
+                    Luggage weight limit:{' '}
+                    <span className="font-semibold text-orange-700">20kg per passenger</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -313,7 +488,8 @@ export const TripDetailsClient = ({
                 Need Help?
               </h4>
               <p className="text-orange-800 text-sm leading-relaxed">
-                Contact our support team for assistance with your booking or travel questions. We're here to make your journey smooth and comfortable.
+                Contact our support team for assistance with your booking or travel questions. We're
+                here to make your journey smooth and comfortable.
               </p>
             </div>
           </div>

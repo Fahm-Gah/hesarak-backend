@@ -38,6 +38,23 @@ interface TripDetails {
     name: string
     province: string
   } | null
+  userJourney?: {
+    boardingTerminal: {
+      id: string
+      name: string
+      province: string
+      address?: string
+    }
+    boardingTime: string
+    destinationTerminal: {
+      id: string
+      name: string
+      province: string
+      address?: string
+    } | null
+    arrivalTime: string | null
+    duration: string | null
+  }
 }
 
 interface UserBookingInfo {
@@ -75,14 +92,14 @@ const EmptyState = memo<{
     </p>
 
     {isAuthenticated && userBookingInfo && (
-      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200/50">
-        <div className="text-sm text-blue-700">
+      <div className="mt-6 p-4 bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-xl border border-orange-200/50">
+        <div className="text-sm text-orange-700">
           <p className="font-semibold mb-1">Booking Limits:</p>
           <p>
             You can book up to{' '}
             <span className="font-bold">{userBookingInfo.remainingSeatsAllowed}</span> more seats
           </p>
-          <p className="text-xs mt-1 text-blue-600">
+          <p className="text-xs mt-1 text-orange-600">
             ({userBookingInfo.totalBookedSeats} of {userBookingInfo.maxSeatsPerUser} seats already
             booked)
           </p>
@@ -249,8 +266,8 @@ export const BookingSummary = memo<BookingSummaryProps>(
 
         {/* User Booking Info */}
         {userBookingInfo && (
-          <div className="mb-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50">
-            <div className="text-sm text-blue-700">
+          <div className="mb-8 p-4 bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl border border-orange-200/50">
+            <div className="text-sm text-orange-700">
               <p className="font-semibold mb-1">Booking Status:</p>
               <p>
                 You can book{' '}
@@ -259,7 +276,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
                 </span>{' '}
                 more seats after this booking
               </p>
-              <p className="text-xs mt-1 text-blue-600">
+              <p className="text-xs mt-1 text-orange-600">
                 ({userBookingInfo.totalBookedSeats + selectedSeats.length} of{' '}
                 {userBookingInfo.maxSeatsPerUser} seats will be booked)
               </p>
@@ -298,7 +315,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
             <button
               onClick={onClearSelection}
               disabled={isLoading}
-              className="w-full py-3 px-4 border-2 border-orange-200 rounded-2xl font-semibold text-gray-700 hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 disabled:opacity-50"
+              className="w-full py-3 px-4 border-2 border-orange-200 rounded-2xl font-semibold text-orange-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 hover:border-orange-300 transition-all duration-200 disabled:opacity-50"
             >
               Clear Selection
             </button>
@@ -306,7 +323,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
         </div>
 
         {/* Terms and Conditions */}
-        <div className="mt-8 pt-6 border-t border-orange-200/50">
+        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 pb-4 border-t border-orange-200/50">
           <div className="text-xs text-gray-500 space-y-2 leading-relaxed">
             <p className="flex items-start gap-2">
               <span className="w-1 h-1 bg-orange-400 rounded-full mt-2 flex-shrink-0" />

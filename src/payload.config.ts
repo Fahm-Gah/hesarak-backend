@@ -26,6 +26,7 @@ import { registerUser } from './endpoints/registerUser'
 import { bookTicket } from './endpoints/bookTicket'
 import { getUserTickets } from './endpoints/getUserTickets'
 import { updateLocation } from './endpoints/updateLocation'
+import { getTicketDetails } from './endpoints/getTicketDetails'
 import { TripRecords } from './collections/TripRecords'
 import { Drivers } from './collections/Drivers'
 
@@ -99,5 +100,6 @@ export default buildConfig({
     bookTicket,
     getUserTickets,
     updateLocation,
+    getTicketDetails,
   ],
 })

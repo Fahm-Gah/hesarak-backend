@@ -21,6 +21,7 @@ export const RegisterClient = () => {
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showGenderDropdown, setShowGenderDropdown] = useState(false)
   const { register, isLoading, error, clearError } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -88,6 +89,35 @@ export const RegisterClient = () => {
       console.error('Registration error:', err)
     }
   }
+
+  // Close gender dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showGenderDropdown) {
+        const target = event.target as Element
+        const dropdown = document.querySelector('.gender-dropdown')
+
+        if (dropdown && !dropdown.contains(target)) {
+          setShowGenderDropdown(false)
+        }
+      }
+    }
+
+    if (showGenderDropdown) {
+      document.addEventListener('click', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [showGenderDropdown])
+
+  const genderOptions = [
+    { value: 'male', label: 'Male', icon: '👨' },
+    { value: 'female', label: 'Female', icon: '👩' },
+  ]
+
+  const selectedGender = genderOptions.find((option) => option.value === formData.gender)
 
   const isFormValid =
     formData.email.trim() &&
@@ -189,21 +219,81 @@ export const RegisterClient = () => {
             </div>
 
             {/* Gender */}
-            <div>
+            <div className="gender-dropdown">
               <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-              <select
-                value={formData.gender}
-                onChange={(e) => handleInputChange('gender', e.target.value as 'male' | 'female')}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 bg-white/80 ${
-                  errors.gender
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                    : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
-                }`}
-                disabled={isLoading || success}
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowGenderDropdown(!showGenderDropdown)
+                  }}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 bg-white/80 flex items-center justify-between ${
+                    errors.gender
+                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
+                  }`}
+                  disabled={isLoading || success}
+                >
+                  <div className="flex items-center">
+                    <span className="text-xl mr-3">{selectedGender?.icon}</span>
+                    <span className="text-gray-900">{selectedGender?.label}</span>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                      showGenderDropdown ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {showGenderDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1">
+                    {genderOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleInputChange('gender', option.value as 'male' | 'female')
+                          setShowGenderDropdown(false)
+                        }}
+                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 flex items-center ${
+                          formData.gender === option.value
+                            ? 'bg-orange-50 text-orange-700'
+                            : 'text-gray-900'
+                        }`}
+                        disabled={isLoading || success}
+                      >
+                        <span className="text-xl mr-3">{option.icon}</span>
+                        <span>{option.label}</span>
+                        {formData.gender === option.value && (
+                          <svg
+                            className="w-5 h-5 ml-auto text-orange-600"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {errors.gender && <p className="mt-1 text-sm text-red-600">{errors.gender}</p>}
             </div>
 
@@ -230,9 +320,9 @@ export const RegisterClient = () => {
             {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-              <div className="flex">
+              <div className="flex w-full">
                 {/* Country Code Selector (Fixed) */}
-                <div className="flex items-center px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100 border-r-0">
+                <div className="flex items-center px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100 border-r-0 flex-shrink-0">
                   <span className="text-2xl mr-2">🇦🇫</span>
                   <span className="text-gray-700 font-medium">+93</span>
                 </div>
@@ -251,7 +341,7 @@ export const RegisterClient = () => {
                     value = value.substring(0, 9)
                     handleInputChange('phone', value)
                   }}
-                  className={`flex-1 px-4 py-3 border rounded-r-lg focus:outline-none focus:ring-2 transition-all duration-200 bg-white/80 ${
+                  className={`flex-1 min-w-0 px-4 py-3 border rounded-r-lg focus:outline-none focus:ring-2 transition-all duration-200 bg-white/80 ${
                     errors.phone
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                       : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
@@ -445,7 +535,7 @@ export const RegisterClient = () => {
             <p className="text-gray-600">
               Already have an account?{' '}
               <Link
-                href="/auth/login"
+                href={`/auth/login${redirectTo !== '/' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
                 className="text-orange-600 hover:text-orange-700 font-medium"
               >
                 Sign in here

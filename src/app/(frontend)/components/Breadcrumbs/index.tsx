@@ -14,7 +14,7 @@ interface BreadcrumbsProps {
 export const Breadcrumbs = ({ items, className = '' }: BreadcrumbsProps) => {
   return (
     <nav className={`flex items-center space-x-2 text-sm ${className}`} aria-label="Breadcrumb">
-      {items.map((item, index) => (
+      {items.map((item: BreadcrumbItem, index: number) => (
         <div key={index} className="flex items-center">
           {index > 0 && (
             <svg
@@ -23,12 +23,7 @@ export const Breadcrumbs = ({ items, className = '' }: BreadcrumbsProps) => {
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           )}
           {item.href && index < items.length - 1 ? (
@@ -41,9 +36,7 @@ export const Breadcrumbs = ({ items, className = '' }: BreadcrumbsProps) => {
           ) : (
             <span
               className={`${
-                index === items.length - 1
-                  ? 'text-orange-600 font-medium'
-                  : 'text-gray-600'
+                index === items.length - 1 ? 'text-orange-600 font-medium' : 'text-gray-600'
               }`}
             >
               {item.label}

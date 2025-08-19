@@ -1,0 +1,8 @@
+export { BookingHeader } from './BookingHeader'
+export { TicketCard } from './TicketCard'
+export { TripDetails } from './TripDetails'
+export { PassengerInfo } from './PassengerInfo'
+export { PaymentInfo } from './PaymentInfo'
+export { ImportantInfo } from './ImportantInfo'
+export { ActionButtons } from './ActionButtons'
+export type { BookingData } from './types'

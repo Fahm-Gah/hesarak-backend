@@ -245,6 +245,43 @@ export const Tickets: CollectionConfig = {
       },
     },
     {
+      name: 'paymentMethod',
+      label: {
+        en: 'Payment Method',
+        fa: 'روش پرداخت',
+      },
+      type: 'select',
+      defaultValue: 'cash',
+      options: [
+        {
+          label: {
+            en: 'Cash (Pay on Bus)',
+            fa: 'نقدی (پرداخت در اتوبوس)',
+          },
+          value: 'cash',
+        },
+        {
+          label: {
+            en: 'Credit/Debit Card',
+            fa: 'کارت اعتباری/نقدی',
+          },
+          value: 'card',
+        },
+        {
+          label: {
+            en: 'Mobile Payment',
+            fa: 'پرداخت موبایل',
+          },
+          value: 'mobile',
+        },
+      ],
+      admin: {
+        position: 'sidebar',
+        hidden: true,
+      },
+      index: true,
+    },
+    {
       name: 'paymentDeadline',
       label: {
         en: 'Payment Deadline',

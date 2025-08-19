@@ -72,7 +72,10 @@ export interface BusType {
   id: string
   name: string
   seats: Seat[]
-  amenities: string[]
+  amenities?: Array<{
+    amenity: string
+    id?: string | null
+  }> | null
   capacity?: number
 }
 

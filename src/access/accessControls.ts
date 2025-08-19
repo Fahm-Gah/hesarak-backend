@@ -79,29 +79,6 @@ export const hasAnyRole = (user: AppUser | null | undefined, roles: string[]): b
   return roles.some((r) => user.roles!.includes(r))
 }
 
-/**
- * Terminal-based where builder for an AppUser.
- * Returns either `true`, `false`, or a Payload-style where object.
- */
-const terminalWhereForUser = (user: AppUser): boolean | Where => {
-  if (!user || user.isActive === false) return false
-
-  if (hasRole(user, 'admin')) return true
-
-  if (hasExactRole(user, 'agent') && user.terminal) {
-    const terminals = Array.isArray(user.terminal) ? user.terminal : [user.terminal]
-    return {
-      or: [
-        { 'from.id': { in: terminals } },
-        { 'to.id': { in: terminals } },
-        { 'terminal.id': { in: terminals } },
-      ],
-    }
-  }
-
-  return false
-}
-
 // ---------------------------
 // Reusable access functions
 // ---------------------------
@@ -162,16 +139,6 @@ export const agentOrHigher: Access = ({ req }: any) => {
 export const superadminOrEditor: Access = ({ req }: any) => {
   const user = validateAppUser(req?.user)
   return hasAnyRole(user, ['superadmin', 'editor'])
-}
-
-/**
- * Terminal-based Access: validate user, then delegate to `terminalWhereForUser`.
- * Cast to any to satisfy Payload's Access typing.
- */
-export const terminalBasedAccess: Access = ({ req }: any) => {
-  const user = validateAppUser(req?.user)
-  if (!user) return false
-  return terminalWhereForUser(user) as any
 }
 
 // Field-level access
@@ -338,16 +305,8 @@ export const tripSchedulesAccess = {
 export const ticketsAccess = {
   read: agentOrHigher,
   create: agentOrHigher,
-  update: ({ req }: any) => {
-    const user = validateAppUser(req?.user)
-    if (!user || user.isActive === false) return false
-    if (hasRole(user, 'admin')) return true
-    if (hasExactRole(user, 'agent')) {
-      return terminalWhereForUser(user) as any
-    }
-    return false
-  },
-  delete: adminOrHigher,
+  update: agentOrHigher,
+  delete: agentOrHigher,
 }
 
 export const usersAccess = {

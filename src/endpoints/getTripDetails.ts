@@ -27,8 +27,22 @@ export const getTripDetails: Endpoint = {
   path: '/trips/:tripId/date/:date',
   method: 'get',
   handler: async (req: PayloadRequest) => {
-    const { payload, routeParams, user } = req
+    const { payload, routeParams, user, searchParams } = req
     const { tripId, date: rawDate } = routeParams as { tripId?: string; date?: string }
+
+    // Extract optional from/to terminal IDs from query parameters
+    const fromTerminalId = searchParams?.get('from') || undefined
+    const toTerminalId = searchParams?.get('to') || undefined
+
+    // Debug logging
+    if (process.env.NODE_ENV === 'development') {
+      console.log('getTripDetails - Parameters received:', {
+        tripId,
+        rawDate,
+        fromTerminalId,
+        toTerminalId,
+      })
+    }
 
     if (!tripId || !rawDate) {
       return Response.json(
@@ -70,8 +84,6 @@ export const getTripDetails: Endpoint = {
           { status: 404 },
         )
       }
-
-      console.log(trip.bus.images)
 
       // Get booked tickets for this trip and date with proper date range
       const dateObj = new Date(convertedDate)
@@ -212,16 +224,45 @@ export const getTripDetails: Endpoint = {
         })
       }
 
-      // Process stops and calculate arrival time
+      // Determine user's boarding and destination points based on provided terminal IDs
+      let userBoardingTerminal = trip.from
+      let userBoardingTime = formatTime(trip.departureTime)
+      let destinationTerminal = null
       let arrivalTime: string | null = null
       let duration: string | null = null
-      let destinationTerminal = null
 
-      if (trip.stops && trip.stops.length > 0) {
+      // If fromTerminalId is provided, find the matching terminal
+      if (fromTerminalId) {
+        if (trip.from.id === fromTerminalId) {
+          // User boards at main departure terminal
+          userBoardingTerminal = trip.from
+          userBoardingTime = formatTime(trip.departureTime)
+        } else if (trip.stops) {
+          // Look for boarding point in stops
+          const boardingStop = trip.stops.find((stop: any) => stop.terminal.id === fromTerminalId)
+          if (boardingStop) {
+            userBoardingTerminal = boardingStop.terminal
+            userBoardingTime = formatTime(boardingStop.time)
+          }
+        }
+      }
+
+      // If toTerminalId is provided, find the matching terminal
+      if (toTerminalId && trip.stops) {
+        const destinationStop = trip.stops.find((stop: any) => stop.terminal.id === toTerminalId)
+        if (destinationStop) {
+          destinationTerminal = destinationStop.terminal
+          arrivalTime = formatTime(destinationStop.time)
+          duration = calculateDuration(userBoardingTime, arrivalTime)
+        }
+      }
+
+      // Fallback: if no specific destination provided, use last stop
+      if (!destinationTerminal && trip.stops && trip.stops.length > 0) {
         const lastStop = trip.stops[trip.stops.length - 1]
         destinationTerminal = lastStop.terminal
         arrivalTime = formatTime(lastStop.time)
-        duration = calculateDuration(formatTime(trip.departureTime), arrivalTime)
+        duration = calculateDuration(userBoardingTime, arrivalTime)
       }
 
       const processedStops =
@@ -255,22 +296,46 @@ export const getTripDetails: Endpoint = {
       const actualBookingsCount = bookedSeatsMap.size
       const effectiveBookedSeats = actualBookingsCount + disabledSeatsCount
 
+      // Debug logging for final terminals
+      if (process.env.NODE_ENV === 'development') {
+        console.log('getTripDetails - Returning terminals:', {
+          userBoardingTerminal: {
+            id: userBoardingTerminal.id,
+            name: userBoardingTerminal.name,
+            province: userBoardingTerminal.province,
+          },
+          destinationTerminal: destinationTerminal
+            ? {
+                id: destinationTerminal.id,
+                name: destinationTerminal.name,
+                province: destinationTerminal.province,
+              }
+            : null,
+          originalTripFrom: {
+            id: trip.from.id,
+            name: trip.from.name,
+            province: trip.from.province,
+          },
+        })
+      }
+
       return Response.json({
         success: true,
         data: {
           id: trip.id,
           name: trip.name,
           price: trip.price,
-          departureTime: formatTime(trip.departureTime),
+          departureTime: userBoardingTime,
           arrivalTime,
           duration,
           searchDate: convertedDate,
           originalDate: decodedDate,
+          // User-specific journey information (for booking summaries, etc.)
           from: {
-            id: trip.from.id,
-            name: trip.from.name,
-            province: trip.from.province,
-            address: trip.from.address || '',
+            id: userBoardingTerminal.id,
+            name: userBoardingTerminal.name,
+            province: userBoardingTerminal.province,
+            address: userBoardingTerminal.address || '',
           },
           to: destinationTerminal
             ? {
@@ -280,6 +345,37 @@ export const getTripDetails: Endpoint = {
                 address: destinationTerminal.address || '',
               }
             : null,
+          // Additional user journey details for components that need them
+          userJourney: {
+            boardingTerminal: {
+              id: userBoardingTerminal.id,
+              name: userBoardingTerminal.name,
+              province: userBoardingTerminal.province,
+              address: userBoardingTerminal.address || '',
+            },
+            boardingTime: userBoardingTime,
+            destinationTerminal: destinationTerminal
+              ? {
+                  id: destinationTerminal.id,
+                  name: destinationTerminal.name,
+                  province: destinationTerminal.province,
+                  address: destinationTerminal.address || '',
+                }
+              : null,
+            arrivalTime,
+            duration,
+          },
+          // Original trip information (for components that need full route)
+          originalTrip: {
+            from: {
+              id: trip.from.id,
+              name: trip.from.name,
+              province: trip.from.province,
+              address: trip.from.address || '',
+            },
+            departureTime: formatTime(trip.departureTime),
+            isUserBoardingAtMainTerminal: userBoardingTerminal.id === trip.from.id,
+          },
           bus: {
             id: trip.bus.id,
             number: trip.bus.number,

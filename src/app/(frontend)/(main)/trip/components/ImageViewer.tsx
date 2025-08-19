@@ -135,12 +135,8 @@ export const ImageViewer = ({
       {/* Main Swiper */}
       <div className="w-full h-full pt-24 pb-8">
         <Swiper
-          modules={[Navigation, Pagination, Zoom, Keyboard, A11y]}
+          modules={[Pagination, Zoom, Keyboard, A11y]}
           initialSlide={initialIndex}
-          navigation={{
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-          }}
           pagination={{
             clickable: true,
             dynamicBullets: true,
@@ -175,7 +171,7 @@ export const ImageViewer = ({
                   alt={image.alt || `Bus ${busNumber} - Image ${index + 1}`}
                   width={image.width}
                   height={image.height}
-                  className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                  className="max-w-full max-h-full object-contain rounded-none md:rounded-lg shadow-2xl"
                   priority={index === initialIndex}
                   loading={index === initialIndex ? 'eager' : 'lazy'}
                   sizes="100vw"
@@ -183,14 +179,6 @@ export const ImageViewer = ({
               </div>
             </SwiperSlide>
           ))}
-
-          {/* Custom Navigation Buttons */}
-          {images.length > 1 && (
-            <>
-              <div className="swiper-button-prev !w-14 !h-14 !bg-white/10 !backdrop-blur-sm !border !border-white/20 !rounded-full after:!text-lg !text-white hover:!bg-white/20 !transition-all !duration-300 !shadow-lg"></div>
-              <div className="swiper-button-next !w-14 !h-14 !bg-white/10 !backdrop-blur-sm !border !border-white/20 !rounded-full after:!text-lg !text-white hover:!bg-white/20 !transition-all !duration-300 !shadow-lg"></div>
-            </>
-          )}
         </Swiper>
       </div>
     </div>

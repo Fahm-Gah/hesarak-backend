@@ -117,7 +117,7 @@ export const searchTrips: Endpoint = {
       const fromTerminalsResult = await payload.find({
         collection: 'terminals',
         where: {
-          province: { 
+          province: {
             like: from,
           },
         },
@@ -128,7 +128,7 @@ export const searchTrips: Endpoint = {
       const toTerminalsResult = await payload.find({
         collection: 'terminals',
         where: {
-          province: { 
+          province: {
             like: to,
           },
         },
@@ -177,12 +177,15 @@ export const searchTrips: Endpoint = {
       // Filter trips that serve the requested route (including intermediate stops)
       const relevantTrips = tripSchedules.docs.filter((trip: any) => {
         // Check if trip starts from a terminal in 'from' province OR has a stop in 'from' province
-        const hasFromLocation = fromTerminalIds.includes(trip.from?.id) || 
+        const hasFromLocation =
+          fromTerminalIds.includes(trip.from?.id) ||
           trip.stops?.some((stop: any) => fromTerminalIds.includes(stop.terminal?.id))
-        
+
         // Check if trip has a stop in the destination province
-        const hasToLocation = trip.stops?.some((stop: any) => toTerminalIds.includes(stop.terminal?.id))
-        
+        const hasToLocation = trip.stops?.some((stop: any) =>
+          toTerminalIds.includes(stop.terminal?.id),
+        )
+
         return hasFromLocation && hasToLocation
       })
 
@@ -237,11 +240,11 @@ export const searchTrips: Endpoint = {
 
           // Find user's boarding and destination points
           const fromStopIndex = trip.stops?.findIndex((stop: any) =>
-            fromTerminalIds.includes(stop.terminal?.id)
+            fromTerminalIds.includes(stop.terminal?.id),
           )
-          
+
           const toStopIndex = trip.stops?.findIndex((stop: any) =>
-            toTerminalIds.includes(stop.terminal?.id)
+            toTerminalIds.includes(stop.terminal?.id),
           )
 
           // Determine user's actual boarding point and time
@@ -264,7 +267,7 @@ export const searchTrips: Endpoint = {
           let destinationTerminal = null
           let arrivalTime: string | null = null
           let duration: string | null = null
-          
+
           if (toStopIndex >= 0) {
             destinationTerminal = trip.stops[toStopIndex].terminal
             arrivalTime = formatTime(trip.stops[toStopIndex].time)

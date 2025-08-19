@@ -117,15 +117,22 @@ export const TripHeader = memo<TripHeaderProps>(({ trip }) => {
         </div>
       </div>
 
-      {trip.bus.type.amenities?.length > 0 && (
+      {trip.bus.type.amenities && trip.bus.type.amenities.length > 0 && (
         <div className="trip-header__metadata-item trip-header__amenities">
           <span className="trip-header__amenities-label">Amenities:</span>
           <div className="trip-header__amenities-list">
-            {trip.bus.type.amenities.map((amenity, index) => (
-              <span key={`${amenity}-${index}`} className="trip-header__amenity">
-                {amenity}
-              </span>
-            ))}
+            {trip.bus.type.amenities.map((amenityItem, index) => {
+              // Handle both old format (string[]) and new format ({ amenity: string }[])
+              const amenityName = typeof amenityItem === 'string' 
+                ? amenityItem 
+                : amenityItem?.amenity || ''
+              
+              return (
+                <span key={amenityItem?.id || `${amenityName}-${index}`} className="trip-header__amenity">
+                  {amenityName}
+                </span>
+              )
+            })}
           </div>
         </div>
       )}

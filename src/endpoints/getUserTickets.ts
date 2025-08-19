@@ -99,6 +99,21 @@ export const getUserTickets: Endpoint = {
         const bus = trip?.bus
         const busType = bus?.type
 
+        // Debug logging
+        if (process.env.NODE_ENV === 'development') {
+          console.log('getUserTickets - Processing ticket:', {
+            ticketId: ticket.id,
+            ticketNumber: ticket.ticketNumber,
+            hasTicketFrom: !!ticket.from,
+            hasTicketTo: !!ticket.to,
+            ticketFromId: ticket.from?.id,
+            ticketToId: ticket.to?.id,
+            tripFromId: trip?.from?.id,
+            fromTerminalName: ticket.fromTerminalName,
+            toTerminalName: ticket.toTerminalName,
+          })
+        }
+
         // Map seat IDs to seat numbers
         const seats =
           ticket.bookedSeats?.map((bookedSeat: any) => {
@@ -115,30 +130,54 @@ export const getUserTickets: Endpoint = {
             }
           }) || []
 
-        // Process arrival time and duration (consistent with other endpoints)
+        // Use ticket's specific from/to terminals if available, otherwise fall back to trip defaults
+        let userBoardingTerminal = trip?.from
+        let userBoardingTime = formatTime(trip?.departureTime) || ''
+        let destinationTerminal = null
         let arrivalTime: string | null = null
         let duration: string | null = null
-        let destinationTerminal = null
 
-        if (trip?.stops && trip.stops.length > 0) {
+        // If ticket has specific from terminal, use it
+        if (ticket.from && typeof ticket.from === 'object') {
+          userBoardingTerminal = ticket.from
+          // Find the boarding time for this specific terminal
+          if (ticket.from.id === trip?.from?.id) {
+            userBoardingTime = formatTime(trip.departureTime) || ''
+          } else if (trip?.stops) {
+            const boardingStop = trip.stops.find((stop: any) => stop.terminal.id === ticket.from.id)
+            if (boardingStop) {
+              userBoardingTime = formatTime(boardingStop.time) || ''
+            }
+          }
+        }
+
+        // If ticket has specific to terminal, use it
+        if (ticket.to && typeof ticket.to === 'object') {
+          destinationTerminal = ticket.to
+          // Find the arrival time for this specific terminal
+          if (trip?.stops) {
+            const destinationStop = trip.stops.find(
+              (stop: any) => stop.terminal.id === ticket.to.id,
+            )
+            if (destinationStop) {
+              arrivalTime = formatTime(destinationStop.time)
+            }
+          }
+        } else if (trip?.stops && trip.stops.length > 0) {
+          // Fallback: use last stop as destination
           const lastStop = trip.stops[trip.stops.length - 1]
           destinationTerminal = lastStop.terminal
-
-          // Handle the stop time - it might be a Date object or string
           arrivalTime = formatTime(lastStop.time)
+        }
 
-          // Get formatted departure time
-          const formattedDepartureTime = formatTime(trip.departureTime)
-
-          // Calculate duration only if both times are valid
-          if (
-            formattedDepartureTime &&
-            arrivalTime &&
-            formattedDepartureTime !== 'Invalid Date' &&
-            arrivalTime !== 'Invalid Date'
-          ) {
-            duration = calculateDuration(formattedDepartureTime, arrivalTime)
-          }
+        // Calculate duration if both times are available
+        if (
+          userBoardingTime &&
+          arrivalTime &&
+          userBoardingTime !== 'Invalid Date' &&
+          arrivalTime !== 'Invalid Date'
+        ) {
+          duration = calculateDuration(userBoardingTime, arrivalTime)
         }
 
         // Calculate price per seat
@@ -157,9 +196,9 @@ export const getUserTickets: Endpoint = {
             id: trip?.id || '',
             name: trip?.name || '',
             from: {
-              name: trip?.from?.name || '',
-              province: trip?.from?.province || '',
-              address: trip?.from?.address || '',
+              name: userBoardingTerminal?.name || '',
+              province: userBoardingTerminal?.province || '',
+              address: userBoardingTerminal?.address || '',
             },
             to: destinationTerminal
               ? {
@@ -168,7 +207,7 @@ export const getUserTickets: Endpoint = {
                   address: destinationTerminal.address || '',
                 }
               : null,
-            departureTime: formatTime(trip?.departureTime) || '',
+            departureTime: userBoardingTime,
             arrivalTime,
             duration,
             bus: {

@@ -297,13 +297,29 @@ export const validateDate = (
  */
 export const convertGregorianToPersianDisplay = (gregorianDate: string): string => {
   try {
-    const m = moment(gregorianDate, 'YYYY-MM-DD')
-    if (m.isValid()) {
-      return m.format('jYYYY/jMM/jDD') // Returns Persian date like "1404/07/10"
+    // Handle multiple date formats
+    let m = moment(gregorianDate, 'YYYY-MM-DD')
+    if (!m.isValid()) {
+      m = moment(gregorianDate) // Try automatic parsing
     }
+    
+    if (m.isValid()) {
+      const formatted = m.format('jYYYY/jMM/jDD')
+      // Double check the year isn't malformed
+      if (formatted.startsWith('0') && formatted.length > 8) {
+        // If year starts with 0, something went wrong, try different approach
+        const persianYear = m.jYear()
+        const persianMonth = m.jMonth() + 1 // jMonth is 0-indexed
+        const persianDay = m.jDate()
+        const corrected = `${persianYear}/${String(persianMonth).padStart(2, '0')}/${String(persianDay).padStart(2, '0')}`
+        return corrected
+      }
+      return formatted
+    }
+    console.warn('Invalid date for conversion:', gregorianDate)
     return gregorianDate
   } catch (error) {
-    console.error('Error converting to Persian display:', error)
+    console.error('Error converting to Persian display:', error, 'Input:', gregorianDate)
     return gregorianDate
   }
 }

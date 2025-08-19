@@ -55,6 +55,18 @@ interface TripDetails {
     availableSeats: number
     bookedSeats: number
   }
+  userJourney?: {
+    boardingTerminal: Terminal
+    boardingTime: string
+    destinationTerminal: Terminal | null
+    arrivalTime: string | null
+    duration: string | null
+  }
+  originalTrip?: {
+    from: Terminal
+    departureTime: string
+    isUserBoardingAtMainTerminal: boolean
+  }
 }
 
 interface TripInfoProps {
@@ -84,7 +96,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-6 pb-4 ${className}`}>
       {/* Trip Details */}
       <div className="bg-gradient-to-br from-white via-orange-50/30 to-red-50/30 rounded-3xl shadow-xl border border-orange-200/50 p-8 backdrop-blur-sm">
         {/* Trip Route Timeline - Compact Mobile-First Design */}
@@ -187,7 +199,45 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
             <div className="absolute left-8 top-2 bottom-2 w-0.5 bg-gradient-to-b from-green-400 via-orange-400 to-red-400 rounded-full opacity-60"></div>
 
             <div className="space-y-5">
-              {/* Departure Terminal */}
+              {/* Show original trip departure if user is not boarding there */}
+              {tripDetails.originalTrip &&
+                !tripDetails.originalTrip.isUserBoardingAtMainTerminal && (
+                  <div className="relative flex items-start gap-5 opacity-60">
+                    <div className="relative z-10 flex-shrink-0">
+                      <div className="w-14 h-14 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl shadow-lg flex items-center justify-center transition-all duration-300 border-2 border-white">
+                        <MapPin className="w-6 h-6 text-white drop-shadow-sm" />
+                      </div>
+                    </div>
+                    <div className="flex-1 bg-gray-50/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/60 shadow-sm transition-all duration-300 min-h-[80px]">
+                      <div className="flex flex-row items-center justify-between gap-3">
+                        <div className="flex-1">
+                          <h4 className="text-xl font-bold text-gray-600">
+                            {tripDetails.originalTrip.from.name}
+                          </h4>
+                          <p className="text-sm text-gray-500 mt-1">
+                            Trip starts here (you're not boarding here)
+                          </p>
+                        </div>
+                        <div className="text-2xl font-bold text-gray-500">
+                          {formatTo12Hour(tripDetails.originalTrip.departureTime)}
+                        </div>
+                      </div>
+                      {tripDetails.originalTrip.from.address && (
+                        <div className="text-sm text-gray-500 bg-gray-100/80 rounded-xl px-4 py-3 mt-4 border border-gray-200/30">
+                          <div className="flex items-center gap-2">
+                            <span>📍</span>
+                            <span>
+                              {tripDetails.originalTrip.from.address},{' '}
+                              {tripDetails.originalTrip.from.name}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+              {/* User's Boarding Terminal */}
               <div className="relative flex items-start gap-5">
                 <div className="relative z-10 flex-shrink-0">
                   <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 border-2 border-white">
@@ -198,6 +248,9 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                   <div className="flex flex-row items-center justify-between gap-3">
                     <div className="flex-1">
                       <h4 className="text-xl font-bold text-green-800">{tripDetails.from.name}</h4>
+                      <p className="text-sm text-green-600 font-medium mt-1">
+                        🎯 Your boarding point
+                      </p>
                     </div>
                     <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
                       {formatTo12Hour(tripDetails.departureTime)}
@@ -216,9 +269,46 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                 </div>
               </div>
 
-              {/* Intermediate Stops */}
+              {/* Intermediate Stops (only between user's boarding and destination) */}
               {tripDetails.stops
-                .filter((stop) => !stop.isDestination)
+                .filter((stop) => {
+                  const userBoardingId = tripDetails.from?.id
+                  const userDestinationId = tripDetails.to?.id
+
+                  // Find the indices of user's boarding and destination
+                  const userBoardingIndex = tripDetails.stops.findIndex(
+                    (s) => s.terminal.id === userBoardingId,
+                  )
+                  const userDestinationIndex = tripDetails.stops.findIndex(
+                    (s) => s.terminal.id === userDestinationId,
+                  )
+                  const currentStopIndex = tripDetails.stops.findIndex(
+                    (s) => s.terminal.id === stop.terminal.id,
+                  )
+
+                  // Show stops that are between user's boarding point and destination
+                  // If user boards at main terminal (not in stops), show stops before destination
+                  if (userBoardingIndex === -1) {
+                    return userDestinationIndex >= 0
+                      ? currentStopIndex < userDestinationIndex
+                      : !stop.isDestination
+                  }
+
+                  // If user has specific boarding and destination points
+                  if (userBoardingIndex >= 0 && userDestinationIndex >= 0) {
+                    return (
+                      currentStopIndex > userBoardingIndex &&
+                      currentStopIndex < userDestinationIndex
+                    )
+                  }
+
+                  // If user boards at intermediate stop but destination is final stop
+                  if (userBoardingIndex >= 0 && userDestinationIndex === -1) {
+                    return currentStopIndex > userBoardingIndex && !stop.isDestination
+                  }
+
+                  return false
+                })
                 .map((stop, index) => (
                   <div key={index} className="relative flex items-start gap-5">
                     <div className="relative z-10 flex-shrink-0">
@@ -251,27 +341,72 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                   </div>
                 ))}
 
-              {/* Final Destination */}
-              {tripDetails.stops
-                .filter((stop) => stop.isDestination)
-                .map((stop, index) => (
-                  <div key={index} className="relative flex items-start gap-5">
-                    <div className="relative z-10 flex-shrink-0">
-                      <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 border-2 border-white">
-                        <MapPin className="w-6 h-6 text-white drop-shadow-sm" />
+              {/* User's Destination Terminal */}
+              {tripDetails.to && (
+                <div className="relative flex items-start gap-5">
+                  <div className="relative z-10 flex-shrink-0">
+                    <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 border-2 border-white">
+                      <MapPin className="w-6 h-6 text-white drop-shadow-sm" />
+                    </div>
+                  </div>
+                  <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-red-200/60 shadow-sm hover:shadow-md transition-all duration-300 min-h-[80px]">
+                    <div className="flex flex-row items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <h4 className="text-xl font-bold text-red-800">{tripDetails.to.name}</h4>
+                        <p className="text-sm text-red-600 font-medium mt-1">🏁 Your destination</p>
+                      </div>
+                      <div className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
+                        {tripDetails.arrivalTime ? formatTo12Hour(tripDetails.arrivalTime) : 'N/A'}
                       </div>
                     </div>
-                    <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-red-200/60 shadow-sm hover:shadow-md transition-all duration-300 min-h-[80px]">
+                    {tripDetails.to.address && (
+                      <div className="text-sm text-gray-600 bg-red-50/80 rounded-xl px-4 py-3 mt-4 border border-red-200/30">
+                        <div className="flex items-center gap-2">
+                          <span>📍</span>
+                          <span>
+                            {tripDetails.to.address}, {tripDetails.to.name}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Show remaining stops after user's destination if any */}
+              {tripDetails.stops
+                .filter((stop) => {
+                  // Show stops that are after the user's destination
+                  const userDestinationId = tripDetails.to?.id
+                  const userDestinationIndex = tripDetails.stops.findIndex(
+                    (s) => s.terminal.id === userDestinationId,
+                  )
+                  const currentStopIndex = tripDetails.stops.findIndex(
+                    (s) => s.terminal.id === stop.terminal.id,
+                  )
+                  return userDestinationIndex >= 0 && currentStopIndex > userDestinationIndex
+                })
+                .map((stop, index) => (
+                  <div key={index} className="relative flex items-start gap-5 opacity-60">
+                    <div className="relative z-10 flex-shrink-0">
+                      <div className="w-14 h-14 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl shadow-lg flex items-center justify-center transition-all duration-300 border-2 border-white">
+                        <div className="w-4 h-4 bg-white rounded-full shadow-sm border border-gray-200"></div>
+                      </div>
+                    </div>
+                    <div className="flex-1 bg-gray-50/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/60 shadow-sm transition-all duration-300 min-h-[80px]">
                       <div className="flex flex-row items-center justify-between gap-3">
                         <div className="flex-1">
-                          <h4 className="text-xl font-bold text-red-800">{stop.terminal.name}</h4>
+                          <h4 className="text-xl font-bold text-gray-600">{stop.terminal.name}</h4>
+                          <p className="text-sm text-gray-500 mt-1">
+                            Trip continues (after your destination)
+                          </p>
                         </div>
-                        <div className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
+                        <div className="text-2xl font-bold text-gray-500">
                           {formatTo12Hour(stop.time)}
                         </div>
                       </div>
                       {stop.terminal.address && (
-                        <div className="text-sm text-gray-600 bg-red-50/80 rounded-xl px-4 py-3 mt-4 border border-red-200/30">
+                        <div className="text-sm text-gray-500 bg-gray-100/80 rounded-xl px-4 py-3 mt-4 border border-gray-200/30">
                           <div className="flex items-center gap-2">
                             <span>📍</span>
                             <span>

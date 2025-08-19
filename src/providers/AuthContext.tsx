@@ -150,54 +150,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
+  const login = useCallback(
+    async (credentials: LoginCredentials) => {
+      setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
 
-    try {
-      // Normalize phone number if it looks like a phone number
-      const emailOrPhone = credentials.email.trim()
-      let loginIdentifier = emailOrPhone
+      try {
+        // Normalize phone number if it looks like a phone number
+        const emailOrPhone = credentials.email.trim()
+        let loginIdentifier = emailOrPhone
 
-      // Check if it's a phone number (contains only digits and some special chars)
-      const phoneRegex = /^[\+]?[0-9\s\-\(\)]+$/
-      if (phoneRegex.test(emailOrPhone)) {
-        loginIdentifier = normalizePhoneNumber(emailOrPhone)
-      }
+        // Check if it's a phone number (contains only digits and some special chars)
+        const phoneRegex = /^[\+]?[0-9\s\-\(\)]+$/
+        if (phoneRegex.test(emailOrPhone)) {
+          loginIdentifier = normalizePhoneNumber(emailOrPhone)
+        }
 
-      const response = await fetch(`${getClientSideURL()}/api/users/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: loginIdentifier,
-          password: credentials.password,
-        }),
-      })
+        const response = await fetch(`${getClientSideURL()}/api/users/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: loginIdentifier,
+            password: credentials.password,
+          }),
+        })
 
-      const data = await response.json()
+        const data = await response.json()
 
-      if (response.ok && data.user) {
-        setAuthState((prev) => ({
-          ...prev,
-          user: data.user,
-          isLoading: false,
-          error: null,
-        }))
-        
-        // Capture location in background after successful login
-        setTimeout(() => {
-          captureLocationSilently()
-        }, 100)
-        
-        console.log(data.user)
-        return { success: true, user: data.user }
-      } else {
-        const errorMessage =
-          data.errors?.[0]?.message ||
-          data.message ||
-          'Login failed. Please check your credentials.'
+        if (response.ok && data.user) {
+          setAuthState((prev) => ({
+            ...prev,
+            user: data.user,
+            isLoading: false,
+            error: null,
+          }))
+
+          // Capture location in background after successful login
+          setTimeout(() => {
+            captureLocationSilently()
+          }, 100)
+
+          console.log(data.user)
+          return { success: true, user: data.user }
+        } else {
+          const errorMessage =
+            data.errors?.[0]?.message ||
+            data.message ||
+            'Login failed. Please check your credentials.'
+
+          setAuthState((prev) => ({
+            ...prev,
+            isLoading: false,
+            error: errorMessage,
+          }))
+
+          return { success: false, error: errorMessage }
+        }
+      } catch (error) {
+        console.error('Login error:', error)
+        const errorMessage = 'Network error. Please try again.'
 
         setAuthState((prev) => ({
           ...prev,
@@ -207,19 +220,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         return { success: false, error: errorMessage }
       }
-    } catch (error) {
-      console.error('Login error:', error)
-      const errorMessage = 'Network error. Please try again.'
-
-      setAuthState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage,
-      }))
-
-      return { success: false, error: errorMessage }
-    }
-  }, [captureLocationSilently])
+    },
+    [captureLocationSilently],
+  )
 
   const register = useCallback(
     async (data: RegisterData) => {

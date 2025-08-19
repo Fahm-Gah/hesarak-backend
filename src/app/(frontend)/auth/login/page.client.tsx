@@ -278,7 +278,7 @@ export const LoginClient = () => {
             <p className="text-gray-600">
               Don't have an account?{' '}
               <Link
-                href="/auth/register"
+                href={`/auth/register${redirectTo !== '/' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
                 className="text-orange-600 hover:text-orange-700 font-medium"
               >
                 Sign up here

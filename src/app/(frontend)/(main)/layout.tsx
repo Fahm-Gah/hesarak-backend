@@ -1,6 +1,7 @@
 import React from 'react'
 import { NavBar } from '@/app/(frontend)/components/NavBar'
 import { AuthProvider } from '@/providers/AuthContext'
+import { Toast } from '@/app/(frontend)/components/Toast'
 
 import '../../globals.css'
 
@@ -21,6 +22,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         <AuthProvider>
           <NavBar />
           <main>{children}</main>
+          <Toast />
         </AuthProvider>
       </body>
     </html>

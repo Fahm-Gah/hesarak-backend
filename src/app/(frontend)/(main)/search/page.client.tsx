@@ -112,7 +112,7 @@ export const SearchPageClient = () => {
     setExpandedTrips(newExpanded)
   }
 
-  const navigateToTripDetails = (tripId: string) => {
+  const navigateToTripDetails = (trip: Trip) => {
     // Pass the search date to the trip details page
     const searchDate =
       date ||
@@ -121,7 +121,28 @@ export const SearchPageClient = () => {
         tomorrow.setDate(tomorrow.getDate() + 1)
         return tomorrow.toISOString().split('T')[0] // YYYY-MM-DD format
       })()
-    router.push(`/trip/${tripId}?date=${encodeURIComponent(searchDate)}`)
+
+    // Build URL with user's specific from/to terminals from search results
+    const params = new URLSearchParams()
+    params.append('date', searchDate)
+
+    // Use the user's boarding and destination terminals from the search result
+    if (trip.from?.id) {
+      params.append('from', trip.from.id)
+    }
+    if (trip.to?.id) {
+      params.append('to', trip.to.id)
+    }
+
+    // Also pass the original search provinces for breadcrumb navigation
+    if (from) {
+      params.append('fromProvince', from)
+    }
+    if (to) {
+      params.append('toProvince', to)
+    }
+
+    router.push(`/trip/${trip.id}?${params.toString()}`)
   }
 
   useEffect(() => {
@@ -469,7 +490,7 @@ export const SearchPageClient = () => {
                     {trip.price.toLocaleString()} AF
                   </p>
                   <button
-                    onClick={() => navigateToTripDetails(trip.id)}
+                    onClick={() => navigateToTripDetails(trip)}
                     disabled={trip.availability.availableSeats === 0}
                     className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
                       trip.availability.availableSeats > 0

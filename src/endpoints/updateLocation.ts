@@ -198,7 +198,8 @@ export const updateLocation: Endpoint = {
 
         // Only add to history if it's significantly different from the last entry
         const lastEntry = updatedHistory[0]
-        const shouldAddToHistory = !lastEntry || 
+        const shouldAddToHistory =
+          !lastEntry ||
           !lastEntry.coordinates ||
           Math.abs(lastEntry.coordinates[0] - locationData.coordinates[0]) > 0.001 || // ~100m difference
           Math.abs(lastEntry.coordinates[1] - locationData.coordinates[1]) > 0.001
