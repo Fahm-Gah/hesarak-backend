@@ -93,9 +93,9 @@ export const searchTrips: Endpoint = {
     }
 
     // Normalize province names (case-insensitive) and decode + convert Persian date
-    const from = rawFrom.trim().toLowerCase()
-    const to = rawTo.trim().toLowerCase()
-    const decodedDate = decodeURIComponent(rawDate.trim())
+    const from = String(rawFrom).trim().toLowerCase()
+    const to = String(rawTo).trim().toLowerCase()
+    const decodedDate = decodeURIComponent(String(rawDate).trim())
     const convertedDate = convertPersianDateToGregorian(decodedDate)
 
     // Validate date
@@ -118,7 +118,7 @@ export const searchTrips: Endpoint = {
         collection: 'terminals',
         where: {
           province: {
-            like: from,
+            contains: from,
           },
         },
         limit: 100,
@@ -129,7 +129,7 @@ export const searchTrips: Endpoint = {
         collection: 'terminals',
         where: {
           province: {
-            like: to,
+            contains: to,
           },
         },
         limit: 100,
