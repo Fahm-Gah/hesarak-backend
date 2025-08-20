@@ -8,10 +8,8 @@ export const getTicketDetails: Endpoint = {
     const { payload, user, routeParams } = req
     const { ticketId } = routeParams || {}
 
-    console.log('getTicketDetails called with:', { ticketId, userId: user?.id, routeParams })
 
     if (!user) {
-      console.log('No user found in request')
       return Response.json(
         {
           success: false,
@@ -22,7 +20,6 @@ export const getTicketDetails: Endpoint = {
     }
 
     if (!ticketId || typeof ticketId !== 'string') {
-      console.log('No valid ticketId found in params:', ticketId)
       return Response.json(
         {
           success: false,
@@ -67,19 +64,6 @@ export const getTicketDetails: Endpoint = {
         )
       }
 
-      // Debug logging
-      if (process.env.NODE_ENV === 'development') {
-        console.log('getTicketDetails - Processing ticket:', {
-          ticketId: ticket.id,
-          ticketNumber: ticket.ticketNumber,
-          hasTicketFrom: !!ticket.from,
-          hasTicketTo: !!ticket.to,
-          ticketFromId: ticket.from?.id,
-          ticketToId: ticket.to?.id,
-          fromTerminalName: ticket.fromTerminalName,
-          toTerminalName: ticket.toTerminalName,
-        })
-      }
 
       // Determine user-specific terminals
       let userFrom = ticket.trip?.from

@@ -266,7 +266,6 @@ export const CheckoutClient = ({
 
       if (result.success) {
         // Store booking data in both session and local storage for success page
-        console.log('Storing booking result:', result.data)
         const bookingData = JSON.stringify(result.data)
         sessionStorage.setItem('bookingResult', bookingData)
         localStorage.setItem(`bookingResult_${result.data.ticketId}`, bookingData)

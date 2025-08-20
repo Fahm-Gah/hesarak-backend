@@ -46,8 +46,8 @@ export const getSeatLayoutDesignerTranslations = (lang: 'en' | 'fa' = 'en') => {
       clearLayout: lang === 'fa' ? 'پاک کردن چیدمان' : 'Clear Layout',
       confirmClear:
         lang === 'fa'
-          ? 'آیا مطمئن هستید که می‌خواهید کل چیدمان را پاک کنید؟ این عمل قابل بازگشت نیست.'
-          : 'Are you sure you want to clear the entire layout? This action cannot be undone.',
+          ? 'آیا مطمئن هستید که می‌خواهید کل چیدمان را پاک کنید؟.'
+          : 'Are you sure you want to clear the entire layout?',
     },
     element: {
       seatPlaceholder: lang === 'fa' ? 'شماره صندلی' : 'Seat #',

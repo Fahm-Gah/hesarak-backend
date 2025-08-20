@@ -252,25 +252,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('Registration successful, logging in user...')
 
           try {
-            const loginResult = await login({
-              email: data.email,
-              password: data.password,
+            // Login the user but skip automatic location capture for registration
+            const response = await fetch(`${getClientSideURL()}/api/users/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+              body: JSON.stringify({
+                email: data.email,
+                password: data.password,
+              }),
             })
 
-            if (loginResult.success) {
-              // Location capture will be triggered by the login function
-              return { success: true, user: loginResult.user }
+            const loginData = await response.json()
+
+            if (response.ok && loginData.user) {
+              setAuthState((prev) => ({
+                ...prev,
+                user: loginData.user,
+                isLoading: false,
+                error: null,
+              }))
+
+              // Don't capture location automatically - registration flow will handle it
+              return { success: true, user: loginData.user }
             } else {
-              // Registration succeeded but login failed - user can login manually
+              const loginErrorMessage =
+                loginData.errors?.[0]?.message ||
+                loginData.message ||
+                'Registration successful, but auto-login failed. Please login manually.'
+
               setAuthState((prev) => ({
                 ...prev,
                 isLoading: false,
-                error: 'Registration successful, but auto-login failed. Please login manually.',
+                error: loginErrorMessage,
               }))
 
               return {
                 success: false,
-                error: 'Registration successful, but auto-login failed. Please login manually.',
+                error: loginErrorMessage,
               }
             }
           } catch (loginError) {

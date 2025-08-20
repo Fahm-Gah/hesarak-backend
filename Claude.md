@@ -186,3 +186,7 @@ PayloadCMS hooks are extensively used for business logic:
 - Follow Persian/English dual language patterns in new features
 - Respect role-based access control when adding new functionality
 - Location tracking requires user permission and privacy considerations
+
+### UI Design
+
+- for Icons always use lucide react

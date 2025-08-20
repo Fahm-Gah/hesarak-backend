@@ -146,23 +146,6 @@ export const TripDetailsClient = ({
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
   const [isBookingLoading, setIsBookingLoading] = useState(false)
 
-  // Debug logging for client-side
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('TripDetailsClient - Received data:', {
-        tripDetails: {
-          id: tripDetails.id,
-          from: tripDetails.from,
-          to: tripDetails.to,
-          departureTime: tripDetails.departureTime,
-          arrivalTime: tripDetails.arrivalTime,
-          userJourney: tripDetails.userJourney,
-          originalTrip: tripDetails.originalTrip,
-        },
-        originalSearchParams,
-      })
-    }
-  }, [tripDetails, originalSearchParams])
 
   // Handle initial error from URL parameters
   useEffect(() => {

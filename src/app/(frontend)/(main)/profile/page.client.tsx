@@ -92,7 +92,6 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
     setSuccess(null)
 
     try {
-      console.log('Updating profile:', userProfile.id)
       const response = await fetch(`${getClientSideURL()}/api/profiles/${userProfile.id}`, {
         method: 'PATCH',
         headers: {
@@ -107,7 +106,6 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
       })
 
       const data = await response.json()
-      console.log('Profile update response:', { status: response.status, data })
 
       if (response.ok) {
         setSuccess('Profile updated successfully!')

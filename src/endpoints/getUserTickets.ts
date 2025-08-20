@@ -78,7 +78,7 @@ export const getUserTickets: Endpoint = {
         where: {
           passenger: { equals: profileId },
         },
-        depth: 3, // Consistent depth
+        depth: 3, // Need deeper nesting to get bus.type.seats configuration
         sort,
       }
 
@@ -99,21 +99,6 @@ export const getUserTickets: Endpoint = {
         const bus = trip?.bus
         const busType = bus?.type
 
-        // Debug logging
-        if (process.env.NODE_ENV === 'development') {
-          console.log('getUserTickets - Processing ticket:', {
-            ticketId: ticket.id,
-            ticketNumber: ticket.ticketNumber,
-            hasTicketFrom: !!ticket.from,
-            hasTicketTo: !!ticket.to,
-            ticketFromId: ticket.from?.id,
-            ticketToId: ticket.to?.id,
-            tripFromId: trip?.from?.id,
-            fromTerminalName: ticket.fromTerminalName,
-            toTerminalName: ticket.toTerminalName,
-          })
-        }
-
         // Map seat IDs to seat numbers
         const seats =
           ticket.bookedSeats?.map((bookedSeat: any) => {
@@ -124,9 +109,57 @@ export const getUserTickets: Endpoint = {
               (seat: any) => seat.id === seatId && seat.type === 'seat',
             )
 
+            // Debug logging in development
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Seat mapping debug:', {
+                seatId,
+                busTypeSeat,
+                availableSeats: busType?.seats?.filter((s: any) => s.type === 'seat').slice(0, 3),
+                busTypeId: busType?.id,
+                tripId: trip?.id,
+              })
+            }
+
+            // Get seat number from bus type configuration
+            let seatNumber = busTypeSeat?.seatNumber
+
+            // If seatNumber is not available, try alternative field names
+            if (!seatNumber) {
+              seatNumber = busTypeSeat?.number || busTypeSeat?.label
+            }
+
+            // If still not found, create a readable seat number from ID
+            if (!seatNumber) {
+              // Try various approaches to extract seat number from ID
+
+              // 1. Look for trailing numbers (e.g., "seat_001" -> "1")
+              let match = seatId.match(/(\d+)$/)
+              if (match) {
+                seatNumber = parseInt(match[1], 10).toString() // Remove leading zeros
+              } else {
+                // 2. Look for any numbers in the ID (e.g., "s1r2c3" -> "1")
+                match = seatId.match(/(\d+)/)
+                if (match) {
+                  seatNumber = match[1]
+                } else {
+                  // 3. Try to find position-based patterns
+                  const positionMatch = seatId.match(/r(\d+)c(\d+)/)
+                  if (positionMatch) {
+                    const row = parseInt(positionMatch[1], 10)
+                    const col = parseInt(positionMatch[2], 10)
+                    // Convert row/col to seat number (assuming 2-4 seats per row)
+                    seatNumber = ((row - 1) * 4 + col).toString()
+                  } else {
+                    // 4. Last resort: use the ID as-is but clean it up
+                    seatNumber = seatId.replace(/[^0-9a-zA-Z]/g, '') || seatId
+                  }
+                }
+              }
+            }
+
             return {
               id: seatId,
-              seatNumber: busTypeSeat?.seatNumber || seatId,
+              seatNumber,
             }
           }) || []
 
@@ -214,7 +247,7 @@ export const getUserTickets: Endpoint = {
               number: bus?.number || '',
               type: {
                 name: busType?.name || '',
-                amenities: busType?.amenities?.length > 0 ? busType.amenities : null,
+                amenities: null, // Remove amenities to lighten response
               },
             },
           },

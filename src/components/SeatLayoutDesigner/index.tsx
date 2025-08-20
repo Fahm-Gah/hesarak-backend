@@ -236,9 +236,7 @@ const SeatLayoutDesigner: JSONFieldClientComponent = ({ path }) => {
           modalSlug="clear-layout-confirm"
           heading="Clear Layout"
           onConfirm={handleClearAll}
-          body={
-            <p>Are you sure you want to clear the entire layout? This action cannot be undone.</p>
-          }
+          body={<p>Are you sure you want to clear the entire layout?</p>}
         />
       </div>
     </DndContext>

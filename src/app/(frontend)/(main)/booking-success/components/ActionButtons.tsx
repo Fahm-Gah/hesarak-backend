@@ -20,7 +20,7 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           primaryHover: 'hover:from-green-600 hover:to-emerald-600',
           primaryText: 'View My Tickets',
           primaryTextShort: 'My Tickets',
-          primaryAction: () => router.push('/profile/tickets'),
+          primaryAction: () => router.push('/my-tickets'),
         }
       case 'cancelled':
         return {

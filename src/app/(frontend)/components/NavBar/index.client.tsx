@@ -39,7 +39,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
   const profileMenuItems = [
     ...(hasAdminRoles ? [{ href: '/admin', label: 'Dashboard', icon: '📊' }] : []),
     { href: '/profile', label: 'Profile', icon: '👤' },
-    { href: '/profile/tickets', label: 'My Tickets', icon: '🎫' },
+    { href: '/my-tickets', label: 'My Tickets', icon: '🎫' },
     { href: '/auth/logout', label: 'Logout', icon: '🚪' },
   ]
 

@@ -76,17 +76,6 @@ export default async function TripDetailsPage({ params, searchParams }: TripDeta
     // User is not authenticated, continue without user data
   }
 
-  // Debug logging for server-side
-  if (process.env.NODE_ENV === 'development') {
-    console.log('TripDetailsPage - Server-side params:', {
-      tripId,
-      date,
-      from,
-      to,
-      fromProvince,
-      toProvince,
-    })
-  }
 
   // Fetch trip details with user-specific from/to if provided
   const tripDetails = await fetchTripDetails(tripId, date, from, to, token || undefined)
