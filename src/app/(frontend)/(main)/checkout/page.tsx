@@ -3,6 +3,8 @@ import { CheckoutClient } from './page.client'
 import { getMeUser } from '@/utils/getMeUser'
 import { getServerSideURL } from '@/utils/getURL'
 
+export const dynamic = 'force-dynamic'
+
 interface CheckoutPageProps {
   searchParams: Promise<{
     tripId?: string

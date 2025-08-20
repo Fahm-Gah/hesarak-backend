@@ -4,6 +4,8 @@ import { getMeUser } from '@/utils/getMeUser'
 import { getServerSideURL } from '@/utils/getURL'
 import type { BookingData } from './components/types'
 
+export const dynamic = 'force-dynamic'
+
 interface BookingSuccessPageProps {
   searchParams: Promise<{
     ticketId?: string
