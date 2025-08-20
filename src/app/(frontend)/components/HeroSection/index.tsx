@@ -106,9 +106,6 @@ export const HeroSection = () => {
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 font-medium max-w-3xl mx-auto leading-relaxed">
             Fast, reliable, and comfortable bus travel across Afghanistan.
-            <span className="block mt-2 text-orange-400 font-semibold">
-              Book now, travel tomorrow.
-            </span>
           </p>
         </div>
 
@@ -121,7 +118,7 @@ export const HeroSection = () => {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl text-center">
           <div className="text-white">
             <div className="text-3xl font-black text-orange-400 mb-2">10K+</div>
-            <div className="text-gray-300 font-medium">Daily Passengers</div>
+            <div className="text-gray-300 font-medium">Monthly Passengers</div>
           </div>
           <div className="text-white">
             <div className="text-3xl font-black text-orange-400 mb-2">50+</div>

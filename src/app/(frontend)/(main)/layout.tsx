@@ -2,6 +2,7 @@ import React from 'react'
 import { NavBar } from '@/app/(frontend)/components/NavBar'
 import { AuthProvider } from '@/providers/AuthContext'
 import { Toast } from '@/app/(frontend)/components/Toast'
+import { Footer } from '@/app/(frontend)/components/Footer'
 
 import '../../globals.css'
 
@@ -22,6 +23,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         <AuthProvider>
           <NavBar />
           <main>{children}</main>
+          <Footer />
           <Toast />
         </AuthProvider>
       </body>

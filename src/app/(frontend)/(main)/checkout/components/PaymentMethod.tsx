@@ -256,11 +256,19 @@ export const PaymentMethod = memo<PaymentMethodProps>(
             />
             <span className="text-sm text-gray-700">
               I agree to the{' '}
-              <a href="#" className="text-orange-600 hover:text-orange-700 font-semibold underline">
+              <a
+                href="/terms"
+                target="_blank"
+                className="text-orange-600 hover:text-orange-700 font-semibold underline"
+              >
                 Terms and Conditions
               </a>{' '}
               and{' '}
-              <a href="#" className="text-orange-600 hover:text-orange-700 font-semibold underline">
+              <a
+                href="/terms#cancellation-policy"
+                target="_blank"
+                className="text-orange-600 hover:text-orange-700 font-semibold underline"
+              >
                 Cancellation Policy
               </a>
               . I understand that I need to arrive at the pickup location at least 15 minutes before

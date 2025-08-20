@@ -26,7 +26,7 @@ export const LogoutClient = () => {
           setTimeout(() => {
             router.push('/')
             router.refresh() // Refresh to update auth state
-          }, 2000)
+          }, 800)
         } else {
           setLocalError(result.error || 'Logout failed. Please try again.')
         }

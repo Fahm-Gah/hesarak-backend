@@ -265,6 +265,9 @@ export const CheckoutClient = ({
       }
 
       if (result.success) {
+        // Show success toast immediately
+        toast.success('🎉 Booking successful! Redirecting to confirmation page...')
+
         // Store booking data in both session and local storage for success page
         const bookingData = JSON.stringify(result.data)
         sessionStorage.setItem('bookingResult', bookingData)

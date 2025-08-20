@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { User } from '@/payload-types'
 import { Logo } from '@/app/(frontend)/components/Logo'
 
@@ -13,25 +14,57 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  const closeDropdown = useCallback(() => {
+    setIsProfileDropdownOpen(false)
+  }, [])
+
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false)
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsProfileDropdownOpen(false)
+        closeDropdown()
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (isProfileDropdownOpen) {
+          closeDropdown()
+        }
+        if (isMobileMenuOpen) {
+          closeMobileMenu()
+        }
+      }
+    }
+
+    if (isProfileDropdownOpen || isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleKeyDown)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isProfileDropdownOpen, isMobileMenuOpen, closeDropdown, closeMobileMenu])
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev)
   }, [])
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
-  const toggleProfileDropdown = () => setIsProfileDropdownOpen(!isProfileDropdownOpen)
+  const toggleProfileDropdown = useCallback(() => {
+    setIsProfileDropdownOpen((prev) => !prev)
+  }, [])
 
   const navLinks = [
+    { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
-    { href: '/blog', label: 'Blog' },
   ]
 
   const hasAdminRoles = user?.roles && user.roles.some((role) => role !== 'customer')
@@ -44,7 +77,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
   ]
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg shadow-lg border-b border-gray-200/50">
+    <nav className="sticky top-0 z-50 bg-white shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
           {/* Logo */}
@@ -72,9 +105,10 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={toggleProfileDropdown}
-                  className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-gray-100/80 hover:bg-gray-200/80 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
+                  className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
                   aria-expanded={isProfileDropdownOpen}
                   aria-haspopup="true"
+                  aria-label="Open user menu"
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
@@ -104,31 +138,34 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                 </button>
 
                 {/* Profile Dropdown */}
-                <div
-                  className={`absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-200/50 py-2 transform transition-all duration-200 origin-top-right ${
-                    isProfileDropdownOpen
-                      ? 'opacity-100 scale-100 translate-y-0'
-                      : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
-                  }`}
-                >
-                  <div className="px-4 py-3 border-b border-gray-200/50">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {(typeof user.profile === 'object' && user.profile?.fullName) || user.email}
-                    </p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
+                {isProfileDropdownOpen && (
+                  <div
+                    className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 transform transition-all duration-200 origin-top-right opacity-100 scale-100 translate-y-0"
+                    role="menu"
+                    aria-orientation="vertical"
+                  >
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {(typeof user.profile === 'object' && user.profile?.fullName) || user.email}
+                      </p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
+                    {profileMenuItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 focus:outline-none focus:bg-orange-50 focus:text-orange-600"
+                        onClick={closeDropdown}
+                        role="menuitem"
+                      >
+                        <span className="mr-3 text-base" aria-hidden="true">
+                          {item.icon}
+                        </span>
+                        {item.label}
+                      </Link>
+                    ))}
                   </div>
-                  {profileMenuItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 focus:outline-none focus:bg-orange-50 focus:text-orange-600"
-                      onClick={() => setIsProfileDropdownOpen(false)}
-                    >
-                      <span className="mr-3 text-base">{item.icon}</span>
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
+                )}
               </div>
             ) : (
               <div className="flex items-center space-x-3">
@@ -188,22 +225,22 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
             isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
           }`}
         >
-          <div className="mx-4 sm:mx-6 lg:mx-8 px-2 pt-2 pb-3 space-y-1 bg-white/95 backdrop-blur-md rounded-lg mt-2 mb-4 border border-gray-200/50">
+          <div className="mx-4 sm:mx-6 lg:mx-8 px-2 pt-2 pb-3 space-y-1 bg-white rounded-lg mt-2 mb-4 border border-gray-200 shadow-lg">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className="block px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:bg-orange-50 focus:text-orange-600"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={closeMobileMenu}
               >
                 {link.label}
               </Link>
             ))}
 
-            <div className="border-t border-gray-200/50 pt-3 mt-3">
+            <div className="border-t border-gray-200 pt-3 mt-3">
               {user ? (
                 <>
-                  <div className="px-4 py-3 border-b border-gray-200/50 mb-2">
+                  <div className="px-4 py-3 border-b border-gray-200 mb-2">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
@@ -226,9 +263,11 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                       key={item.href}
                       href={item.href}
                       className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:bg-orange-50 focus:text-orange-600"
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={closeMobileMenu}
                     >
-                      <span className="mr-3 text-base">{item.icon}</span>
+                      <span className="mr-3 text-base" aria-hidden="true">
+                        {item.icon}
+                      </span>
                       {item.label}
                     </Link>
                   ))}
@@ -238,14 +277,14 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                   <Link
                     href="/auth/login"
                     className="block px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg font-medium text-center transition-all duration-200 focus:outline-none focus:bg-orange-50 focus:text-orange-600"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                   >
                     Login
                   </Link>
                   <Link
                     href="/auth/register"
                     className="block px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg font-medium text-center hover:from-orange-700 hover:to-red-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                   >
                     Register
                   </Link>

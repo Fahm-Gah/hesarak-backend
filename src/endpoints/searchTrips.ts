@@ -48,6 +48,8 @@ interface SearchedTrip {
     }
   }
   availability: TripAvailability
+  isBookingAllowed: boolean
+  bookingBlockedReason?: string
   stops?: {
     terminal: {
       id: string
@@ -190,7 +192,7 @@ export const searchTrips: Endpoint = {
       })
 
       // Get seat availability for each trip with proper date filtering
-      const tripsWithAvailability: SearchedTrip[] = await Promise.all(
+      const tripsWithAvailability: (SearchedTrip | null)[] = await Promise.all(
         relevantTrips.map(async (trip: any) => {
           // Get booked tickets for this trip on the specified date
           const dateObj = new Date(convertedDate)
@@ -247,6 +249,25 @@ export const searchTrips: Endpoint = {
             toTerminalIds.includes(stop.terminal?.id),
           )
 
+          // Check if user can board at main terminal
+          const canBoardAtMainTerminal = fromTerminalIds.includes(trip.from?.id)
+
+          // Validate trip direction: user must board before destination
+          // If user boards at main terminal (index -1), destination must be in stops (index >= 0)
+          if (canBoardAtMainTerminal && toStopIndex < 0) {
+            return null // User boards at main terminal but destination is not found in stops
+          }
+
+          // If user boards at intermediate stop, destination must come after boarding point
+          if (fromStopIndex >= 0 && toStopIndex >= 0 && fromStopIndex >= toStopIndex) {
+            return null // User is trying to book in the opposite direction of travel
+          }
+
+          // If user can't board at main terminal and no valid intermediate boarding point found
+          if (!canBoardAtMainTerminal && fromStopIndex < 0) {
+            return null // No valid boarding point found
+          }
+
           // Determine user's actual boarding point and time
           let userBoardingTerminal, userBoardingTime: string
           if (fromTerminalIds.includes(trip.from?.id)) {
@@ -276,6 +297,16 @@ export const searchTrips: Endpoint = {
 
           // Calculate effective booked seats (actual bookings + disabled seats)
           const effectiveBookedSeats = bookedSeatsCount + disabledSeatsCount
+
+          // Check if booking is allowed based on departure time (2 hour cutoff)
+          const now = new Date()
+          const [hours, minutes] = userBoardingTime.split(':').map(Number)
+          const departureDateTime = new Date(convertedDate)
+          departureDateTime.setHours(hours, minutes, 0, 0)
+
+          const timeDiffInHours = (departureDateTime.getTime() - now.getTime()) / (1000 * 60 * 60)
+          const isBookingAllowed = timeDiffInHours >= 2
+          const bookingBlockedReason = timeDiffInHours < 2 ? 'Booking closed' : undefined
 
           return {
             id: trip.id,
@@ -312,6 +343,8 @@ export const searchTrips: Endpoint = {
               bookedSeats: effectiveBookedSeats, // Includes disabled seats
               availableSeats: Math.max(0, totalSeats - effectiveBookedSeats),
             },
+            isBookingAllowed,
+            bookingBlockedReason,
             stops:
               trip.stops?.map((stop: any, index: any) => ({
                 terminal: {
@@ -339,11 +372,12 @@ export const searchTrips: Endpoint = {
         }),
       )
 
-      // Sort by departure time and filter available trips
-      tripsWithAvailability.sort((a, b) => a.departureTime.localeCompare(b.departureTime))
-      const availableTrips = tripsWithAvailability.filter(
-        (trip) => trip.availability.availableSeats > 0,
+      // Filter out null results (invalid direction trips) and sort by departure time
+      const validTrips: SearchedTrip[] = tripsWithAvailability.filter(
+        (trip): trip is SearchedTrip => trip !== null,
       )
+      validTrips.sort((a, b) => a.departureTime.localeCompare(b.departureTime))
+      const availableTrips = validTrips.filter((trip) => trip.availability.availableSeats > 0)
 
       return Response.json({
         success: true,
@@ -354,11 +388,11 @@ export const searchTrips: Endpoint = {
             originalDate: decodedDate,
             convertedDate,
           },
-          trips: tripsWithAvailability,
+          trips: validTrips,
           summary: {
-            totalTrips: tripsWithAvailability.length,
+            totalTrips: validTrips.length,
             availableTrips: availableTrips.length,
-            fullyBookedTrips: tripsWithAvailability.length - availableTrips.length,
+            fullyBookedTrips: validTrips.length - availableTrips.length,
           },
         },
       })
