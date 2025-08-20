@@ -117,17 +117,6 @@ export const PopularRoutesSection = () => {
             </div>
           ))}
         </div>
-
-        {/* View All Routes Button */}
-        <div className="text-center mt-12">
-          <Link
-            href="/search"
-            className="inline-flex items-center px-8 py-4 bg-white border-2 border-orange-600 text-orange-600 rounded-xl font-semibold hover:bg-orange-600 hover:text-white transition-all duration-300"
-          >
-            View All Routes
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Link>
-        </div>
       </div>
     </section>
   )

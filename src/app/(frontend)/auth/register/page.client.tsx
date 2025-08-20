@@ -230,7 +230,7 @@ export const RegisterClient = () => {
             variant="auth"
             size="lg"
             title="Create Account"
-            subtitle="Join Hesaarak to get started."
+            subtitle="Join Hesarakbus to get started."
           />
 
           {/* Error Message */}

@@ -3,9 +3,9 @@ import { Metadata } from 'next'
 import { FileText, AlertTriangle, Clock, RefreshCw, CreditCard, Users } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Terms and Conditions | Hesaarak - Service Agreement',
+  title: 'Terms and Conditions | Hesarakbus - Service Agreement',
   description:
-    'Read the terms and conditions for using Hesaarak bus booking services, including our cancellation policy and service guidelines.',
+    'Read the terms and conditions for using Hesarakbus bus booking services, including our cancellation policy and service guidelines.',
 }
 
 export default function TermsPage() {
@@ -19,8 +19,8 @@ export default function TermsPage() {
               Terms & <span className="text-orange-500">Conditions</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Please read these terms carefully before using our services. By booking with Hesaarak,
-              you agree to these conditions.
+              Please read these terms carefully before using our services. By booking with
+              Hesarakbus, you agree to these conditions.
             </p>
             <p className="text-sm text-gray-400 mt-4">Last updated: December 2024</p>
           </div>
@@ -73,12 +73,12 @@ export default function TermsPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-6">1. General Terms</h2>
               <div className="space-y-4 text-gray-700">
                 <p>
-                  By using Hesaarak's services, you agree to be bound by these terms and conditions.
-                  These terms apply to all users of our website, mobile application, and booking
-                  services.
+                  By using Hesarakbus's services, you agree to be bound by these terms and
+                  conditions. These terms apply to all users of our website, mobile application, and
+                  booking services.
                 </p>
                 <p>
-                  Hesaarak reserves the right to modify these terms at any time. Changes will be
+                  Hesarakbus reserves the right to modify these terms at any time. Changes will be
                   effective immediately upon posting on our website. Continued use of our services
                   constitutes acceptance of any modifications.
                 </p>
@@ -156,7 +156,7 @@ export default function TermsPage() {
                       <strong>Medical Emergency:</strong> Full refund with valid medical certificate
                     </li>
                     <li>
-                      <strong>Trip Cancellation by Hesaarak:</strong> Full refund or free
+                      <strong>Trip Cancellation by Hesarakbus:</strong> Full refund or free
                       rescheduling
                     </li>
                     <li>
@@ -233,7 +233,7 @@ export default function TermsPage() {
                     <li>One carry-on bag and one checked bag per passenger</li>
                     <li>Maximum checked baggage weight: 20kg per passenger</li>
                     <li>Prohibited items: weapons, explosives, flammable materials</li>
-                    <li>Hesaarak is not responsible for lost or damaged personal items</li>
+                    <li>Hesarakbus is not responsible for lost or damaged personal items</li>
                   </ul>
                 </div>
               </div>
@@ -250,7 +250,7 @@ export default function TermsPage() {
                   <ul className="list-disc list-inside space-y-2 ml-4">
                     <li>Services are subject to weather conditions and road accessibility</li>
                     <li>Schedule changes may occur due to traffic or unforeseen circumstances</li>
-                    <li>Hesaarak reserves the right to cancel trips for safety reasons</li>
+                    <li>Hesarakbus reserves the right to cancel trips for safety reasons</li>
                   </ul>
                 </div>
                 <div>
@@ -258,7 +258,7 @@ export default function TermsPage() {
                     Liability Limitations
                   </h3>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Hesaarak's liability is limited to the cost of your ticket</li>
+                    <li>Hesarakbus's liability is limited to the cost of your ticket</li>
                     <li>We are not responsible for indirect or consequential damages</li>
                     <li>Travel insurance is recommended for comprehensive coverage</li>
                     <li>Claims must be reported within 30 days of incident</li>

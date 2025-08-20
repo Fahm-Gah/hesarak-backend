@@ -3,9 +3,9 @@ import { Metadata } from 'next'
 import { Shield, Eye, Lock, UserCheck, Database, Globe } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Hesaarak - Your Data Protection',
+  title: 'Privacy Policy | Hesarakbus - Your Data Protection',
   description:
-    'Learn how Hesaarak protects your personal information and handles your data with transparency and security.',
+    'Learn how Hesarakbus protects your personal information and handles your data with transparency and security.',
 }
 
 export default function PrivacyPage() {
@@ -185,7 +185,7 @@ export default function PrivacyPage() {
                     </li>
                     <li>
                       <strong>Safety and Security:</strong> To protect the rights, property, or
-                      safety of Hesaarak, our users, or others
+                      safety of Hesarakbus, our users, or others
                     </li>
                     <li>
                       <strong>Business Transfers:</strong> In connection with a merger, acquisition,

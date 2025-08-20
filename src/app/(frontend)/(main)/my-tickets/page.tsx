@@ -8,7 +8,7 @@ import { getServerSideURL } from '@/utils/getURL'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'My Tickets | Hesaarak',
+  title: 'My Tickets | Hesarakbus',
   description: 'View your booked bus tickets and travel history',
 }
 

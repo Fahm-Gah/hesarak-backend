@@ -2,6 +2,7 @@
 
 import React from 'react'
 import moment from 'moment-jalaali'
+import { Calendar } from 'lucide-react'
 
 interface JalaaliDateFieldProps {
   value: { year: number; month: number; day: number }
@@ -118,19 +119,7 @@ export const JalaaliDateField = ({
         >
           <span className={value ? 'text-gray-900' : 'text-gray-400'}>{displayText}</span>
           {showIcon && (
-            <svg
-              className="w-4 h-4 text-gray-400 transition-transform duration-200 absolute left-3"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
+            <Calendar className="w-4 h-4 text-gray-400 transition-transform duration-200 absolute left-3" />
           )}
         </div>
       </div>

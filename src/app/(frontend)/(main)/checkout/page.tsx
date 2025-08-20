@@ -194,7 +194,7 @@ export async function generateMetadata({ searchParams }: CheckoutPageProps) {
 
   if (!tripId || !date) {
     return {
-      title: 'Checkout - Hesaarak',
+      title: 'Checkout - Hesarakbus',
     }
   }
 
@@ -202,8 +202,8 @@ export async function generateMetadata({ searchParams }: CheckoutPageProps) {
 
   return {
     title: tripDetails
-      ? `Checkout - ${tripDetails.from.name} to ${tripDetails.to?.name} | Hesaarak`
-      : 'Checkout - Hesaarak',
+      ? `Checkout - ${tripDetails.from.name} to ${tripDetails.to?.name} | Hesarakbus`
+      : 'Checkout - Hesarakbus',
     description: tripDetails
       ? `Complete your booking for ${tripDetails.from.name} to ${tripDetails.to?.name} on ${tripDetails.originalDate}`
       : 'Complete your bus ticket booking',

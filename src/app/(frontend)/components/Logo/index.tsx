@@ -54,7 +54,7 @@ export const Logo = ({
         <h1
           className={`${config.text} font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent ${variant === 'auth' ? 'mb-2' : ''}`}
         >
-          {title || 'Hesaarak'}
+          {title || 'Hesarakbus'}
         </h1>
 
         {subtitle && variant === 'auth' && <p className="text-gray-600">{subtitle}</p>}

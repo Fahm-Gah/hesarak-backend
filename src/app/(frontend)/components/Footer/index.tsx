@@ -14,7 +14,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-bold text-orange-400 mb-4">Hesaarak</h3>
+            <h3 className="text-xl font-bold text-orange-400 mb-4">Hesarakbus</h3>
             <p className="text-gray-300 mb-4 leading-relaxed">
               Your trusted partner for safe and comfortable bus travel across Afghanistan. Book your
               journey with confidence.
@@ -127,7 +127,9 @@ export const Footer = () => {
         {/* Divider */}
         <div className="border-t border-gray-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">© {currentYear} Hesaarak. All rights reserved.</p>
+            <p className="text-gray-400 text-sm">
+              © {currentYear} Hesarakbus. All rights reserved.
+            </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link
                 href="/privacy"

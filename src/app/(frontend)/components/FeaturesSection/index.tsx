@@ -42,7 +42,7 @@ export const FeaturesSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Why Choose <span className="text-orange-600">Hesaarak</span>?
+            Why Choose <span className="text-orange-600">Hesarakbus</span>?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Experience the best in bus travel with our commitment to safety, comfort, and

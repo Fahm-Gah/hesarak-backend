@@ -88,7 +88,7 @@ export async function generateMetadata({ searchParams }: BookingSuccessPageProps
 
   if (!ticketId) {
     return {
-      title: 'Booking Confirmed - Hesaarak',
+      title: 'Booking Confirmed - Hesarakbus',
       description:
         'Your bus ticket has been successfully booked. View your ticket details and booking information.',
     }
@@ -102,7 +102,7 @@ export async function generateMetadata({ searchParams }: BookingSuccessPageProps
   } catch {
     // User not authenticated, return basic metadata
     return {
-      title: 'Booking Details - Hesaarak',
+      title: 'Booking Details - Hesarakbus',
       description: 'View your booking details and ticket information.',
     }
   }
@@ -111,8 +111,8 @@ export async function generateMetadata({ searchParams }: BookingSuccessPageProps
 
   return {
     title: ticketDetails
-      ? `Ticket ${ticketDetails.ticketNumber} - ${ticketDetails.trip.name} | Hesaarak`
-      : 'Booking Details - Hesaarak',
+      ? `Ticket ${ticketDetails.ticketNumber} - ${ticketDetails.trip.name} | Hesarakbus`
+      : 'Booking Details - Hesarakbus',
     description: ticketDetails
       ? `Your booking for ${ticketDetails.trip.name} - Ticket #${ticketDetails.ticketNumber}`
       : 'View your booking details and ticket information.',

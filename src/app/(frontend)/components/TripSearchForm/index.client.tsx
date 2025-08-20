@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import moment from 'moment-jalaali'
+import { ChevronDown, ArrowLeftRight, Search, Loader2 } from 'lucide-react'
 import { JalaaliDatePicker } from '../JalaaliDatePicker'
 
 interface TripSearchFormClientProps {
@@ -113,7 +114,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
         {/* First Line: Form Controls */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-3 w-full">
           {/* From Field */}
-          <div className="flex-1 min-w-0 w-full lg:w-auto">
+          <div className="flex-1 min-w-0 w-full lg:flex-1">
             <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
               FROM
             </label>
@@ -129,19 +130,9 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
                 <span className={formData.from ? 'text-gray-900' : 'text-gray-500'}>
                   {formData.from || 'Select city'}
                 </span>
-                <svg
+                <ChevronDown
                   className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showFromDropdown ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                />
               </div>
 
               {showFromDropdown && (
@@ -169,31 +160,21 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
           </div>
 
           {/* Swap Button */}
-          <div className="flex justify-center lg:block">
+          <div className="flex items-center justify-center">
             <button
               type="button"
               onClick={handleSwap}
-              className="p-2.5 bg-orange-600 hover:bg-orange-700 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group transform hover:scale-110 active:scale-95 flex-shrink-0"
+              className="p-2.5 bg-orange-600 hover:bg-orange-700 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group transform hover:scale-110 active:scale-95 flex-shrink-0 lg:mb-1"
               aria-label="Swap cities"
             >
-              <svg
+              <ArrowLeftRight
                 className="w-5 h-5 text-white transform group-hover:rotate-180 transition-transform duration-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                />
-              </svg>
+              />
             </button>
           </div>
 
           {/* To Field */}
-          <div className="flex-1 min-w-0 w-full lg:w-auto">
+          <div className="flex-1 min-w-0 w-full lg:flex-1">
             <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
               TO
             </label>
@@ -209,19 +190,9 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
                 <span className={formData.to ? 'text-gray-900' : 'text-gray-500'}>
                   {formData.to || 'Select city'}
                 </span>
-                <svg
+                <ChevronDown
                   className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showToDropdown ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                />
               </div>
 
               {showToDropdown && (
@@ -249,7 +220,9 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
           </div>
 
           {/* Date Field */}
-          <JalaaliDatePicker value={selectedJalaaliDate} onChange={handleDateChange} label="DATE" />
+          <div className="flex-1 min-w-0 w-full lg:flex-1">
+            <JalaaliDatePicker value={selectedJalaaliDate} onChange={handleDateChange} label="DATE" />
+          </div>
         </div>
 
         {/* Second Line: Search Button */}
@@ -270,38 +243,14 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
 
             {isLoading ? (
               <div className="flex items-center space-x-3 relative z-10">
-                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
+                <Loader2 className="animate-spin h-5 w-5 text-white" />
                 <span>SEARCHING...</span>
               </div>
             ) : (
               <div className="flex items-center space-x-3 relative z-10">
-                <svg
+                <Search
                   className="w-5 h-5 transform group-hover:scale-110 transition-transform duration-200"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+                />
                 <span>SEARCH BUSES</span>
               </div>
             )}

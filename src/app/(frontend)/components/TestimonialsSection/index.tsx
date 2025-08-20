@@ -16,7 +16,7 @@ export const TestimonialsSection = () => {
       location: 'Herat',
       rating: 5,
       comment:
-        'I travel frequently for business and Hesaarak has become my go-to choice. Clean buses, professional drivers, and great customer service.',
+        'I travel frequently for business and Hesarakbus has become my go-to choice. Clean buses, professional drivers, and great customer service.',
       route: 'Herat to Kabul',
     },
     {
@@ -48,7 +48,7 @@ export const TestimonialsSection = () => {
       location: 'Kabul',
       rating: 5,
       comment:
-        'Professional and courteous service. The drivers are experienced and the buses are well-maintained. Feel safe traveling with Hesaarak.',
+        'Professional and courteous service. The drivers are experienced and the buses are well-maintained. Feel safe traveling with Hesarakbus.',
       route: 'Kabul to Kandahar',
     },
   ]
@@ -71,7 +71,7 @@ export const TestimonialsSection = () => {
             What Our <span className="text-orange-600">Passengers</span> Say
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Read testimonials from thousands of satisfied passengers who trust Hesaarak for their
+            Read testimonials from thousands of satisfied passengers who trust Hesarakbus for their
             travel needs
           </p>
         </div>

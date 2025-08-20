@@ -17,7 +17,7 @@ export const CTASection = () => {
         <div className="text-center text-white">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Your Journey?</h2>
           <p className="text-xl md:text-2xl mb-12 opacity-90 max-w-3xl mx-auto">
-            Join thousands of satisfied passengers who trust Hesaarak for safe, comfortable, and
+            Join thousands of satisfied passengers who trust Hesarakbus for safe, comfortable, and
             affordable bus travel across Afghanistan.
           </p>
 
@@ -48,7 +48,8 @@ export const CTASection = () => {
                   <h3 className="text-2xl font-bold">Get Our Mobile App</h3>
                 </div>
                 <p className="text-lg opacity-90 mb-4">
-                  Download the Hesaarak mobile app for easier booking and trip management on the go.
+                  Download the Hesarakbus mobile app for easier booking and trip management on the
+                  go.
                 </p>
                 <div className="text-sm opacity-75">
                   • Faster booking process

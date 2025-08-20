@@ -20,9 +20,9 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Help & Support | Hesaarak - Get Help with Bus Bookings',
+  title: 'Help & Support | Hesarakbus - Get Help with Bus Bookings',
   description:
-    'Find answers to common questions about booking bus tickets with Hesaarak, payment methods, cancellation policies, and get support.',
+    'Find answers to common questions about booking bus tickets with Hesarakbus, payment methods, cancellation policies, and get support.',
 }
 
 export default function HelpPage() {
@@ -41,7 +41,7 @@ export default function HelpPage() {
               Help & <span className="text-orange-500">Support</span>
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Get help with booking tickets, managing your trips, and using Hesaarak's bus booking
+              Get help with booking tickets, managing your trips, and using Hesarakbus's bus booking
               platform.
             </p>
           </div>

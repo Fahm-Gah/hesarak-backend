@@ -12,9 +12,9 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Contact Us | Hesaarak - Get in Touch for Support',
+  title: 'Contact Us | Hesarakbus - Get in Touch for Support',
   description:
-    "Contact Hesaarak for booking assistance, customer support, or any questions about our bus travel services across Afghanistan. We're here to help 24/7.",
+    "Contact Hesarakbus for booking assistance, customer support, or any questions about our bus travel services across Afghanistan. We're here to help 24/7.",
 }
 
 export default function ContactPage() {
@@ -81,7 +81,7 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Contact <span className="text-orange-500">Hesaarak</span>
+              Contact <span className="text-orange-500">Hesarakbus</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               We're here to help! Get in touch with our friendly customer service team for any

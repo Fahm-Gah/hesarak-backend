@@ -5,7 +5,7 @@ import '../../globals.css'
 
 export const metadata = {
   description: 'Authentication pages',
-  title: 'Authentication - Hesaarak',
+  title: 'Authentication - Hesarakbus',
 }
 
 export default async function AuthLayout(props: { children: React.ReactNode }) {

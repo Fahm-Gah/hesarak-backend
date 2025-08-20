@@ -3,9 +3,9 @@ import { Metadata } from 'next'
 import { Shield, Users, MapPin, Award, Clock, Heart } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'About Us | Hesaarak - Your Trusted Bus Travel Partner',
+  title: 'About Us | Hesarakbus - Your Trusted Bus Travel Partner',
   description:
-    "Learn about Hesaarak's mission to provide safe, comfortable, and reliable bus travel across Afghanistan. Discover our story, values, and commitment to passenger safety.",
+    "Learn about Hesarakbus's mission to provide safe, comfortable, and reliable bus travel across Afghanistan. Discover our story, values, and commitment to passenger safety.",
 }
 
 export default function AboutPage() {
@@ -46,7 +46,7 @@ export default function AboutPage() {
   const milestones = [
     {
       year: '2020',
-      title: 'Hesaarak Founded',
+      title: 'Hesarakbus Founded',
       description:
         'Started with a vision to revolutionize bus travel in Afghanistan with modern technology and customer-first approach.',
     },
@@ -83,7 +83,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              About <span className="text-orange-500">Hesaarak</span>
+              About <span className="text-orange-500">Hesarakbus</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               We are committed to providing safe, comfortable, and reliable bus travel services
@@ -226,7 +226,7 @@ export default function AboutPage() {
           <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
             Every day, our team of dedicated professionals works tirelessly to ensure your journey
             is safe, comfortable, and memorable. From our drivers to our customer service
-            representatives, everyone at Hesaarak is committed to serving you with excellence.
+            representatives, everyone at Hesarakbus is committed to serving you with excellence.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
