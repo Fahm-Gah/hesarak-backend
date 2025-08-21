@@ -4,40 +4,51 @@ import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/providers/AuthContext'
-import { validateLoginData, type LoginFormData } from '@/validations/auth'
 import { Logo } from '@/app/(frontend)/components/Logo'
+import { EmailPhoneInput } from './components/EmailPhoneInput'
+import { PasswordInput } from '../register/components/PasswordInput'
+import { LocationPermissionPrompt } from '../register/components/LocationPermissionPrompt'
+import { Alert } from '../register/components/Alert'
+import { LoginSubmitButton } from './components/LoginSubmitButton'
+import { useLocationPermission } from '@/hooks'
+import { useLoginForm } from './hooks/useLoginForm'
 
 export const LoginClient = () => {
-  const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: '',
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
   const [success, setSuccess] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false)
   const { login, isLoading, error, clearError } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/'
 
-  const handleInputChange = (field: keyof LoginFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    // Clear field-specific error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }))
-    }
-    if (error) clearError() // Clear auth error when user starts typing
-    if (success) setSuccess(false) // Clear success when user starts typing
+  const { formData, errors, handleInputChange, validateForm, isFormValid } = useLoginForm(
+    clearError,
+    () => setSuccess(false),
+  )
+
+  const { shouldShowLocationPrompt, isCheckingPermission, permissionState } =
+    useLocationPermission()
+
+  // Location permission handlers
+  const handleLocationGranted = () => {
+    proceedToRedirect()
   }
 
-  const validateForm = () => {
-    const validation = validateLoginData(formData)
-    if (!validation.isValid) {
-      setErrors(validation.errors)
-      return false
-    }
-    setErrors({})
-    return true
+  const handleLocationSkipped = () => {
+    proceedToRedirect()
+  }
+
+  const proceedToRedirect = () => {
+    const hasAdminRoles =
+      // We'll get this from the login result, but for now use a default
+      false // This will be updated in handleSubmit
+    const defaultRedirect = hasAdminRoles ? '/admin' : '/'
+    const finalRedirect = redirectTo !== '/' ? redirectTo : defaultRedirect
+
+    setTimeout(() => {
+      router.push(finalRedirect)
+      router.refresh()
+    }, 1000)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,18 +71,24 @@ export const LoginClient = () => {
         // Login successful - show success message
         setSuccess(true)
 
-        const hasAdminRoles =
-          result.user.roles && result.user.roles.some((role: string) => role !== 'customer')
-        const defaultRedirect = hasAdminRoles ? '/admin' : '/'
+        // Check if we should show location prompt
+        if (shouldShowLocationPrompt && !isCheckingPermission) {
+          // Show location permission prompt after a brief success display
+          setTimeout(() => {
+            setShowLocationPrompt(true)
+          }, 1500)
+        } else {
+          // No location prompt needed, redirect directly
+          const hasAdminRoles =
+            result.user.roles && result.user.roles.some((role: string) => role !== 'customer')
+          const defaultRedirect = hasAdminRoles ? '/admin' : '/'
+          const finalRedirect = redirectTo !== '/' ? redirectTo : defaultRedirect
 
-        // Use redirect parameter or default based on user role
-        const finalRedirect = redirectTo !== '/' ? redirectTo : defaultRedirect
-
-        // Wait a moment to show success message, then redirect
-        setTimeout(() => {
-          router.push(finalRedirect)
-          router.refresh() // Refresh to update auth state
-        }, 1500)
+          setTimeout(() => {
+            router.push(finalRedirect)
+            router.refresh()
+          }, 1500)
+        }
       }
       // Error handling is done in the AuthContext
     } catch (err) {
@@ -79,222 +96,101 @@ export const LoginClient = () => {
     }
   }
 
-  const isFormValid = formData.email.trim() && formData.password.trim()
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8">
           {/* Logo */}
-          <Logo variant="auth" size="lg" subtitle="Welcome back! Please sign in to your account." />
+          <Logo
+            variant="auth"
+            size="lg"
+            title="Welcome back"
+            subtitle="Please sign in to your account."
+          />
 
           {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-center">
-                <svg
-                  className="w-5 h-5 text-red-500 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span className="text-red-700 text-sm">{error}</span>
-              </div>
-            </div>
-          )}
+          {error && <Alert type="error" message={error} />}
 
           {/* Success Message */}
-          {success && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center">
-                <svg
-                  className="w-5 h-5 text-green-500 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span className="text-green-700 text-sm">Login successful! Redirecting...</span>
-              </div>
-            </div>
+          {success && !showLocationPrompt && (
+            <Alert type="success" message="Login successful! Setting up your session..." />
+          )}
+
+          {/* Location Permission Prompt */}
+          {showLocationPrompt && (
+            <LocationPermissionPrompt
+              onLocationGranted={handleLocationGranted}
+              onLocationSkipped={handleLocationSkipped}
+            />
           )}
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email/Phone Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email or Phone</label>
-              <input
-                type="text"
+          {!showLocationPrompt && (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email/Phone Field */}
+              <EmailPhoneInput
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 bg-white/80 ${
-                  errors.email
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                    : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
-                }`}
-                placeholder="Enter your email or phone number"
-                required
+                onChange={(value) => handleInputChange('email', value)}
+                disabled={isLoading || success}
+                error={errors.email}
                 autoComplete="username"
               />
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-            </div>
 
-            {/* Password Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 bg-white/80 ${
-                    errors.password
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
-                  }`}
-                  placeholder="Enter your password"
-                  required
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                >
-                  {showPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                      />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-            </div>
+              {/* Password Field */}
+              <PasswordInput
+                label="Password"
+                value={formData.password}
+                onChange={(value) => handleInputChange('password', value)}
+                placeholder="Enter your password"
+                disabled={isLoading || success}
+                error={errors.password}
+                autoComplete="current-password"
+              />
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={!isFormValid || isLoading || success}
-              className="w-full px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg font-medium hover:from-orange-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100 relative overflow-hidden"
-            >
-              <div className="relative z-10">
-                {success ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-6 h-6 mr-2">
-                      <svg className="w-full h-full text-white" viewBox="0 0 24 24" fill="none">
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          fill="none"
-                          className="animate-[draw-circle_1s_ease-in-out_forwards]"
-                          strokeDasharray="62.83"
-                          strokeDashoffset="62.83"
-                        />
-                        <path
-                          d="M8 12l2 2 4-4"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          fill="none"
-                          className="animate-[draw-check_0.5s_ease-in-out_0.8s_forwards]"
-                          strokeDasharray="10"
-                          strokeDashoffset="10"
-                        />
-                      </svg>
-                    </div>
-                    <span>Login Successful!</span>
-                  </div>
-                ) : isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Signing in...
-                  </div>
-                ) : (
-                  'Sign In'
-                )}
-              </div>
-              <style jsx>{`
-                @keyframes draw-circle {
-                  to {
-                    stroke-dashoffset: 0;
-                  }
-                }
-                @keyframes draw-check {
-                  to {
-                    stroke-dashoffset: 0;
-                  }
-                }
-              `}</style>
-            </button>
-          </form>
+              {/* Submit Button */}
+              <LoginSubmitButton
+                isLoading={isLoading}
+                isSuccess={success}
+                disabled={!isFormValid || isLoading || success}
+              />
+            </form>
+          )}
 
           {/* Divider */}
-          <div className="my-8 flex items-center">
-            <div className="flex-1 border-t border-gray-300"></div>
-            <div className="px-4 text-sm text-gray-500">or</div>
-            <div className="flex-1 border-t border-gray-300"></div>
-          </div>
+          {!showLocationPrompt && (
+            <>
+              <div className="my-8 flex items-center">
+                <div className="flex-1 border-t border-gray-300"></div>
+                <div className="px-4 text-sm text-gray-500">or</div>
+                <div className="flex-1 border-t border-gray-300"></div>
+              </div>
 
-          {/* Sign Up Link */}
-          <div className="text-center">
-            <p className="text-gray-600">
-              Don't have an account?{' '}
-              <Link
-                href={`/auth/register${redirectTo !== '/' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
-                className="text-orange-600 hover:text-orange-700 font-medium"
-              >
-                Sign up here
-              </Link>
-            </p>
-          </div>
+              {/* Sign Up Link */}
+              <div className="text-center">
+                <p className="text-gray-600">
+                  Don't have an account?{' '}
+                  <Link
+                    href={`/auth/register${redirectTo !== '/' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
+                    className="text-orange-600 hover:text-orange-700 font-medium"
+                  >
+                    Sign up here
+                  </Link>
+                </p>
+              </div>
+            </>
+          )}
 
           {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-            <p className="text-sm text-gray-500">
-              Need help?{' '}
-              <Link href="/contact" className="text-orange-600 hover:text-orange-700 font-medium">
-                Contact Support
-              </Link>
-            </p>
-          </div>
+          {!showLocationPrompt && (
+            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+              <p className="text-sm text-gray-500">
+                Need help?{' '}
+                <Link href="/contact" className="text-orange-600 hover:text-orange-700 font-medium">
+                  Contact Support
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

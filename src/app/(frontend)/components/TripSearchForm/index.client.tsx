@@ -125,7 +125,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
                   setShowFromDropdown(!showFromDropdown)
                   setShowToDropdown(false)
                 }}
-                className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 pr-10 shadow-sm flex items-center justify-between"
+                className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
               >
                 <span className={formData.from ? 'text-gray-900' : 'text-gray-500'}>
                   {formData.from || 'Select city'}
@@ -167,9 +167,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
               className="p-2.5 bg-orange-600 hover:bg-orange-700 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group transform hover:scale-110 active:scale-95 flex-shrink-0 lg:mb-1"
               aria-label="Swap cities"
             >
-              <ArrowLeftRight
-                className="w-5 h-5 text-white transform group-hover:rotate-180 transition-transform duration-500"
-              />
+              <ArrowLeftRight className="w-5 h-5 text-white transform group-hover:rotate-180 transition-transform duration-500" />
             </button>
           </div>
 
@@ -185,7 +183,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
                   setShowToDropdown(!showToDropdown)
                   setShowFromDropdown(false)
                 }}
-                className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 pr-10 shadow-sm flex items-center justify-between"
+                className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
               >
                 <span className={formData.to ? 'text-gray-900' : 'text-gray-500'}>
                   {formData.to || 'Select city'}
@@ -221,7 +219,11 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
 
           {/* Date Field */}
           <div className="flex-1 min-w-0 w-full lg:flex-1">
-            <JalaaliDatePicker value={selectedJalaaliDate} onChange={handleDateChange} label="DATE" />
+            <JalaaliDatePicker
+              value={selectedJalaaliDate}
+              onChange={handleDateChange}
+              label="DATE"
+            />
           </div>
         </div>
 
@@ -248,9 +250,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
               </div>
             ) : (
               <div className="flex items-center space-x-3 relative z-10">
-                <Search
-                  className="w-5 h-5 transform group-hover:scale-110 transition-transform duration-200"
-                />
+                <Search className="w-5 h-5 transform group-hover:scale-110 transition-transform duration-200" />
                 <span>SEARCH BUSES</span>
               </div>
             )}

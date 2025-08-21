@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getMeUser } from '@/utils/getMeUser'
 import { LoginClient } from './page.client'
@@ -35,5 +35,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     // User is not authenticated, continue to login page
   }
 
-  return <LoginClient />
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-600"></div>
+        </div>
+      }
+    >
+      <LoginClient />
+    </Suspense>
+  )
 }

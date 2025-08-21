@@ -1,6 +1,9 @@
+'use client'
+
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight, Download, Smartphone } from 'lucide-react'
+import { ArrowRight, Smartphone } from 'lucide-react'
+import { AppStoreButton, GooglePlayButton } from './DownloadButtons'
 
 export const CTASection = () => {
   return (
@@ -40,14 +43,14 @@ export const CTASection = () => {
           </div>
 
           {/* App Download Section */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="text-left mb-6 md:mb-0">
-                <div className="flex items-center mb-4">
-                  <Smartphone className="w-8 h-8 mr-3" />
-                  <h3 className="text-2xl font-bold">Get Our Mobile App</h3>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-4xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="text-left md:flex-1">
+                <div className="flex items-center mb-3">
+                  <Smartphone className="w-7 h-7 mr-3" />
+                  <h3 className="text-xl font-bold">Get Our Mobile App</h3>
                 </div>
-                <p className="text-lg opacity-90 mb-4">
+                <p className="text-base opacity-90 mb-3">
                   Download the Hesarakbus mobile app for easier booking and trip management on the
                   go.
                 </p>
@@ -59,22 +62,19 @@ export const CTASection = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-black text-white px-6 py-3 rounded-xl flex items-center hover:bg-gray-800 transition-colors">
-                  <Download className="w-5 h-5 mr-2" />
-                  <div className="text-left">
-                    <div className="text-xs">Download on the</div>
-                    <div className="text-sm font-semibold">App Store</div>
-                  </div>
-                </button>
-
-                <button className="bg-black text-white px-6 py-3 rounded-xl flex items-center hover:bg-gray-800 transition-colors">
-                  <Download className="w-5 h-5 mr-2" />
-                  <div className="text-left">
-                    <div className="text-xs">Get it on</div>
-                    <div className="text-sm font-semibold">Google Play</div>
-                  </div>
-                </button>
+              <div className="flex flex-col sm:flex-row gap-3 md:flex-shrink-0">
+                <AppStoreButton
+                  onClick={() => {
+                    // Add App Store link when available
+                    console.log('App Store button clicked')
+                  }}
+                />
+                <GooglePlayButton
+                  onClick={() => {
+                    // Add Google Play link when available
+                    console.log('Google Play button clicked')
+                  }}
+                />
               </div>
             </div>
           </div>
