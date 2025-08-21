@@ -23,10 +23,8 @@ export const LogoutClient = () => {
           setIsSuccess(true)
 
           // Redirect to home page after showing success message
-          setTimeout(() => {
-            router.push('/')
-            router.refresh() // Refresh to update auth state
-          }, 800)
+          router.push('/')
+          router.refresh() // Refresh to update auth state
         } else {
           setLocalError(result.error || 'Logout failed. Please try again.')
         }

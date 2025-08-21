@@ -93,6 +93,11 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
       return
     }
 
+    // Prevent navigation if booking is not allowed or fully booked
+    if (!trip.isBookingAllowed || trip.availability.availableSeats === 0) {
+      return
+    }
+
     setIsNavigating(true)
     const { from, to, date } = searchParams
 
@@ -119,13 +124,15 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
     router.push(`/trip/${trip.id}?${params.toString()}`)
   }
 
+  const isDisabled = !trip.isBookingAllowed || trip.availability.availableSeats === 0
+
   return (
     <div
       onClick={handleCardClick}
-      className={`group relative w-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden ${
-        !trip.isBookingAllowed || trip.availability.availableSeats === 0
+      className={`group relative w-full bg-white border border-gray-100 rounded-2xl shadow-sm transition-all duration-300 overflow-hidden ${
+        isDisabled
           ? 'opacity-60 cursor-not-allowed'
-          : 'hover:-translate-y-1'
+          : 'cursor-pointer hover:shadow-xl hover:-translate-y-1'
       }`}
     >
       {/* Gradient accent bar */}
@@ -263,7 +270,7 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
       </div>
 
       {/* Disabled overlay */}
-      {(!trip.isBookingAllowed || trip.availability.availableSeats === 0) && (
+      {isDisabled && (
         <div className="absolute inset-0 bg-gray-50/50 rounded-2xl pointer-events-none"></div>
       )}
     </div>

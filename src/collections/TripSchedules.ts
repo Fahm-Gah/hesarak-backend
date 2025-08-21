@@ -31,9 +31,10 @@ export const TripSchedules: CollectionConfig = {
       },
       type: 'text',
       required: true,
+      unique: false,
       admin: {
         description: {
-          en: 'must be unique across all trip schedules e.g. "VIP | Kabul - Parwaan - Mazaar | 10:00 AM | Daily"',
+          en: '"VIP | Kabul - Parwaan - Mazaar | 10:00 AM | Daily"',
           fa: '"VIP | کابل - پروان - مزار | 10:00 صبح | روزانه"',
         },
       },

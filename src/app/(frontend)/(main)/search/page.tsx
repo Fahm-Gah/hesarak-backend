@@ -1,7 +1,7 @@
 import React from 'react'
 import { Metadata } from 'next'
 import { SearchPageClient } from './page.client'
-import { getServerSideURL } from '@/utils/getURL'
+import { getClientSideURL } from '@/utils/getURL'
 import moment from 'moment-jalaali'
 
 export const dynamic = 'force-dynamic'
@@ -11,6 +11,7 @@ interface SearchPageProps {
     from?: string
     to?: string
     date?: string
+    page?: string
   }>
 }
 
@@ -24,6 +25,13 @@ interface SearchResult {
       convertedDate: string
     }
     trips: any[]
+    pagination: {
+      currentPage: number
+      totalPages: number
+      totalCount: number
+      hasNextPage: boolean
+      hasPrevPage: boolean
+    }
     summary: {
       totalTrips: number
       availableTrips: number
@@ -38,6 +46,7 @@ async function fetchSearchResults(
   from: string,
   to: string,
   date: string,
+  page?: string,
 ): Promise<SearchResult | null> {
   try {
     const searchParamsObj = new URLSearchParams({
@@ -46,8 +55,10 @@ async function fetchSearchResults(
       date,
     })
 
+    if (page) searchParamsObj.set('page', page)
+
     const response = await fetch(
-      `${getServerSideURL()}/api/trips/search?${searchParamsObj.toString()}`,
+      `${getClientSideURL()}/api/trips/search?${searchParamsObj.toString()}`,
       {
         cache: 'no-store', // Always fetch fresh data for search results
       },
@@ -65,6 +76,25 @@ async function fetchSearchResults(
   }
 }
 
+// Fetch provinces for dropdowns
+async function fetchProvinces(): Promise<string[]> {
+  try {
+    const response = await fetch(`${getClientSideURL()}/api/provinces`, {
+      cache: 'force-cache',
+      next: { revalidate: 3600 }, // Cache for 1 hour
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      return data.data?.provinces || []
+    }
+  } catch (error) {
+    console.error('Error fetching provinces:', error)
+  }
+
+  return []
+}
+
 // Get today's date in Jalaali format
 function getTodayJalaaliDate(): string {
   const today = moment()
@@ -73,21 +103,33 @@ function getTodayJalaaliDate(): string {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams
-  const { from, to } = params
+  const { from, to, page } = params
 
   // Use today's date if date is not provided
   const date = params.date || getTodayJalaaliDate()
 
+  // Fetch provinces for dropdowns (always fetch on server)
+  const provinces = await fetchProvinces()
+
   // If missing from or to, show the search prompt page
   if (!from || !to) {
-    return <SearchPageClient searchParams={{ from: from || '', to: to || '', date }} />
+    return (
+      <SearchPageClient
+        searchParams={{ from: from || '', to: to || '', date, page }}
+        provinces={provinces}
+      />
+    )
   }
 
   // Fetch search results on the server
-  const searchResult = await fetchSearchResults(from, to, date)
+  const searchResult = await fetchSearchResults(from, to, date, page)
 
   return (
-    <SearchPageClient searchResult={searchResult || undefined} searchParams={{ from, to, date }} />
+    <SearchPageClient
+      searchResult={searchResult || undefined}
+      searchParams={{ from, to, date, page }}
+      provinces={provinces}
+    />
   )
 }
 

@@ -363,7 +363,7 @@ export interface Terminal {
 export interface TripSchedule {
   id: string;
   /**
-   * must be unique across all trip schedules e.g. "VIP | Kabul - Parwaan - Mazaar | 10:00 AM | Daily"
+   * "VIP | Kabul - Parwaan - Mazaar | 10:00 AM | Daily"
    */
   name: string;
   /**

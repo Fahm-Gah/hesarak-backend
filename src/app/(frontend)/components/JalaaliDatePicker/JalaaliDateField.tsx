@@ -74,9 +74,9 @@ export const JalaaliDateField = ({
   const getSizeStyles = () => {
     switch (size) {
       case 'sm':
-        return 'px-3 py-2 text-sm'
+        return 'px-4 py-3.5 text-sm'
       case 'lg':
-        return 'px-5 py-4 text-lg'
+        return 'px-4 py-3.5 text-lg'
       case 'md':
       default:
         return 'px-4 py-3.5'
@@ -87,10 +87,10 @@ export const JalaaliDateField = ({
   const getVariantStyles = () => {
     switch (variant) {
       case 'compact':
-        return 'bg-white border border-gray-300 rounded-lg'
+        return 'bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl'
       case 'default':
       default:
-        return 'bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl shadow-sm'
+        return 'bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl'
     }
   }
 
@@ -112,14 +112,14 @@ export const JalaaliDateField = ({
           className={`
             ${getSizeStyles()}
             ${getVariantStyles()}
-            w-full text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg transition-all duration-300 flex items-center justify-between
-            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md'}
-            ${showIcon ? 'pr-10' : ''}
+            w-full text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            ${showIcon ? 'pl-12' : ''}
           `}
         >
-          <span className={value ? 'text-gray-900' : 'text-gray-400'}>{displayText}</span>
+          <span className={value ? 'text-gray-900' : 'text-gray-500'}>{displayText}</span>
           {showIcon && (
-            <Calendar className="w-4 h-4 text-gray-400 transition-transform duration-200 absolute left-3" />
+            <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
           )}
         </div>
       </div>

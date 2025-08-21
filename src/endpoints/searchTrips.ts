@@ -11,6 +11,7 @@ interface SearchQuery {
   from?: string // province name
   to?: string // province name
   date?: string // date in Persian or Gregorian format
+  page?: string // page number for pagination
 }
 
 interface TripAvailability {
@@ -81,7 +82,7 @@ export const searchTrips: Endpoint = {
     const { payload, query } = req
 
     // Extract and normalize query parameters
-    const { from: rawFrom, to: rawTo, date: rawDate } = query as SearchQuery
+    const { from: rawFrom, to: rawTo, date: rawDate, page: rawPage } = query as SearchQuery
 
     // Input validation
     if (!rawFrom || !rawTo || !rawDate) {
@@ -100,6 +101,10 @@ export const searchTrips: Endpoint = {
     const decodedDate = decodeURIComponent(String(rawDate).trim())
     const convertedDate = convertPersianDateToGregorian(decodedDate)
 
+    // Parse and validate pagination parameters
+    const pageNum = Math.max(1, parseInt(String(rawPage || '1'), 10) || 1)
+    const limitNum = 10 // Fixed limit of 10 items per page
+
     // Validate date
     const dateValidation = validateDate(decodedDate)
     if (!dateValidation.isValid) {
@@ -115,50 +120,73 @@ export const searchTrips: Endpoint = {
     try {
       const dayOfWeek = getDayOfWeek(convertedDate)
 
-      // Find terminals in the 'from' province (case-insensitive)
-      const fromTerminalsResult = await payload.find({
-        collection: 'terminals',
-        where: {
-          province: {
-            contains: from,
+      // Enhanced terminal search with multiple strategies
+      const searchTerminals = async (searchTerm: string) => {
+        // Strategy 1: Exact province match (highest priority)
+        const exactProvinceMatch = await payload.find({
+          collection: 'terminals',
+          where: {
+            province: {
+              equals: searchTerm,
+            },
           },
-        },
-        limit: 100,
-      })
+          limit: 200,
+        })
 
-      // Find terminals in the 'to' province (case-insensitive)
-      const toTerminalsResult = await payload.find({
-        collection: 'terminals',
-        where: {
-          province: {
-            contains: to,
+        if (exactProvinceMatch.docs.length > 0) {
+          return exactProvinceMatch.docs
+        }
+
+        // Strategy 2: Case-insensitive exact match
+        const caseInsensitiveMatch = await payload.find({
+          collection: 'terminals',
+          where: {
+            or: [{ province: { like: searchTerm } }, { name: { like: searchTerm } }],
           },
-        },
-        limit: 100,
-      })
+          limit: 200,
+        })
 
-      if (fromTerminalsResult.docs.length === 0) {
+        if (caseInsensitiveMatch.docs.length > 0) {
+          return caseInsensitiveMatch.docs
+        }
+
+        // Strategy 3: Fuzzy search with contains (fallback)
+        const fuzzyMatch = await payload.find({
+          collection: 'terminals',
+          where: {
+            or: [{ province: { contains: searchTerm } }, { name: { contains: searchTerm } }],
+          },
+          limit: 200,
+        })
+
+        return fuzzyMatch.docs
+      }
+
+      const fromTerminals = await searchTerminals(from)
+      const toTerminals = await searchTerminals(to)
+
+      if (fromTerminals.length === 0) {
         return Response.json(
           {
             success: false,
-            error: `No terminals found in province: ${from}`,
+            error: `No terminals found for: ${from}. Please check spelling or try a different location.`,
           },
           { status: 404 },
         )
       }
 
-      if (toTerminalsResult.docs.length === 0) {
+      if (toTerminals.length === 0) {
         return Response.json(
           {
             success: false,
-            error: `No terminals found in province: ${to}`,
+            error: `No terminals found for: ${to}. Please check spelling or try a different location.`,
           },
           { status: 404 },
         )
       }
 
-      const fromTerminalIds = fromTerminalsResult.docs.map((t: any) => t.id)
-      const toTerminalIds = toTerminalsResult.docs.map((t: any) => t.id)
+      const fromTerminalIds = fromTerminals.map((t: any) => t.id)
+      const toTerminalIds = toTerminals.map((t: any) => t.id)
 
       // Fetch all active trip schedules that might serve our route
       const tripSchedules = await payload.find({
@@ -379,6 +407,13 @@ export const searchTrips: Endpoint = {
       validTrips.sort((a, b) => a.departureTime.localeCompare(b.departureTime))
       const availableTrips = validTrips.filter((trip) => trip.availability.availableSeats > 0)
 
+      // Apply pagination
+      const totalCount = validTrips.length
+      const totalPages = Math.ceil(totalCount / limitNum)
+      const startIndex = (pageNum - 1) * limitNum
+      const endIndex = Math.min(startIndex + limitNum, totalCount)
+      const paginatedTrips = validTrips.slice(startIndex, endIndex)
+
       return Response.json({
         success: true,
         data: {
@@ -388,7 +423,14 @@ export const searchTrips: Endpoint = {
             originalDate: decodedDate,
             convertedDate,
           },
-          trips: validTrips,
+          trips: paginatedTrips,
+          pagination: {
+            currentPage: pageNum,
+            totalPages,
+            totalCount,
+            hasNextPage: pageNum < totalPages,
+            hasPrevPage: pageNum > 1,
+          },
           summary: {
             totalTrips: validTrips.length,
             availableTrips: availableTrips.length,

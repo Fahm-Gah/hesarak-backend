@@ -48,7 +48,7 @@ export interface TicketsResponse {
     tickets: UserTicket[]
     total: number
     page?: number
-    limit?: number
+    totalPages?: number
     hasMore?: boolean
   }
   error?: string

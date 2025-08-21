@@ -1,25 +1,35 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { JalaaliDatePicker } from '@/app/(frontend)/components/JalaaliDatePicker'
+import { Search, ArrowLeftRight, Loader2, ChevronDown } from 'lucide-react'
 import moment from 'moment-jalaali'
 
 interface SearchBarProps {
   initialFrom: string
   initialTo: string
   initialDate: string
+  provinces?: string[]
 }
 
-export const SearchBar = ({ initialFrom, initialTo, initialDate }: SearchBarProps) => {
+export const SearchBar = ({
+  initialFrom,
+  initialTo,
+  initialDate,
+  provinces = [],
+}: SearchBarProps) => {
   const router = useRouter()
   const [searchFrom, setSearchFrom] = useState(initialFrom)
   const [searchTo, setSearchTo] = useState(initialTo)
+  const [fromInput, setFromInput] = useState(initialFrom)
+  const [toInput, setToInput] = useState(initialTo)
   const [showFromDropdown, setShowFromDropdown] = useState(false)
   const [showToDropdown, setShowToDropdown] = useState(false)
-  const [provinces, setProvinces] = useState<string[]>([])
-  const [isLoadingProvinces, setIsLoadingProvinces] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+
+  const fromDropdownRef = useRef<HTMLDivElement>(null)
+  const toDropdownRef = useRef<HTMLDivElement>(null)
 
   // Parse Jalaali date
   const parseJalaaliDate = (dateStr: string) => {
@@ -42,75 +52,90 @@ export const SearchBar = ({ initialFrom, initialTo, initialDate }: SearchBarProp
 
   const [searchDate, setSearchDate] = useState(parseJalaaliDate(initialDate))
 
-  // Reset search state when component mounts
+  // Reset search state when component mounts or search params change
   useEffect(() => {
     setIsSearching(false)
   }, [initialFrom, initialTo, initialDate])
 
-  // Load provinces
+  // Reset searching state after a timeout to prevent stuck button
   useEffect(() => {
-    const loadProvinces = async () => {
-      setIsLoadingProvinces(true)
-      try {
-        const response = await fetch('/api/provinces')
-        if (response.ok) {
-          const data = await response.json()
-          if (data.success && Array.isArray(data.data)) {
-            setProvinces(data.data)
-          } else if (data.data?.provinces && Array.isArray(data.data.provinces)) {
-            setProvinces(data.data.provinces)
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load provinces:', error)
-      } finally {
-        setIsLoadingProvinces(false)
-      }
+    if (isSearching) {
+      const timeout = setTimeout(() => {
+        setIsSearching(false)
+      }, 5000) // Reset after 5 seconds maximum
+
+      return () => clearTimeout(timeout)
     }
+  }, [isSearching])
 
-    loadProvinces()
-  }, [])
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setShowFromDropdown(false)
-      setShowToDropdown(false)
-    }
-
-    if (showFromDropdown || showToDropdown) {
-      document.addEventListener('click', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [showFromDropdown, showToDropdown])
-
-  const handleProvinceSelect = (field: 'from' | 'to', province: string) => {
-    // If selecting the same province as the other field, swap them
-    if (field === 'from' && province === searchTo) {
-      setSearchTo(searchFrom)
-    } else if (field === 'to' && province === searchFrom) {
-      setSearchFrom(searchTo)
-    }
-
-    if (field === 'from') {
-      setSearchFrom(province)
-      setShowFromDropdown(false)
-    } else {
-      setSearchTo(province)
-      setShowToDropdown(false)
-    }
-  }
-
-  // Get filtered provinces for each dropdown
+  // Get available provinces for each dropdown (excluding the other field's selection)
   const getAvailableProvinces = (excludeField: 'from' | 'to') => {
+    if (!provinces || !Array.isArray(provinces)) {
+      return []
+    }
     const excludeValue = excludeField === 'from' ? searchFrom : searchTo
     return provinces.filter((province) => province !== excludeValue)
   }
 
+  // Handle province selection
+  const handleProvinceSelect = (province: string, field: 'from' | 'to') => {
+    if (field === 'from') {
+      // If selecting the same city as the TO field, swap them
+      if (province === searchTo) {
+        setSearchTo(searchFrom)
+        setToInput(fromInput)
+      }
+
+      setSearchFrom(province)
+      setFromInput(province)
+      setShowFromDropdown(false)
+    } else {
+      // If selecting the same city as the FROM field, swap them
+      if (province === searchFrom) {
+        setSearchFrom(searchTo)
+        setFromInput(toInput)
+      }
+
+      setSearchTo(province)
+      setToInput(province)
+      setShowToDropdown(false)
+    }
+  }
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+
+      // Check if click is outside FROM dropdown
+      if (fromDropdownRef.current && !fromDropdownRef.current.contains(target)) {
+        const fromField = fromDropdownRef.current.previousElementSibling
+        if (!fromField?.contains(target)) {
+          setShowFromDropdown(false)
+        }
+      }
+
+      // Check if click is outside TO dropdown
+      if (toDropdownRef.current && !toDropdownRef.current.contains(target)) {
+        const toField = toDropdownRef.current.previousElementSibling
+        if (!toField?.contains(target)) {
+          setShowToDropdown(false)
+        }
+      }
+    }
+
+    if (showFromDropdown || showToDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showFromDropdown, showToDropdown])
+
   const handleSearch = () => {
+    if (!searchFrom || !searchTo) return
+
     setIsSearching(true)
 
     // Convert Jalaali date to string format
@@ -126,16 +151,22 @@ export const SearchBar = ({ initialFrom, initialTo, initialDate }: SearchBarProp
   }
 
   const handleSwap = () => {
-    const temp = searchFrom
+    const tempFrom = searchFrom
+    const tempFromInput = fromInput
+
     setSearchFrom(searchTo)
-    setSearchTo(temp)
+    setFromInput(toInput)
+    setSearchTo(tempFrom)
+    setToInput(tempFromInput)
   }
 
+  const isFormValid = searchFrom && searchTo && searchFrom !== searchTo
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-3 w-full">
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 lg:p-6 mb-6">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-4 w-full">
         {/* From Field */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 w-full lg:flex-1">
           <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
             FROM
           </label>
@@ -146,57 +177,31 @@ export const SearchBar = ({ initialFrom, initialTo, initialDate }: SearchBarProp
                 setShowFromDropdown(!showFromDropdown)
                 setShowToDropdown(false)
               }}
-              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 lg:px-4 lg:py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 pr-8 lg:pr-10 flex items-center justify-between"
+              className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
             >
-              <span className={searchFrom ? 'text-gray-900' : 'text-gray-500'}>
-                {isLoadingProvinces ? 'Loading provinces...' : searchFrom || 'Select Province'}
+              <span className={fromInput ? 'text-gray-900' : 'text-gray-500'}>
+                {fromInput || 'Select city'}
               </span>
-              <svg
+              <ChevronDown
                 className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showFromDropdown ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              />
             </div>
 
             {showFromDropdown && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
-                {isLoadingProvinces ? (
-                  <div className="px-4 py-3 text-center text-gray-500 flex items-center justify-center">
-                    <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Loading provinces...
-                  </div>
-                ) : getAvailableProvinces('to').length > 0 ? (
+              <div
+                ref={fromDropdownRef}
+                className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto"
+              >
+                {getAvailableProvinces('to').length > 0 ? (
                   <>
-                    {getAvailableProvinces('to').map((province) => (
+                    {getAvailableProvinces('to').map((province, index) => (
                       <div
-                        key={province}
+                        key={`from-${province}-${index}`}
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleProvinceSelect('from', province)
+                          handleProvinceSelect(province, 'from')
                         }}
-                        className="px-4 py-3 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg border-b border-gray-100 last:border-b-0"
+                        className="px-4 py-3 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition-colors duration-150 first:rounded-t-2xl last:rounded-b-2xl border-b border-gray-100 last:border-b-0"
                       >
                         {province}
                       </div>
@@ -208,15 +213,26 @@ export const SearchBar = ({ initialFrom, initialTo, initialDate }: SearchBarProp
                     )}
                   </>
                 ) : (
-                  <div className="px-4 py-3 text-center text-gray-500">No provinces available</div>
+                  <div className="px-4 py-3 text-center text-gray-500">No cities available</div>
                 )}
               </div>
             )}
           </div>
         </div>
 
+        {/* Swap Button - Desktop */}
+        <div className="hidden lg:flex justify-center items-end pb-2">
+          <button
+            onClick={handleSwap}
+            className="p-2 rounded-full bg-gray-100 hover:bg-orange-100 text-gray-600 hover:text-orange-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 group"
+            title="Swap departure and destination"
+          >
+            <ArrowLeftRight className="w-5 h-5 transform group-hover:rotate-180 transition-transform duration-500" />
+          </button>
+        </div>
+
         {/* To Field */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 w-full lg:flex-1">
           <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
             TO
           </label>
@@ -227,57 +243,31 @@ export const SearchBar = ({ initialFrom, initialTo, initialDate }: SearchBarProp
                 setShowToDropdown(!showToDropdown)
                 setShowFromDropdown(false)
               }}
-              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 lg:px-4 lg:py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 pr-8 lg:pr-10 flex items-center justify-between"
+              className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
             >
-              <span className={searchTo ? 'text-gray-900' : 'text-gray-500'}>
-                {isLoadingProvinces ? 'Loading provinces...' : searchTo || 'Select Province'}
+              <span className={toInput ? 'text-gray-900' : 'text-gray-500'}>
+                {toInput || 'Select city'}
               </span>
-              <svg
+              <ChevronDown
                 className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showToDropdown ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              />
             </div>
 
             {showToDropdown && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
-                {isLoadingProvinces ? (
-                  <div className="px-4 py-3 text-center text-gray-500 flex items-center justify-center">
-                    <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Loading provinces...
-                  </div>
-                ) : getAvailableProvinces('from').length > 0 ? (
+              <div
+                ref={toDropdownRef}
+                className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto"
+              >
+                {getAvailableProvinces('from').length > 0 ? (
                   <>
-                    {getAvailableProvinces('from').map((province) => (
+                    {getAvailableProvinces('from').map((province, index) => (
                       <div
-                        key={province}
+                        key={`to-${province}-${index}`}
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleProvinceSelect('to', province)
+                          handleProvinceSelect(province, 'to')
                         }}
-                        className="px-4 py-3 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg border-b border-gray-100 last:border-b-0"
+                        className="px-4 py-3 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition-colors duration-150 first:rounded-t-2xl last:rounded-b-2xl border-b border-gray-100 last:border-b-0"
                       >
                         {province}
                       </div>
@@ -289,15 +279,26 @@ export const SearchBar = ({ initialFrom, initialTo, initialDate }: SearchBarProp
                     )}
                   </>
                 ) : (
-                  <div className="px-4 py-3 text-center text-gray-500">No provinces available</div>
+                  <div className="px-4 py-3 text-center text-gray-500">No cities available</div>
                 )}
               </div>
             )}
           </div>
         </div>
 
+        {/* Swap Button - Mobile */}
+        <div className="lg:hidden flex justify-center">
+          <button
+            onClick={handleSwap}
+            className="p-2 rounded-full bg-gray-100 hover:bg-orange-100 text-gray-600 hover:text-orange-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 group"
+            title="Swap departure and destination"
+          >
+            <ArrowLeftRight className="w-5 h-5 transform group-hover:rotate-180 transition-transform duration-500" />
+          </button>
+        </div>
+
         {/* Date Field */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 lg:max-w-xs">
           <JalaaliDatePicker
             value={searchDate}
             onChange={setSearchDate}
@@ -317,29 +318,24 @@ export const SearchBar = ({ initialFrom, initialTo, initialDate }: SearchBarProp
         {/* Search Button */}
         <button
           onClick={handleSearch}
-          disabled={!searchFrom || !searchTo || isLoadingProvinces || isSearching}
-          className="px-4 py-2.5 lg:px-6 lg:py-3.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors whitespace-nowrap flex items-center justify-center gap-2"
+          disabled={!isFormValid || isSearching}
+          className="px-6 py-3 lg:px-8 lg:py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl hover:from-orange-700 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 whitespace-nowrap flex items-center justify-center gap-2 font-semibold shadow-lg hover:shadow-xl disabled:shadow-none"
         >
-          {isSearching && (
-            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
+          {isSearching ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Search className="w-4 h-4" />
           )}
           {isSearching ? 'Searching...' : 'Search'}
         </button>
       </div>
+
+      {/* Quick validation feedback */}
+      {searchFrom && searchTo && searchFrom === searchTo && (
+        <div className="mt-3 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          Please select different departure and destination locations.
+        </div>
+      )}
     </div>
   )
 }

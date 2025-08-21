@@ -1,10 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
+import { Pagination } from '@/components/Pagination'
 import { SearchBar } from './components/SearchBar'
 import { FiltersSidebar } from './components/FiltersSidebar'
 import { TripResultsList } from './components/TripResultsList'
+import { PopularRoutes } from './components/PopularRoutes'
+import { SearchSuggestions } from './components/SearchSuggestions'
 
 interface Trip {
   id: string
@@ -75,6 +79,13 @@ interface SearchResult {
       convertedDate: string
     }
     trips: Trip[]
+    pagination: {
+      currentPage: number
+      totalPages: number
+      totalCount: number
+      hasNextPage: boolean
+      hasPrevPage: boolean
+    }
     summary: {
       totalTrips: number
       availableTrips: number
@@ -90,13 +101,18 @@ interface SearchPageClientProps {
     from: string
     to: string
     date: string
+    page?: string
   }
+  provinces?: string[]
 }
 
 export const SearchPageClient = ({
   searchResult,
-  searchParams: { from, to, date },
+  searchParams: { from, to, date, page },
+  provinces = [],
 }: SearchPageClientProps) => {
+  const router = useRouter()
+  const searchParams_hook = useSearchParams()
   const [expandedTrips, setExpandedTrips] = useState<Set<string>>(new Set())
   const [showFilters, setShowFilters] = useState(false)
 
@@ -165,6 +181,17 @@ export const SearchPageClient = ({
 
   const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Search Trips' }]
 
+  // Pagination handlers
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams_hook.toString())
+    params.set('page', newPage.toString())
+    // Keep existing search parameters
+    if (from) params.set('from', from)
+    if (to) params.set('to', to)
+    if (date) params.set('date', date)
+    router.push(`/search?${params.toString()}`)
+  }
+
   // Handle case when no search parameters are provided
   if (!from || !to) {
     return (
@@ -176,57 +203,13 @@ export const SearchPageClient = ({
           </div>
 
           {/* Search Bar */}
-          <SearchBar initialFrom={from} initialTo={to} initialDate={date} />
+          <SearchBar initialFrom={from} initialTo={to} initialDate={date} provinces={provinces} />
 
-          {/* Welcome Message */}
-          <div className="mt-8 bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="max-w-2xl mx-auto">
-              <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-10 h-10 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
+          {/* Popular Routes */}
+          <PopularRoutes />
 
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Find Your Perfect Bus Trip</h1>
-
-              <p className="text-lg text-gray-600 mb-6">
-                Search for bus trips between cities across Afghanistan. Simply select your departure
-                and destination cities, choose your travel date, and find the best options for your
-                journey.
-              </p>
-
-              <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-500">
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                    <span className="text-orange-600 font-bold">1</span>
-                  </div>
-                  <span>Select departure city</span>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                    <span className="text-orange-600 font-bold">2</span>
-                  </div>
-                  <span>Choose destination</span>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                    <span className="text-orange-600 font-bold">3</span>
-                  </div>
-                  <span>Pick your date</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Search Suggestions */}
+          <SearchSuggestions />
         </div>
       </div>
     )
@@ -241,7 +224,7 @@ export const SearchPageClient = ({
             <Breadcrumbs items={breadcrumbItems} />
           </div>
 
-          <SearchBar initialFrom={from} initialTo={to} initialDate={date} />
+          <SearchBar initialFrom={from} initialTo={to} initialDate={date} provinces={provinces} />
 
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -265,7 +248,7 @@ export const SearchPageClient = ({
         </div>
 
         {/* Search Bar */}
-        <SearchBar initialFrom={from} initialTo={to} initialDate={date} />
+        <SearchBar initialFrom={from} initialTo={to} initialDate={date} provinces={provinces} />
 
         {/* Main Content with Filters */}
         <div className="flex flex-col lg:flex-row gap-6">
@@ -288,6 +271,21 @@ export const SearchPageClient = ({
               onClearFilters={handleClearFilters}
               showFilters={() => setShowFilters(true)}
             />
+
+            {/* Pagination */}
+            {data.pagination && data.trips.length > 0 && (
+              <div className="mt-8">
+                <Pagination
+                  currentPage={data.pagination.currentPage}
+                  totalPages={data.pagination.totalPages}
+                  totalCount={data.pagination.totalCount}
+                  limit={10}
+                  onPageChange={handlePageChange}
+                  onLimitChange={() => {}} // No-op since limit is fixed
+                  showLimitSelector={false}
+                />
+              </div>
+            )}
           </div>
         </div>
 

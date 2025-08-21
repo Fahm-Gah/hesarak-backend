@@ -30,6 +30,7 @@ export const Terminals: CollectionConfig = {
       },
       type: 'text',
       required: true,
+      unique: false,
     },
     {
       name: 'province',

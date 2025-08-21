@@ -64,34 +64,146 @@ export const getUserTickets: Endpoint = {
 
       // Parse optional query parameters
       const searchParams = new URLSearchParams(req.url?.split('?')[1] || '')
-      const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : undefined
-      const limit = searchParams.get('limit')
-        ? Math.min(parseInt(searchParams.get('limit')!), 100)
-        : undefined
+      const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
       const sort = searchParams.get('sort') || '-date'
+
+      // Parse filter parameters
+      const searchTerm = searchParams.get('search') || ''
+      const status = searchParams.get('status') || ''
+      const fromDate = searchParams.get('fromDate') || ''
+      const toDate = searchParams.get('toDate') || ''
+      const fromLocation = searchParams.get('fromLocation') || ''
+      const toLocation = searchParams.get('toLocation') || ''
 
       const profileId = typeof user.profile === 'string' ? user.profile : user.profile.id
 
-      // Build query options
-      const queryOptions: any = {
-        collection: 'tickets',
-        where: {
-          passenger: { equals: profileId },
-        },
-        depth: 3, // Need deeper nesting to get bus.type.seats configuration
-        sort,
+      // Build base where clause
+      const whereClause: any = {
+        passenger: { equals: profileId },
       }
 
-      // Add pagination only if requested
-      if (page !== undefined) {
-        queryOptions.page = page
+      // Add status filters
+      if (status) {
+        const statuses = status.split(',')
+        const statusConditions: any[] = []
+
+        statuses.forEach((statusFilter) => {
+          if (statusFilter === 'paid') {
+            statusConditions.push({ isPaid: { equals: true } })
+          } else if (statusFilter === 'pending') {
+            statusConditions.push({
+              and: [{ isPaid: { not_equals: true } }, { isCancelled: { not_equals: true } }],
+            })
+          } else if (statusFilter === 'cancelled') {
+            statusConditions.push({ isCancelled: { equals: true } })
+          }
+        })
+
+        if (statusConditions.length > 0) {
+          whereClause.and = [
+            { passenger: { equals: profileId } },
+            statusConditions.length === 1 ? statusConditions[0] : { or: statusConditions },
+          ]
+          // Remove the base passenger filter since it's now in the and clause
+          delete whereClause.passenger
+        }
       }
-      if (limit !== undefined) {
-        queryOptions.limit = limit
+
+      // Add date range filters
+      if (fromDate) {
+        whereClause.date = { greater_than_equal: fromDate }
+      }
+      if (toDate) {
+        if (whereClause.date) {
+          whereClause.date.less_than_equal = toDate
+        } else {
+          whereClause.date = { less_than_equal: toDate }
+        }
+      }
+
+      // Add search filter (for ticket number)
+      if (searchTerm) {
+        whereClause.ticketNumber = { contains: searchTerm }
+      }
+
+      // Build query options
+      const limit = 10 // Fixed limit of 10 tickets per page
+      const queryOptions: any = {
+        collection: 'tickets',
+        where: whereClause,
+        depth: 3, // Need deeper nesting to get bus.type.seats configuration
+        sort,
+        page,
+        limit,
       }
 
       // Find all tickets where this user is the passenger
-      const tickets = await payload.find(queryOptions)
+      let tickets = await payload.find(queryOptions)
+
+      // Apply client-side filters that can't be done in the database query
+      let filteredDocs = tickets.docs
+
+      // Filter by from/to location (needs to be done after fetching due to nested relationships)
+      if (fromLocation || toLocation) {
+        filteredDocs = filteredDocs.filter((ticket: any) => {
+          const trip = ticket.trip
+          let matches = true
+
+          if (fromLocation) {
+            const userFrom = ticket.from || trip?.from
+            matches = matches && userFrom?.name?.toLowerCase().includes(fromLocation.toLowerCase())
+          }
+
+          if (toLocation) {
+            const userTo = ticket.to || (trip?.stops && trip.stops[trip.stops.length - 1]?.terminal)
+            matches = matches && userTo?.name?.toLowerCase().includes(toLocation.toLowerCase())
+          }
+
+          return matches
+        })
+      }
+
+      // Apply search term to other fields (bus number, route names)
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase()
+        filteredDocs = filteredDocs.filter((ticket: any) => {
+          const trip = ticket.trip
+          const bus = trip?.bus
+          const userFrom = ticket.from || trip?.from
+          const userTo = ticket.to || (trip?.stops && trip.stops[trip.stops.length - 1]?.terminal)
+
+          return (
+            ticket.ticketNumber?.toLowerCase().includes(searchLower) ||
+            userFrom?.name?.toLowerCase().includes(searchLower) ||
+            userTo?.name?.toLowerCase().includes(searchLower) ||
+            bus?.number?.toLowerCase().includes(searchLower)
+          )
+        })
+      }
+
+      // For now, when client-side filtering is applied, we need to recalculate pagination
+      // This is not ideal but fixes the immediate display issue
+      const hasClientFilters = fromLocation || toLocation || searchTerm
+
+      if (hasClientFilters) {
+        // When filters are applied, use filtered count for both display and pagination
+        tickets = {
+          ...tickets,
+          docs: filteredDocs,
+          totalDocs: filteredDocs.length,
+          totalPages: Math.ceil(filteredDocs.length / limit),
+          hasNextPage: false, // Since we're showing all filtered results
+          hasPrevPage: false,
+          page: 1,
+        }
+      } else {
+        // No client-side filters, use original pagination
+        tickets = {
+          ...tickets,
+          docs: filteredDocs,
+          totalDocs: tickets.totalDocs, // Keep original total
+        }
+      }
 
       // Transform tickets to response format
       const transformedTickets: UserTicket[] = tickets.docs.map((ticket: any) => {
@@ -265,15 +377,13 @@ export const getUserTickets: Endpoint = {
       // Build response with conditional pagination info
       const responseData: any = {
         tickets: transformedTickets,
-        total: tickets.totalDocs || transformedTickets.length,
+        total: tickets.totalDocs, // Use the correct total count
       }
 
-      // Add pagination info only if pagination was used
-      if (page !== undefined || limit !== undefined) {
-        responseData.page = tickets.page || 1
-        responseData.limit = tickets.limit || transformedTickets.length
-        responseData.hasMore = tickets.hasNextPage || false
-      }
+      // Add pagination info
+      responseData.page = tickets.page || 1
+      responseData.totalPages = tickets.totalPages || 1
+      responseData.hasMore = tickets.hasNextPage || false
 
       return Response.json({
         success: true,

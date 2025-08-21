@@ -15,9 +15,34 @@ export const metadata: Metadata = {
 import { UserTicket, TicketsResponse } from './types'
 
 // Server-side data fetching function
-async function fetchUserTickets(token: string): Promise<UserTicket[]> {
+async function fetchUserTickets(
+  token: string,
+  page?: number,
+  filters?: {
+    search?: string
+    status?: string
+    fromDate?: string
+    toDate?: string
+    fromLocation?: string
+    toLocation?: string
+    filter?: string
+  },
+): Promise<{ tickets: UserTicket[]; pagination?: any }> {
   try {
-    const response = await fetch(`${getServerSideURL()}/api/user/tickets`, {
+    const searchParams = new URLSearchParams()
+    if (page) searchParams.set('page', page.toString())
+    if (filters?.search) searchParams.set('search', filters.search)
+    if (filters?.status) searchParams.set('status', filters.status)
+    if (filters?.fromDate) searchParams.set('fromDate', filters.fromDate)
+    if (filters?.toDate) searchParams.set('toDate', filters.toDate)
+    if (filters?.fromLocation) searchParams.set('fromLocation', filters.fromLocation)
+    if (filters?.toLocation) searchParams.set('toLocation', filters.toLocation)
+    if (filters?.filter && filters.filter !== 'all') searchParams.set('filter', filters.filter)
+
+    const queryString = searchParams.toString()
+    const url = `${getServerSideURL()}/api/user/tickets${queryString ? `?${queryString}` : ''}`
+
+    const response = await fetch(url, {
       headers: {
         Authorization: `JWT ${token}`,
         'Content-Type': 'application/json',
@@ -35,14 +60,38 @@ async function fetchUserTickets(token: string): Promise<UserTicket[]> {
       throw new Error(result.error || 'Failed to fetch tickets')
     }
 
-    return result.data?.tickets || []
+    return {
+      tickets: result.data?.tickets || [],
+      pagination:
+        result.data?.page !== undefined
+          ? {
+              currentPage: result.data.page,
+              totalCount: result.data.total,
+              totalPages: result.data.totalPages || Math.ceil((result.data.total || 0) / 10),
+              hasMore: result.data.hasMore,
+            }
+          : undefined,
+    }
   } catch (error) {
     console.error('Error fetching user tickets:', error)
-    return []
+    return { tickets: [] }
   }
 }
 
-export default async function TicketsPage() {
+interface TicketsPageProps {
+  searchParams: Promise<{
+    page?: string
+    search?: string
+    status?: string
+    fromDate?: string
+    toDate?: string
+    fromLocation?: string
+    toLocation?: string
+    filter?: string
+  }>
+}
+
+export default async function TicketsPage({ searchParams }: TicketsPageProps) {
   // Check authentication
   let user
   let token
@@ -55,8 +104,23 @@ export default async function TicketsPage() {
     redirect('/auth/login?redirect=' + encodeURIComponent('/my-tickets'))
   }
 
-  // Fetch tickets server-side
-  const tickets = await fetchUserTickets(token)
+  // Get pagination and filter params
+  const params = await searchParams
+  const page = params.page ? parseInt(params.page) : 1
 
-  return <TicketsPageClient tickets={tickets} user={user} />
+  // Extract filter parameters
+  const filters = {
+    search: params.search,
+    status: params.status,
+    fromDate: params.fromDate,
+    toDate: params.toDate,
+    fromLocation: params.fromLocation,
+    toLocation: params.toLocation,
+    filter: params.filter || 'all',
+  }
+
+  // Fetch tickets server-side with pagination and filters
+  const { tickets, pagination } = await fetchUserTickets(token, page, filters)
+
+  return <TicketsPageClient tickets={tickets} user={user} pagination={pagination} />
 }
