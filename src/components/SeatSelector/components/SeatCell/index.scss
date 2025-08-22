@@ -1,6 +1,32 @@
 @import '~@payloadcms/ui/scss';
 
 @layer payload-default {
+  .seat-selector {
+    // Load skeleton styles
+    &__loading-skeleton {
+      height: 40px;
+      background: linear-gradient(
+        90deg,
+        var(--theme-elevation-100) 25%,
+        var(--theme-elevation-150) 50%,
+        var(--theme-elevation-100) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--style-radius-s);
+      margin: calc(var(--base) * 0.5) 0;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+  }
+
   .seat-cell {
     position: relative;
     display: flex;
@@ -16,6 +42,14 @@
     transition: all 150ms ease-in-out;
     user-select: none;
     overflow: hidden;
+
+    // Performance optimizations
+    contain: layout style;
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+
+    // Hardware acceleration hint
+    transform: translateZ(0);
 
     // Base styles for all seat types
     &--seat {
@@ -40,7 +74,7 @@
         &:hover:not(.seat-cell--disabled) {
           background-color: var(--theme-success-200);
           border-color: var(--theme-success-400);
-          transform: scale(1.05);
+          transform: scale(1.05) translateZ(0);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
       }
@@ -55,7 +89,7 @@
         &:hover:not(.seat-cell--disabled) {
           background-color: var(--color-blue-300);
           border-color: var(--color-blue-600);
-          transform: scale(1.05);
+          transform: scale(1.05) translateZ(0);
           box-shadow:
             0 2px 8px rgba(0, 0, 0, 0.15),
             0 0 0 2px rgba(59, 130, 246, 0.3);
@@ -76,7 +110,7 @@
         &:hover:not(.seat-cell--disabled) {
           background-color: var(--theme-success-200);
           border-color: var(--theme-success-400);
-          transform: scale(1.05);
+          transform: scale(1.05) translateZ(0);
           box-shadow:
             0 2px 8px rgba(0, 0, 0, 0.15),
             0 0 0 1px rgba(34, 197, 94, 0.3);
@@ -91,7 +125,7 @@
 
         &:hover:not(.seat-cell--disabled) {
           // Only transform and shadow, NO color changes
-          transform: scale(1.05);
+          transform: scale(1.05) translateZ(0);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
       }
@@ -104,7 +138,7 @@
 
         &:hover:not(.seat-cell--disabled) {
           // Only transform and shadow, NO color changes
-          transform: scale(1.05);
+          transform: scale(1.05) translateZ(0);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
       }
@@ -138,18 +172,21 @@
       font-weight: 500;
     }
 
-    // Icon styles
+    // Icon styles with performance optimization
     &__icon {
       flex-shrink: 0;
       margin-bottom: 2px;
+      will-change: auto;
+      contain: layout;
     }
 
-    // Content (seat number or label)
+    // Content (seat number or label) with containment
     &__content {
       font-size: inherit;
       font-weight: inherit;
       text-align: center;
       line-height: 1;
+      contain: layout style;
     }
 
     // Punch hole - Simple inset style in top right corner
@@ -212,12 +249,13 @@
       }
     }
 
-    // Reduced motion
+    // Reduced motion with performance preservation
     @media (prefers-reduced-motion: reduce) {
       transition: none;
+      will-change: auto;
 
       &:hover {
-        transform: none !important;
+        transform: translateZ(0) !important;
       }
 
       // Disable update animation for reduced motion

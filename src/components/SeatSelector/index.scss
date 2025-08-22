@@ -1,5 +1,4 @@
 @import '~@payloadcms/ui/scss';
-
 @import './components/Legend/index.scss';
 @import './components/SeatCell/index.scss';
 @import './components/SelectedSeatsList/index.scss';
@@ -8,13 +7,13 @@
 
 @layer payload-default {
   .seat-selector {
-    // Wrapper for the entire field
     &-wrapper {
       position: relative;
       width: 100%;
+      contain: layout style;
+      will-change: auto;
     }
 
-    // Main container
     &__container {
       padding: var(--base);
       border: 1px solid var(--theme-border-color);
@@ -25,12 +24,43 @@
       display: flex;
       flex-direction: column;
       gap: var(--base);
+      position: relative;
     }
 
-    // Grid wrapper for loading overlay
+    &__expired-indicator {
+      position: absolute;
+      top: calc(var(--base) * 0.5);
+      right: calc(var(--base) * 0.5);
+      display: flex;
+      align-items: center;
+      gap: calc(var(--base) * 0.25);
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      padding: calc(var(--base) * 0.25) calc(var(--base) * 0.5);
+      border-radius: var(--style-radius-s);
+      font-size: calc(var(--base) * 0.6);
+      font-weight: 600;
+      box-shadow:
+        0 2px 4px rgba(239, 68, 68, 0.2),
+        0 0 0 1px rgba(239, 68, 68, 0.1);
+      z-index: 10;
+      animation: pulseError 2s infinite;
+
+      @keyframes pulseError {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+    }
+
     &__grid-wrapper {
       position: relative;
       min-height: 300px;
+      contain: layout style;
     }
 
     &__grid-overlay {
@@ -40,17 +70,9 @@
       backdrop-filter: blur(2px);
       z-index: 3;
       border-radius: var(--style-radius-m);
-      transition: opacity 200ms ease-in-out;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      // Style the PayloadCMS ShimmerEffect
-      .shimmer-effect {
-        width: 100%;
-        height: 100%;
-        border-radius: var(--style-radius-m);
-      }
     }
 
     &__grid {
@@ -64,13 +86,12 @@
       max-width: 800px;
       margin: 0 auto;
       width: 100%;
-
-      // Fix: Cap the maximum row height to prevent excessive stretching
-      // Still fills space but with reasonable limits
+      contain: layout style;
+      transform: translateZ(0);
+      backface-visibility: hidden;
       align-items: stretch;
       justify-items: stretch;
 
-      // Responsive adjustments
       @media (max-width: 768px) {
         gap: calc(var(--base) * 0.3);
         padding: calc(var(--base) * 0.75);
@@ -84,7 +105,38 @@
       }
     }
 
-    // Instructions text
+    &__virtual-grid {
+      border: 1px solid var(--theme-border-color);
+      border-radius: var(--style-radius-m);
+      background-color: var(--theme-elevation-50);
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      max-height: 600px;
+      overflow: auto;
+      contain: layout style;
+      transform: translateZ(0);
+
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--theme-elevation-100);
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--theme-elevation-400);
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--theme-elevation-500);
+      }
+    }
+
     &__instructions {
       text-align: center;
       padding: calc(var(--base) * 1.5);
@@ -101,25 +153,94 @@
       }
     }
 
-    // Focus management for accessibility
+    &-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      font-size: calc(var(--base) * 0.8);
+      color: var(--theme-elevation-600);
+    }
+
+    &__loading-skeleton {
+      height: 40px;
+      background: linear-gradient(
+        90deg,
+        var(--theme-elevation-100) 25%,
+        var(--theme-elevation-150) 50%,
+        var(--theme-elevation-100) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--style-radius-s);
+      margin: calc(var(--base) * 0.5) 0;
+      contain: layout style;
+    }
+
+    &__loading-shimmer {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 25%,
+        var(--theme-elevation-100) 50%,
+        transparent 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--style-radius-m);
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
     &__grid:focus-within {
       outline: 2px solid var(--theme-primary-500);
       outline-offset: 2px;
     }
 
-    // High contrast mode support
     @media (prefers-contrast: high) {
       &__container,
       &__grid,
+      &__virtual-grid,
       &__instructions {
         border-width: 2px;
       }
     }
 
-    // Reduced motion preferences
     @media (prefers-reduced-motion: reduce) {
-      &__grid-overlay {
-        transition: none;
+      &__grid-overlay,
+      &__loading-skeleton,
+      &__loading-shimmer,
+      &__expired-indicator {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    @supports (container-type: inline-size) {
+      &-wrapper {
+        container-type: inline-size;
+      }
+
+      @container (max-width: 768px) {
+        &__grid {
+          gap: calc(var(--base) * 0.3);
+          padding: calc(var(--base) * 0.75);
+        }
+      }
+
+      @container (max-width: 480px) {
+        &__grid {
+          gap: calc(var(--base) * 0.25);
+          padding: calc(var(--base) * 0.5);
+        }
       }
     }
   }

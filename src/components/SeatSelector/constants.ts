@@ -1,0 +1,45 @@
+export const PERFORMANCE_CONFIG = {
+  FETCH_CACHE_TTL: 30000,
+  TRANSLATION_CACHE_SIZE: 10,
+  SEAT_ID_CACHE_SIZE: 1000,
+  VIRTUALIZATION_THRESHOLD: 50,
+  VIRTUAL_OVERSCAN: 3,
+  VIRTUAL_ITEM_HEIGHT: 60,
+  SEAT_UPDATE_ANIMATION_DURATION: 600,
+  COMPONENT_TRANSITION_DURATION: 200,
+  TAP_SCALE_DURATION: 100,
+  SEAT_CLEAR_DEBOUNCE: 100,
+  STATE_UPDATE_DEBOUNCE: 50,
+  MAX_CONCURRENT_REQUESTS: 2,
+  REQUEST_TIMEOUT: 10000,
+  CLEANUP_INTERVAL: 60000,
+  MAX_CACHE_AGE: 300000,
+} as const
+
+export const ACCESSIBILITY_CONFIG = {
+  ARIA_LIVE_REGIONS: true,
+  FOCUS_MANAGEMENT: true,
+  HIGH_CONTRAST_SUPPORT: true,
+  REDUCED_MOTION_SUPPORT: true,
+  TAB_INDEX_MANAGEMENT: true,
+  ARROW_KEY_NAVIGATION: false,
+  MIN_CONTRAST_RATIO: 4.5,
+  MIN_CONTRAST_RATIO_LARGE: 3,
+} as const
+
+export const RESPONSIVE_BREAKPOINTS = {
+  MOBILE: 480,
+  TABLET: 768,
+  DESKTOP: 1024,
+  LARGE_DESKTOP: 1440,
+} as const
+
+export const ANIMATION_VARIANTS = {
+  enter: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.15 } },
+} as const
+
+export const EMPTY_ARRAY: readonly string[] = Object.freeze([])
+export const EMPTY_OBJECT = Object.freeze({})
+
+export const DEFAULT_GRID_DIMENSIONS = Object.freeze({ rows: 10, cols: 4 })

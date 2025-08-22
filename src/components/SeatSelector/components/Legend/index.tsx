@@ -1,11 +1,11 @@
-import React, { memo } from 'react'
+import React, { memo, useMemo } from 'react'
 import { useLanguage } from '@/hooks/useLanguage'
-import { getSeatSelectorTranslations } from '@/utils/seatSelectorTranslations'
+import { getOptimizedTranslations } from '../../utils'
 import './index.scss'
 
 export const Legend = memo(() => {
   const lang = useLanguage()
-  const t = getSeatSelectorTranslations(lang)
+  const t = useMemo(() => getOptimizedTranslations(lang), [lang])
 
   const statuses = ['available', 'selected', 'booked', 'unpaid'] as const
 

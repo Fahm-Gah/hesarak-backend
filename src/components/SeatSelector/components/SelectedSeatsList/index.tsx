@@ -1,10 +1,11 @@
-import React, { useMemo, memo } from 'react'
+import React, { useMemo, memo, useCallback } from 'react'
 import { X } from 'lucide-react'
 import { useFormFields } from '@payloadcms/ui'
 import { useLanguage } from '@/hooks/useLanguage'
-import { getSeatSelectorTranslations } from '@/utils/seatSelectorTranslations'
+import { getOptimizedTranslations } from '../../utils'
 import type { Trip } from '../../types'
 import './index.scss'
+import { unstable_batchedUpdates } from 'react-dom'
 
 interface SelectedSeatsListProps {
   selectedSeatIds: string[]
@@ -14,10 +15,75 @@ interface SelectedSeatsListProps {
   readOnly?: boolean
 }
 
+// Memoized seat item component
+const SeatItem = memo<{
+  id: string
+  seatNumber: string
+  price: number
+  onRemove: (id: string) => void
+  readOnly: boolean
+  t: any
+}>(({ id, seatNumber, price, onRemove, readOnly, t }) => {
+  const handleClick = useCallback(() => {
+    if (!readOnly) {
+      unstable_batchedUpdates(() => {
+        onRemove(id)
+      })
+    }
+  }, [id, onRemove, readOnly])
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!readOnly && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        onRemove(id)
+      }
+    },
+    [id, onRemove, readOnly],
+  )
+
+  const handleButtonClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      onRemove(id)
+    },
+    [id, onRemove],
+  )
+
+  return (
+    <div
+      className="selected-seats-list__seat-item"
+      role={readOnly ? 'listitem' : 'button'}
+      tabIndex={readOnly ? -1 : 0}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+    >
+      <div className="selected-seats-list__seat-details">
+        <span className="selected-seats-list__seat-number">
+          {t.seatTypes.seat} {seatNumber}
+        </span>
+        <span className="selected-seats-list__seat-price">AFN {price.toLocaleString()}</span>
+      </div>
+      {!readOnly && (
+        <button
+          type="button"
+          className="selected-seats-list__seat-remove-button"
+          onClick={handleButtonClick}
+          aria-label={`${t.labels.removeSeat} ${seatNumber}`}
+        >
+          <X size={16} />
+        </button>
+      )}
+    </div>
+  )
+})
+
+SeatItem.displayName = 'SeatItem'
+
 export const SelectedSeatsList = memo<SelectedSeatsListProps>(
   ({ selectedSeatIds, trip, removeSeat, clearAll, readOnly = false }) => {
     const lang = useLanguage()
-    const t = getSeatSelectorTranslations(lang)
+    const t = useMemo(() => getOptimizedTranslations(lang), [lang])
 
     const priceField = useFormFields(([fields]) => fields?.pricePerTicket)
     const rawOverride = priceField?.value
@@ -28,23 +94,34 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
       return Number.isNaN(n) ? undefined : n
     }, [rawOverride])
 
+    // Optimized seat number mapping
     const seatNumberMap = useMemo(() => {
-      if (!trip?.bus?.type?.seats || !Array.isArray(trip.bus.type.seats)) {
-        return new Map<string, string>()
+      const seats = trip?.bus?.type?.seats
+      if (!seats || !Array.isArray(seats) || seats.length === 0) {
+        return EMPTY_SEAT_MAP
       }
-      return new Map(
-        trip.bus.type.seats.map((seat: any, idx: number) => {
-          const seatId =
-            (typeof seat.id === 'string' && seat.id) ||
-            (typeof seat._id === 'string' && seat._id) ||
-            `${seat.position.row}-${seat.position.col}-${idx}`
 
-          return [seatId, seat.seatNumber || 'N/A']
-        }),
-      )
-    }, [trip])
+      const map = new Map<string, string>()
+      for (let idx = 0; idx < seats.length; idx++) {
+        const seat = seats[idx] as any
+        const seatId =
+          (typeof seat.id === 'string' && seat.id) ||
+          (typeof seat._id === 'string' && seat._id) ||
+          `${seat.position.row}-${seat.position.col}-${idx}`
 
-    const getSeatNumber = (id: string) => seatNumberMap.get(id) || 'N/A'
+        map.set(seatId, seat.seatNumber || 'N/A')
+      }
+
+      return map
+    }, [trip?.bus?.type?.seats])
+
+    // Stable empty map reference
+    const EMPTY_SEAT_MAP = useMemo(() => new Map<string, string>(), [])
+
+    const getSeatNumber = useCallback(
+      (id: string) => seatNumberMap.get(id) || 'N/A',
+      [seatNumberMap],
+    )
 
     const effectivePerSeatPrice = useMemo(() => {
       if (typeof parsedOverride === 'number') return parsedOverride
@@ -53,8 +130,24 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
     }, [parsedOverride, trip])
 
     const totalPrice = useMemo(() => {
-      return selectedSeatIds.reduce((acc) => acc + effectivePerSeatPrice, 0)
-    }, [selectedSeatIds, effectivePerSeatPrice])
+      return selectedSeatIds.length * effectivePerSeatPrice
+    }, [selectedSeatIds.length, effectivePerSeatPrice])
+
+    // Optimized clear all handler
+    const handleClearAll = useCallback(() => {
+      unstable_batchedUpdates(() => {
+        clearAll()
+      })
+    }, [clearAll])
+
+    // Memoized seat items data
+    const seatItemsData = useMemo(() => {
+      return selectedSeatIds.map((id) => ({
+        id,
+        seatNumber: getSeatNumber(id),
+        price: effectivePerSeatPrice,
+      }))
+    }, [selectedSeatIds, getSeatNumber, effectivePerSeatPrice])
 
     if (!trip) return null
 
@@ -68,7 +161,7 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
             <button
               type="button"
               className="selected-seats-list__clear-button"
-              onClick={clearAll}
+              onClick={handleClearAll}
               aria-label={t.labels.clearAll}
             >
               {t.labels.clearAll}
@@ -77,46 +170,16 @@ export const SelectedSeatsList = memo<SelectedSeatsListProps>(
         </div>
 
         <div className="selected-seats-list__seats-container">
-          {selectedSeatIds.map((id) => (
-            <div
+          {seatItemsData.map(({ id, seatNumber, price }) => (
+            <SeatItem
               key={id}
-              className="selected-seats-list__seat-item"
-              role={readOnly ? 'listitem' : 'button'}
-              tabIndex={readOnly ? -1 : 0}
-              onClick={!readOnly ? () => removeSeat(id) : undefined}
-              onKeyDown={
-                !readOnly
-                  ? (e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        removeSeat(id)
-                      }
-                    }
-                  : undefined
-              }
-            >
-              <div className="selected-seats-list__seat-details">
-                <span className="selected-seats-list__seat-number">
-                  {t.seatTypes.seat} {getSeatNumber(id)}
-                </span>
-                <span className="selected-seats-list__seat-price">
-                  AFN {effectivePerSeatPrice.toLocaleString()}
-                </span>
-              </div>
-              {!readOnly && (
-                <button
-                  type="button"
-                  className="selected-seats-list__seat-remove-button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    removeSeat(id)
-                  }}
-                  aria-label={`${t.labels.removeSeat} ${getSeatNumber(id)}`}
-                >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
+              id={id}
+              seatNumber={seatNumber}
+              price={price}
+              onRemove={removeSeat}
+              readOnly={readOnly}
+              t={t}
+            />
           ))}
         </div>
 

@@ -1,0 +1,302 @@
+PS C:\Users\Matee\Desktop\Hesaarak\hesarak-backend> pnpm test
+
+> hesarak-backend@1.0.0 test C:\Users\Matee\Desktop\Hesaarak\hesarak-backend
+> pnpm run test:int && pnpm run test:e2e
+
+
+> hesarak-backend@1.0.0 test:int C:\Users\Matee\Desktop\Hesaarak\hesarak-backend
+> cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts
+
+
+ RUN  v3.2.3 C:/Users/Matee/Desktop/Hesaarak/hesarak-backend
+
+
+
+ ❯ tests/int/api.int.spec.ts [queued]
+
+ ❯ tests/int/api.int.spec.ts [queued]
+
+ ❯ tests/int/api.int.spec.ts [queued]
+ ✓ tests/int/components/SeatSelector/hooks/useSeatSelector.int.spec.ts (18 tests) 83ms
+
+ ❯ tests/int/api.int.spec.ts [queued]
+
+ ❯ tests/int/api.int.spec.ts [queued]
+ ❯ tests/int/components/SeatSelector/components/Legend.int.spec.ts [queued]
+ ❯ tests/int/components/SeatSelector/components/SeatCell.int.spec.ts [queued]
+ ✓ tests/int/components/SeatSelector/lib/seatCalculations.int.spec.ts (21 tests) 7ms
+ ✓ tests/int/components/SeatSelector/hooks/useSeatAnimations.int.spec.ts (11 tests) 58ms
+ ✓ tests/int/components/SeatSelector/hooks/useBookingData.int.spec.ts (10 tests) 59ms
+(node:14228) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 2)
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/int/api.int.spec.ts (1 test | 1 skipped) 1ms
+   ↓ API > fetches users
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Suites 12 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/int/api.int.spec.ts > API
+UploadThingError: The `utapi` can only be used on the server.
+ ❯ guardServerOnly node_modules/.pnpm/uploadthing@7.3.0_next@15.3_b831390e499793d6b54b3dcad5ebb758/node_modules/uploadthing/server/index.js:761:15
+ ❯ new UTApi node_modules/.pnpm/uploadthing@7.3.0_next@15.3_b831390e499793d6b54b3dcad5ebb758/node_modules/uploadthing/server/index.js:1056:9   
+ ❯ Object.adapter node_modules/.pnpm/@payloadcms+storage-uploadt_5c570cdf5f9f7e88e96bde88bdc1eba8/node_modules/@payloadcms/storage-uploadthing/src/index.ts:159:19
+ ❯ map node_modules/.pnpm/@payloadcms+plugin-cloud-st_ef2a21c9a7ea317cb54b4b00d42b6a4d/node_modules/@payloadcms/plugin-cloud-storage/src/plugin.ts:37:35
+ ❯ node_modules/.pnpm/@payloadcms+plugin-cloud-st_ef2a21c9a7ea317cb54b4b00d42b6a4d/node_modules/@payloadcms/plugin-cloud-storage/src/plugin.ts:33:47
+ ❯ plugin node_modules/.pnpm/@payloadcms+storage-uploadt_5c570cdf5f9f7e88e96bde88bdc1eba8/node_modules/@payloadcms/storage-uploadthing/src/index.ts:139:5
+ ❯ buildConfig node_modules/.pnpm/payload@3.48.0_graphql@16.11.0_typescript@5.7.3/node_modules/payload/src/config/build.ts:14:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/SeatSelector.accessibility.advanced.int.spec.ts [ tests/int/components/SeatSelector/SeatSelector.accessibility.advanced.int.spec.ts ]
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.accessibility.advanced.int.spec.ts:83:33: ERROR: Expected ">" but found "path"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.accessibility.advanced.int.spec.ts:83:33
+  
+  Expected ">" but found "path"
+  81 |        const user = userEvent.setup()
+  82 |        
+  83 |        render(<SeatSelectorClient path="seats" />)
+     |                                   ^
+  84 |  
+  85 |        await waitFor(() => {
+  
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/SeatSelector.accessibility.int.spec.ts [ tests/int/components/SeatSelector/SeatSelector.accessibility.int.spec.ts ]
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.accessibility.int.spec.ts:79:55: ERROR: Expected ">" but found "path"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.accessibility.int.spec.ts:79:55
+
+  Expected ">" but found "path"
+  77 |    describe('WCAG 2.1 Compliance', () => {
+  78 |      it('should have no accessibility violations in default state', async () => {
+  79 |        const { container } = render(<SeatSelectorClient path="seats" />)
+     |                                                         ^
+  80 |        const results = await axe(container)
+  81 |        expect(results).toHaveNoViolations()
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/SeatSelector.animations.int.spec.ts [ tests/int/components/SeatSelector/SeatSelector.animations.int.spec.ts ]
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.animations.int.spec.ts:76:33: ERROR: Expected ">" but found "path"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.animations.int.spec.ts:76:33
+
+  Expected ">" but found "path"
+  74 |    describe('Component Mount Animations', () => {
+  75 |      it('should animate container entrance', async () => {
+  76 |        render(<SeatSelectorClient path="seats" />)
+     |                                   ^
+  77 |
+  78 |        const wrapper = document.querySelector('.seat-selector-wrapper')
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/SeatSelector.errorStates.int.spec.ts [ tests/int/components/SeatSelector/SeatSelector.errorStates.int.spec.ts ]
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.errorStates.int.spec.ts:83:33: ERROR: Expected ">" but found "path"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.errorStates.int.spec.ts:83:33
+
+  Expected ">" but found "path"
+  81 |        })
+  82 |
+  83 |        render(<SeatSelectorClient path="seats" />)
+     |                                   ^
+  84 |
+  85 |        expect(screen.getByText(/network connection failed/i)).toBeInTheDocument()
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/SeatSelector.int.spec.ts [ tests/int/components/SeatSelector/SeatSelector.int.spec.ts ]
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.int.spec.ts:69:33: ERROR: Expected ">" but found "path"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.int.spec.ts:69:33
+
+  Expected ">" but found "path"
+  67 |        })
+  68 |
+  69 |        render(<SeatSelectorClient path="seats" />)
+     |                                   ^
+  70 |
+  71 |        expect(screen.getByText('Loading seat map...')).toBeInTheDocument()
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/SeatSelector.performance.int.spec.ts [ tests/int/components/SeatSelector/SeatSelector.performance.int.spec.ts ]
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.performance.int.spec.ts:75:33: ERROR: Expected ">" but found "path"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.performance.int.spec.ts:75:33
+
+  Expected ">" but found "path"
+  73 |
+  74 |        const startTime = performance.now()
+  75 |        render(<SeatSelectorClient path="seats" />)
+     |                                   ^
+  76 |
+  77 |        await waitFor(() => {
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/SeatSelector.userInteractions.int.spec.ts [ tests/int/components/SeatSelector/SeatSelector.userInteractions.int.spec.ts ]
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.userInteractions.int.spec.ts:88:33: ERROR: Expected ">" but found "path"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.userInteractions.int.spec.ts:88:33      
+
+  Expected ">" but found "path"
+  86 |        })
+  87 |
+  88 |        render(<SeatSelectorClient path="seats" />)
+     |                                   ^
+  89 |
+  90 |        await waitFor(() => {
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/SeatSelector.visual.int.spec.ts [ tests/int/components/SeatSelector/SeatSelector.visual.int.spec.ts ] 
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.visual.int.spec.ts:86:33: ERROR: Expected ">" but found "path"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/SeatSelector.visual.int.spec.ts:86:33
+
+  Expected ">" but found "path"
+  84 |        }))
+  85 |
+  86 |        render(<SeatSelectorClient path="seats" />)
+     |                                   ^
+  87 |
+  88 |        expect(screen.getByRole('button', { name: /seat a1/i })).toHaveClass('seat-cell--available')
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/components/Legend.int.spec.ts [ tests/int/components/SeatSelector/components/Legend.int.spec.ts ]     
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/components/Legend.int.spec.ts:49:21: ERROR: Expected ">" but found "/"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/components/Legend.int.spec.ts:49:21
+
+  Expected ">" but found "/"
+  47 |    describe('Rendering', () => {
+  48 |      it('should render legend with all status items', () => {
+  49 |        render(<Legend />)
+     |                       ^
+  50 |
+  51 |        expect(screen.getByRole('list')).toHaveAttribute('aria-label', 'Seat Status Legend')
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/components/SeatCell.int.spec.ts [ tests/int/components/SeatSelector/components/SeatCell.int.spec.ts ] 
+Error: Transform failed with 1 error:
+C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/components/SeatCell.int.spec.ts:30:10: ERROR: Expected ">" but found "seat"
+  Plugin: vite:esbuild
+  File: C:/Users/Matee/Desktop/Hesaarak/hesarak-backend/tests/int/components/SeatSelector/components/SeatCell.int.spec.ts:30:10
+
+  Expected ">" but found "seat"
+  28 |        render(
+  29 |          <SeatCell
+  30 |            seat={defaultSeat}
+     |            ^
+  31 |            status="available"
+  32 |            bookingStatus="available"
+
+ ❯ failureErrorWithLog node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:1467:15
+ ❯ node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:736:50
+ ❯ responseCallbacks.<computed> node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:603:9
+ ❯ handleIncomingPacket node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:658:12
+ ❯ Socket.readFromStdout node_modules/.pnpm/esbuild@0.25.8/node_modules/esbuild/lib/main.js:581:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  tests/int/components/SeatSelector/hooks/useSeatFormState.int.spec.ts [ tests/int/components/SeatSelector/hooks/useSeatFormState.int.spec.ts ]
+TypeError: Unknown file extension ".css" for C:\Users\Matee\Desktop\Hesaarak\hesarak-backend\node_modules\.pnpm\react-image-crop@10.1.8_react@19.1.0\node_modules\react-image-crop\dist\ReactCrop.css
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+UploadThingError: The `utapi` can only be used on the server.
+ ❯ guardServerOnly node_modules/.pnpm/uploadthing@7.3.0_next@15.3_b831390e499793d6b54b3dcad5ebb758/node_modules/uploadthing/server/index.js:761:15
+ ❯ new UTApi node_modules/.pnpm/uploadthing@7.3.0_next@15.3_b831390e499793d6b54b3dcad5ebb758/node_modules/uploadthing/server/index.js:1056:9   
+ ❯ Object.adapter node_modules/.pnpm/@payloadcms+storage-uploadt_5c570cdf5f9f7e88e96bde88bdc1eba8/node_modules/@payloadcms/storage-uploadthing/src/index.ts:159:19
+ ❯ map node_modules/.pnpm/@payloadcms+plugin-cloud-st_ef2a21c9a7ea317cb54b4b00d42b6a4d/node_modules/@payloadcms/plugin-cloud-storage/src/plugin.ts:37:35
+ ❯ node_modules/.pnpm/@payloadcms+plugin-cloud-st_ef2a21c9a7ea317cb54b4b00d42b6a4d/node_modules/@payloadcms/plugin-cloud-storage/src/plugin.ts:33:47
+ ❯ plugin node_modules/.pnpm/@payloadcms+storage-uploadt_5c570cdf5f9f7e88e96bde88bdc1eba8/node_modules/@payloadcms/storage-uploadthing/src/index.ts:139:5
+ ❯ buildConfig node_modules/.pnpm/payload@3.48.0_graphql@16.11.0_typescript@5.7.3/node_modules/payload/src/config/build.ts:14:34
+ ❯ processTicksAndRejections node:internal/process/task_queues:105:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { _tag: 'UploadThingError', code: 'INTERNAL_SERVER_ERROR', data: undefined }
+This error originated in "tests/int/api.int.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  12 failed | 4 passed (16)
+      Tests  60 passed | 1 skipped (61)
+     Errors  1 error
+   Start at  20:22:45
+   Duration  6.18s (transform 621ms, setup 3.62s, collect 5.51s, tests 208ms, environment 20.61s, prepare 5.10s)
+
+ ELIFECYCLE  Command failed with exit code 1.
+ ELIFECYCLE  Test failed. See above for more details.
