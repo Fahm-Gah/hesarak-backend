@@ -7,6 +7,8 @@ import { normalizeDateToMidnight } from './hooks/normalizeDateToMidnight'
 import { validateTripDate } from './hooks/validateTripDate'
 import { clearSeatsOnTripDateChange } from './hooks/clearSeatsOnTripDateChange'
 import { populateFromAndTo } from './hooks/populateFromAndTo'
+import { populatePaymentDeadline } from './hooks/populatePaymentDeadline'
+import { computeTicketStatus } from './hooks/computeTicketStatus'
 import { ticketsAccess } from '@/access/accessControls'
 
 export const Tickets: CollectionConfig = {
@@ -255,8 +257,8 @@ export const Tickets: CollectionConfig = {
       options: [
         {
           label: {
-            en: 'Cash (Pay on Bus)',
-            fa: 'نقدی (پرداخت در اتوبوس)',
+            en: 'Cash',
+            fa: 'نقد',
           },
           value: 'cash',
         },
@@ -292,15 +294,14 @@ export const Tickets: CollectionConfig = {
         position: 'sidebar',
         condition: (data) => !data.isPaid,
         description: {
-          en: 'Payment deadline for unpaid tickets',
-          fa: 'مهلت پرداخت برای تکت‌های پرداخت نشده',
+          en: 'Payment deadline for online payments (auto-populated if not set)',
+          fa: 'مهلت پرداخت برای پرداخت‌های آنلاین (در صورت عدم تنظیم، خودکار پر می‌شود)',
         },
-        hidden: true,
         components: {
           Field: '@/components/PersianDatePickerField',
         },
         date: {
-          pickerAppearance: 'timeOnly',
+          pickerAppearance: 'dayAndTime',
         },
       },
     },
@@ -311,9 +312,11 @@ export const Tickets: CollectionConfig = {
       validateBookedSeats,
       generateUniqueTicket,
       populateBookedBy,
+      normalizeDateToMidnight, // Normalize date first
+      populatePaymentDeadline, // Then populate payment deadline with normalized date
       calculateTotalPrice,
-      normalizeDateToMidnight,
       populateFromAndTo,
     ],
+    afterRead: [computeTicketStatus],
   },
 }

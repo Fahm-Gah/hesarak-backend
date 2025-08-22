@@ -428,7 +428,7 @@ export interface Ticket {
   bookedBy?: (string | null) | User;
   paymentMethod?: ('cash' | 'card' | 'mobile') | null;
   /**
-   * Payment deadline for unpaid tickets
+   * Payment deadline for online payments (auto-populated if not set)
    */
   paymentDeadline?: string | null;
   updatedAt: string;

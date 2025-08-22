@@ -38,6 +38,7 @@ export interface UserTicket {
     isPaid?: boolean
     isCancelled?: boolean
     paymentDeadline?: string
+    isExpired?: boolean
   }
   bookedAt: string
 }

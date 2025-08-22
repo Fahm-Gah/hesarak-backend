@@ -83,6 +83,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
         case 'status':
           // Create a status string for sorting
           const getStatusString = (ticket: any) => {
+            if (ticket.status.isExpired) return 'expired'
             if (ticket.status.isCancelled) return 'cancelled'
             if (ticket.status.isPaid) return 'paid'
             return 'pending'
@@ -368,9 +369,9 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
               </div>
             )}
 
-            {/* Pagination */}
-            {pagination && (
-              <div className="mt-8">
+            {/* Footer - Always show for consistent alignment */}
+            <div className="mt-8">
+              {pagination && pagination.totalPages > 1 ? (
                 <Pagination
                   currentPage={pagination.currentPage}
                   totalPages={pagination.totalPages}
@@ -382,8 +383,25 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                   itemLabel="tickets"
                   isLoading={false}
                 />
-              </div>
-            )}
+              ) : (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4">
+                  <div className="flex items-center justify-center">
+                    <p className="text-sm text-gray-600">
+                      {sortedTickets.length === 0
+                        ? 'No tickets found'
+                        : sortedTickets.length === 1
+                          ? 'Showing 1 ticket'
+                          : `Showing ${sortedTickets.length} tickets`}
+                      {hasActiveFilters && tickets.length > sortedTickets.length && (
+                        <span className="ml-1 text-gray-500">
+                          (filtered from {tickets.length} total)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

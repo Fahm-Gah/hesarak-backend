@@ -85,25 +85,46 @@ export const useTicketFilters = (tickets: UserTicket[]) => {
     // Basic time filter
     if (filter === 'upcoming') {
       filtered = filtered.filter(
-        (ticket) => isUpcoming(ticket.booking.date) && !ticket.status.isCancelled,
+        (ticket) =>
+          isUpcoming(ticket.booking.date) && !ticket.status.isCancelled && !ticket.status.isExpired,
       )
     } else if (filter === 'past') {
       filtered = filtered.filter(
-        (ticket) => !isUpcoming(ticket.booking.date) || ticket.status.isCancelled,
+        (ticket) =>
+          !isUpcoming(ticket.booking.date) || ticket.status.isCancelled || ticket.status.isExpired,
       )
     }
 
     // Status filters
     if (statusFilters.length > 0) {
       filtered = filtered.filter((ticket) => {
+        // Debug logging for filter issues (uncomment for debugging)
+        // if (process.env.NODE_ENV === 'development' && ticket.ticketNumber) {
+        //   console.log('🔍 Filter debug for ticket', ticket.ticketNumber, {
+        //     statusFilters,
+        //     isPaid: ticket.status.isPaid,
+        //     isCancelled: ticket.status.isCancelled,
+        //     isExpired: ticket.status.isExpired,
+        //     expiredAt: ticket.status.expiredAt,
+        //     paymentDeadline: ticket.status.paymentDeadline
+        //   })
+        // }
+
         if (statusFilters.includes('paid') && ticket.status.isPaid) return true
         if (
           statusFilters.includes('pending') &&
           !ticket.status.isPaid &&
-          !ticket.status.isCancelled
+          !ticket.status.isCancelled &&
+          !ticket.status.isExpired
         )
           return true
-        if (statusFilters.includes('cancelled') && ticket.status.isCancelled) return true
+        if (
+          statusFilters.includes('cancelled') &&
+          ticket.status.isCancelled &&
+          !ticket.status.isExpired
+        )
+          return true
+        if (statusFilters.includes('expired') && ticket.status.isExpired) return true
         return false
       })
     }

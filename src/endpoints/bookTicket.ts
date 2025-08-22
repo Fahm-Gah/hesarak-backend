@@ -169,12 +169,16 @@ export const bookTicket: Endpoint = {
         limit: 1000, // Ensure we get all tickets
       })
 
+      // Filter out expired tickets since they shouldn't block new bookings
+      // Note: isExpired is added by the afterRead hook
+      const activeTickets = existingTickets.docs.filter((ticket: any) => !ticket.isExpired)
+
       // Check for conflicts and user limits with improved logic
       const bookedSeatIds = new Set<string>()
       let userExistingSeats = 0
       const userTickets: any[] = []
 
-      existingTickets.docs.forEach((ticket: any) => {
+      activeTickets.forEach((ticket: any) => {
         if (Array.isArray(ticket.bookedSeats)) {
           ticket.bookedSeats.forEach((seatData: any) => {
             // Handle different seat data formats
@@ -273,8 +277,11 @@ export const bookTicket: Endpoint = {
         limit: 1000,
       })
 
+      // Filter out expired tickets from final check as well
+      const activeFinalTickets = finalCheck.docs.filter((ticket: any) => !ticket.isExpired)
+
       let finalUserSeatCount = 0
-      finalCheck.docs.forEach((ticket: any) => {
+      activeFinalTickets.forEach((ticket: any) => {
         const seatCount = Array.isArray(ticket.bookedSeats) ? ticket.bookedSeats.length : 0
         finalUserSeatCount += seatCount
       })
@@ -296,28 +303,7 @@ export const bookTicket: Endpoint = {
       // Determine payment status based on payment method
       const isPaid = paymentMethod !== 'cash' // Only paid if not cash payment
 
-      // Calculate payment deadline: 2 hours before departure time
-      let paymentDeadline: Date | undefined = undefined
-      if (paymentMethod === 'cash' && trip.departureTime) {
-        const departureTime = new Date(trip.departureTime)
-        // Combine trip date with departure time
-        const tripDate = new Date(normalizedDate)
-        const departureDateTime = new Date(
-          tripDate.getFullYear(),
-          tripDate.getMonth(),
-          tripDate.getDate(),
-          departureTime.getHours(),
-          departureTime.getMinutes(),
-          departureTime.getSeconds(),
-        )
-        // Set deadline to 2 hours before departure
-        paymentDeadline = new Date(departureDateTime.getTime() - 2 * 60 * 60 * 1000)
-
-        // Ensure deadline is not in the past
-        if (paymentDeadline <= new Date()) {
-          paymentDeadline = new Date(Date.now() + 30 * 60 * 1000) // 30 minutes from now as fallback
-        }
-      }
+      // Payment deadline will be automatically populated by the populatePaymentDeadline hook
 
       // Create ticket with simplified bookedSeats format
       const ticketData: any = {
@@ -333,7 +319,7 @@ export const bookTicket: Endpoint = {
         isCancelled: false,
         bookedBy: user.id,
         paymentMethod,
-        paymentDeadline: paymentDeadline?.toISOString(),
+        // Note: paymentDeadline will be auto-populated by the populatePaymentDeadline hook
       }
 
       // Add user-specified from/to terminals if provided
@@ -421,8 +407,9 @@ export const bookTicket: Endpoint = {
             },
             status: {
               isPaid: ticket.isPaid,
+              isExpired: ticket.isExpired || false,
               paymentMethod: ticket.paymentMethod || paymentMethod,
-              paymentDeadline: ticket.paymentDeadline || '',
+              paymentDeadline: ticket.paymentDeadline || null,
             },
           },
         },

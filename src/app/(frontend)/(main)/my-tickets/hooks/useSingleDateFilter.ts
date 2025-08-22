@@ -15,6 +15,9 @@ interface UseSingleDateFilterReturn {
   getDateRangeForQuery: () => { from: string; to: string } | null
   clearDateFilter: () => void
   isDateSelected: boolean
+  timePeriod: 'all' | 'past' | 'upcoming'
+  setTimePeriod: (period: 'all' | 'past' | 'upcoming') => void
+  getTimePeriodRangeForQuery: () => { from: string; to: string } | null
 }
 
 /**
@@ -23,6 +26,7 @@ interface UseSingleDateFilterReturn {
  */
 export const useSingleDateFilter = (): UseSingleDateFilterReturn => {
   const [dateFilter, setDateFilter] = useState<DateFilter | null>(null)
+  const [timePeriod, setTimePeriod] = useState<'all' | 'past' | 'upcoming'>('all')
 
   const getDateRangeForQuery = useCallback(() => {
     if (!dateFilter) return null
@@ -59,6 +63,28 @@ export const useSingleDateFilter = (): UseSingleDateFilterReturn => {
     setDateFilter(null)
   }, [])
 
+  const getTimePeriodRangeForQuery = useCallback(() => {
+    if (timePeriod === 'all') return null
+
+    const today = moment().startOf('day')
+
+    if (timePeriod === 'past') {
+      // Past trips: from beginning of time to end of yesterday
+      return {
+        from: '1900-01-01T00:00:00.000Z',
+        to: today.clone().subtract(1, 'day').endOf('day').toISOString(),
+      }
+    } else if (timePeriod === 'upcoming') {
+      // Upcoming trips: from today onwards
+      return {
+        from: today.toISOString(),
+        to: '2100-12-31T23:59:59.999Z',
+      }
+    }
+
+    return null
+  }, [timePeriod])
+
   const isDateSelected = dateFilter !== null
 
   return {
@@ -67,5 +93,8 @@ export const useSingleDateFilter = (): UseSingleDateFilterReturn => {
     getDateRangeForQuery,
     clearDateFilter,
     isDateSelected,
+    timePeriod,
+    setTimePeriod,
+    getTimePeriodRangeForQuery,
   }
 }

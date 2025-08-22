@@ -189,7 +189,7 @@ export const validateBookedSeats: CollectionBeforeChangeHook = async ({
             depth: 0,
           })
 
-          // Filter by normalized date and collect taken seats
+          // Filter by normalized date and collect taken seats (excluding expired tickets)
           const takenSeats = new Map<string, any>() // seat ID -> ticket info
 
           existing.docs.forEach((doc: any) => {
@@ -197,6 +197,28 @@ export const validateBookedSeats: CollectionBeforeChangeHook = async ({
 
             // Only consider tickets for the same date
             if (normalizeDate(doc.date) === normalizedDate) {
+              // Check if this ticket is expired (manual check since isExpired is virtual)
+              const isExpired = (() => {
+                if (!doc.paymentDeadline || doc.isPaid || doc.isCancelled) {
+                  return false
+                }
+                try {
+                  const deadline = new Date(doc.paymentDeadline)
+                  const now = new Date()
+                  const expired = !isNaN(deadline.getTime()) && deadline < now
+
+                  return expired
+                } catch (error) {
+                  console.error('Error checking expiration:', error)
+                  return false
+                }
+              })()
+
+              // Skip expired tickets - they don't block new bookings
+              if (isExpired) {
+                return
+              }
+
               const bookedSeats = Array.isArray(doc.bookedSeats) ? doc.bookedSeats : []
 
               bookedSeats.forEach((seatData: any) => {

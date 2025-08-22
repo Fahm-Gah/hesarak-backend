@@ -8,7 +8,6 @@ export const getTicketDetails: Endpoint = {
     const { payload, user, routeParams } = req
     const { ticketId } = routeParams || {}
 
-
     if (!user) {
       return Response.json(
         {
@@ -63,7 +62,6 @@ export const getTicketDetails: Endpoint = {
           { status: 403 },
         )
       }
-
 
       // Determine user-specific terminals
       let userFrom = ticket.trip?.from
@@ -161,6 +159,7 @@ export const getTicketDetails: Endpoint = {
         status: {
           isPaid: ticket.isPaid || false,
           isCancelled: ticket.isCancelled || false,
+          isExpired: ticket.isExpired || false,
           paymentMethod: ticket.paymentMethod || 'cash',
           paymentDeadline: ticket.paymentDeadline || '',
         },

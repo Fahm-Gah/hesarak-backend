@@ -61,5 +61,6 @@ export interface BookingData {
     isCancelled?: boolean
     paymentMethod?: string
     paymentDeadline?: string
+    isExpired?: boolean
   }
 }

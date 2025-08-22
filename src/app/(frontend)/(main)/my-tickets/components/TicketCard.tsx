@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Copy, Clock, Check } from 'lucide-react'
+import { Copy, Clock, Check, XCircle } from 'lucide-react'
 import { UserTicket } from '../types'
 import { convertGregorianToPersianDisplay } from '@/utils/dateUtils'
 
@@ -88,6 +88,15 @@ const copyToClipboard = async (text: string, setCopied: (value: boolean) => void
 
 // Function to get status badge
 const getStatusBadge = (ticket: UserTicket) => {
+  // Check expired status first (highest priority)
+  if (ticket.status.isExpired) {
+    return (
+      <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">
+        Expired
+      </span>
+    )
+  }
+
   if (ticket.status.isCancelled) {
     return (
       <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
@@ -95,6 +104,7 @@ const getStatusBadge = (ticket: UserTicket) => {
       </span>
     )
   }
+
   if (ticket.status.isPaid) {
     return (
       <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
@@ -102,6 +112,7 @@ const getStatusBadge = (ticket: UserTicket) => {
       </span>
     )
   }
+
   return (
     <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">
       Pending Payment
@@ -135,6 +146,15 @@ export const TicketCard = ({
   }
 
   const getCardTheme = () => {
+    // Check expired status first (highest priority)
+    if (ticket.status.isExpired) {
+      return {
+        cardBg: 'bg-gradient-to-br from-white via-orange-50/30 to-gray-50/30',
+        cardBorder: 'border-orange-200/50',
+        headerBg: 'bg-gradient-to-r from-orange-500 to-gray-600',
+      }
+    }
+
     if (ticket.status.isCancelled) {
       return {
         cardBg: 'bg-gradient-to-br from-white via-red-50/30 to-orange-50/30',
@@ -142,6 +162,7 @@ export const TicketCard = ({
         headerBg: 'bg-gradient-to-r from-red-500 to-orange-600',
       }
     }
+
     if (ticket.status.isPaid) {
       return {
         cardBg: 'bg-gradient-to-br from-white via-green-50/30 to-emerald-50/30',
@@ -149,6 +170,7 @@ export const TicketCard = ({
         headerBg: 'bg-gradient-to-r from-green-500 to-emerald-600',
       }
     }
+
     return {
       cardBg: 'bg-gradient-to-br from-white via-orange-50/30 to-yellow-50/30',
       cardBorder: 'border-orange-200/50',
@@ -344,25 +366,49 @@ export const TicketCard = ({
           {/* Bottom Section - Responsive layout */}
           <div
             className={`flex flex-col gap-3 sm:gap-4 ${
-              ticket.status.paymentDeadline && !ticket.status.isPaid && !ticket.status.isCancelled
+              ticket.status.paymentDeadline &&
+              (!ticket.status.isPaid || ticket.status.isExpired) &&
+              !ticket.status.isCancelled
                 ? 'lg:flex-row lg:items-center lg:justify-between'
                 : ''
             }`}
           >
             {/* Payment Deadline - Bottom on mobile, left on desktop */}
             {ticket.status.paymentDeadline &&
-              !ticket.status.isPaid &&
+              (!ticket.status.isPaid || ticket.status.isExpired) &&
               !ticket.status.isCancelled && (
-                <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl p-3 sm:p-4 shadow-sm lg:flex-shrink-0 order-2 lg:order-1">
+                <div
+                  className={`rounded-xl p-3 sm:p-4 shadow-sm lg:flex-shrink-0 order-2 lg:order-1 ${
+                    ticket.status.isExpired
+                      ? 'bg-gradient-to-r from-red-50 to-orange-50 border border-red-200'
+                      : 'bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200'
+                  }`}
+                >
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
+                    <div
+                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
+                        ticket.status.isExpired ? 'bg-red-100' : 'bg-yellow-100'
+                      }`}
+                    >
+                      {ticket.status.isExpired ? (
+                        <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                      ) : (
+                        <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
+                      )}
                     </div>
                     <div>
-                      <p className="text-xs text-yellow-600 font-medium uppercase tracking-wide">
-                        Payment Deadline
+                      <p
+                        className={`text-xs font-medium uppercase tracking-wide ${
+                          ticket.status.isExpired ? 'text-red-700' : 'text-yellow-600'
+                        }`}
+                      >
+                        {ticket.status.isExpired ? 'Expired At:' : 'Payment Deadline'}
                       </p>
-                      <p className="text-xs sm:text-sm font-bold text-yellow-800">
+                      <p
+                        className={`text-xs sm:text-sm font-bold ${
+                          ticket.status.isExpired ? 'text-red-800' : 'text-yellow-800'
+                        }`}
+                      >
                         {formatJalaaliDateTime(ticket.status.paymentDeadline)}
                       </p>
                     </div>
@@ -373,7 +419,9 @@ export const TicketCard = ({
             {/* Bus Type and Price - Mobile: bus left, price right; Desktop: grouped on right */}
             <div
               className={`flex items-center justify-between order-1 ${
-                ticket.status.paymentDeadline && !ticket.status.isPaid && !ticket.status.isCancelled
+                ticket.status.paymentDeadline &&
+                (!ticket.status.isPaid || ticket.status.isExpired) &&
+                !ticket.status.isCancelled
                   ? 'lg:justify-end lg:gap-4 lg:order-2'
                   : 'lg:justify-end lg:gap-4'
               }`}

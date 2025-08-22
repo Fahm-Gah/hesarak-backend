@@ -40,6 +40,7 @@ interface UserTicket {
   status: {
     isPaid?: boolean
     isCancelled?: boolean
+    isExpired?: boolean
     paymentDeadline?: string
   }
   bookedAt: string
@@ -82,32 +83,8 @@ export const getUserTickets: Endpoint = {
         passenger: { equals: profileId },
       }
 
-      // Add status filters
-      if (status) {
-        const statuses = status.split(',')
-        const statusConditions: any[] = []
-
-        statuses.forEach((statusFilter) => {
-          if (statusFilter === 'paid') {
-            statusConditions.push({ isPaid: { equals: true } })
-          } else if (statusFilter === 'pending') {
-            statusConditions.push({
-              and: [{ isPaid: { not_equals: true } }, { isCancelled: { not_equals: true } }],
-            })
-          } else if (statusFilter === 'cancelled') {
-            statusConditions.push({ isCancelled: { equals: true } })
-          }
-        })
-
-        if (statusConditions.length > 0) {
-          whereClause.and = [
-            { passenger: { equals: profileId } },
-            statusConditions.length === 1 ? statusConditions[0] : { or: statusConditions },
-          ]
-          // Remove the base passenger filter since it's now in the and clause
-          delete whereClause.passenger
-        }
-      }
+      // Note: Status filtering is now handled client-side after fetching
+      // to properly support the 'expired' virtual field
 
       // Add date range filters
       if (fromDate) {
@@ -142,6 +119,29 @@ export const getUserTickets: Endpoint = {
 
       // Apply client-side filters that can't be done in the database query
       let filteredDocs = tickets.docs
+
+      // Filter by status (including expired status which is a virtual field)
+      if (status) {
+        const statuses = status.split(',')
+        const originalCount = filteredDocs.length
+
+        // Apply client-side status filtering for all status combinations
+        // This is needed because 'expired' is a virtual field that can't be queried in the database
+        filteredDocs = filteredDocs.filter((ticket: any) =>
+          statuses.some((statusFilter) => {
+            if (statusFilter === 'expired') {
+              return ticket.isExpired === true
+            } else if (statusFilter === 'paid') {
+              return ticket.isPaid === true && !ticket.isExpired
+            } else if (statusFilter === 'pending') {
+              return !ticket.isPaid && !ticket.isCancelled && !ticket.isExpired
+            } else if (statusFilter === 'cancelled') {
+              return ticket.isCancelled === true && !ticket.isExpired // Manually cancelled, not expired
+            }
+            return false
+          }),
+        )
+      }
 
       // Filter by from/to location (needs to be done after fetching due to nested relationships)
       if (fromLocation || toLocation) {
@@ -183,7 +183,7 @@ export const getUserTickets: Endpoint = {
 
       // For now, when client-side filtering is applied, we need to recalculate pagination
       // This is not ideal but fixes the immediate display issue
-      const hasClientFilters = fromLocation || toLocation || searchTerm
+      const hasClientFilters = fromLocation || toLocation || searchTerm || status
 
       if (hasClientFilters) {
         // When filters are applied, use filtered count for both display and pagination
@@ -220,17 +220,6 @@ export const getUserTickets: Endpoint = {
             const busTypeSeat = busType?.seats?.find(
               (seat: any) => seat.id === seatId && seat.type === 'seat',
             )
-
-            // Debug logging in development
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Seat mapping debug:', {
-                seatId,
-                busTypeSeat,
-                availableSeats: busType?.seats?.filter((s: any) => s.type === 'seat').slice(0, 3),
-                busTypeId: busType?.id,
-                tripId: trip?.id,
-              })
-            }
 
             // Get seat number from bus type configuration
             let seatNumber = busTypeSeat?.seatNumber
@@ -332,6 +321,7 @@ export const getUserTickets: Endpoint = {
         const status: UserTicket['status'] = {}
         if (ticket.isPaid) status.isPaid = true
         if (ticket.isCancelled) status.isCancelled = true
+        if (ticket.isExpired) status.isExpired = true
         if (ticket.paymentDeadline) status.paymentDeadline = ticket.paymentDeadline
 
         return {

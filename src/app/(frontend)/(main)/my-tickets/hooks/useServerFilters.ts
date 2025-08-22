@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSingleDateFilter } from './useSingleDateFilter'
-import moment from 'moment-jalaali'
 
 interface Route {
   name: string
@@ -28,9 +27,15 @@ export const useServerFilters = (tickets: any[]) => {
     to: searchParams.get('toDate') || '',
   })
 
-  // Initialize date filter from URL params (only once on mount)
+  // Initialize date filter and time period from URL params (only once on mount)
   useEffect(() => {
+    const urlTimePeriod = searchParams.get('timePeriod')
     const urlDateFilter = searchParams.get('dateFilter')
+
+    if (urlTimePeriod && ['all', 'past', 'upcoming'].includes(urlTimePeriod)) {
+      singleDateFilter.setTimePeriod(urlTimePeriod as 'all' | 'past' | 'upcoming')
+    }
+
     if (urlDateFilter && !singleDateFilter.dateFilter) {
       try {
         const [year, month, day] = urlDateFilter.split('-').map(Number)
@@ -74,8 +79,19 @@ export const useServerFilters = (tickets: any[]) => {
         params.delete('search')
       }
 
+      // Handle time period filter first
+      if (singleDateFilter.timePeriod !== 'all') {
+        const timePeriodRange = singleDateFilter.getTimePeriodRangeForQuery()
+        if (timePeriodRange) {
+          params.set('fromDate', timePeriodRange.from)
+          params.set('toDate', timePeriodRange.to)
+          params.set('timePeriod', singleDateFilter.timePeriod)
+        }
+        // Clear specific date filter when using time period
+        params.delete('dateFilter')
+      }
       // Handle single date filter
-      if (singleDateFilter.dateFilter) {
+      else if (singleDateFilter.dateFilter) {
         const dateRangeQuery = singleDateFilter.getDateRangeForQuery()
         if (dateRangeQuery) {
           params.set('fromDate', dateRangeQuery.from)
@@ -85,6 +101,7 @@ export const useServerFilters = (tickets: any[]) => {
             `${singleDateFilter.dateFilter.year}-${singleDateFilter.dateFilter.month}-${singleDateFilter.dateFilter.day}`,
           )
         }
+        params.delete('timePeriod')
       } else {
         // Use manual date range if no single date filter
         if (dateRange.from) {
@@ -100,6 +117,7 @@ export const useServerFilters = (tickets: any[]) => {
         }
 
         params.delete('dateFilter')
+        params.delete('timePeriod')
       }
 
       if (routeFilters.from) {
@@ -125,7 +143,9 @@ export const useServerFilters = (tickets: any[]) => {
     dateRange,
     routeFilters,
     singleDateFilter.dateFilter,
+    singleDateFilter.timePeriod,
     singleDateFilter.getDateRangeForQuery,
+    singleDateFilter.getTimePeriodRangeForQuery,
     router,
   ])
 
@@ -158,6 +178,7 @@ export const useServerFilters = (tickets: any[]) => {
     dateRange,
     routeFilters,
     singleDateFilter.dateFilter,
+    singleDateFilter.timePeriod,
     isInitialized,
     updateURL,
   ])
@@ -215,6 +236,7 @@ export const useServerFilters = (tickets: any[]) => {
     setDateRange({ from: '', to: '' })
     setRouteFilters({ from: '', to: '' })
     singleDateFilter.clearDateFilter()
+    singleDateFilter.setTimePeriod('all')
   }
 
   const hasActiveFilters =
@@ -224,7 +246,8 @@ export const useServerFilters = (tickets: any[]) => {
     !!dateRange.to ||
     !!routeFilters.from ||
     !!routeFilters.to ||
-    singleDateFilter.isDateSelected
+    singleDateFilter.isDateSelected ||
+    singleDateFilter.timePeriod !== 'all'
 
   return {
     // Advanced filters

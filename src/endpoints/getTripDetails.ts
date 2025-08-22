@@ -113,6 +113,10 @@ export const getTripDetails: Endpoint = {
       // Process bus layout first to get busType
       const busType = trip.bus?.type
 
+      // Filter out expired tickets since they shouldn't block seat availability
+      // Note: isExpired is added by the afterRead hook
+      const activeTickets = bookedTicketsResult.docs.filter((ticket: any) => !ticket.isExpired)
+
       // Create a map of booked seats and track current user's bookings
       const bookedSeatsMap = new Map<
         string,
@@ -123,12 +127,13 @@ export const getTripDetails: Endpoint = {
           userId?: string
           isPaid: boolean
           paymentDeadline?: string
+          isExpired?: boolean
         }
       >()
 
       let userBookedSeatCount = 0
 
-      bookedTicketsResult.docs.forEach((ticket: any) => {
+      activeTickets.forEach((ticket: any) => {
         // Check if this ticket belongs to the current user's profile
         let isCurrentUserTicket = false
         if (user?.profile) {
@@ -150,6 +155,7 @@ export const getTripDetails: Endpoint = {
                 userId: ticket.bookedBy?.id,
                 isPaid: ticket.isPaid,
                 paymentDeadline: ticket.paymentDeadline,
+                isExpired: ticket.isExpired || false,
               })
 
               // Track current user's bookings if authenticated

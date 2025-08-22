@@ -22,6 +22,9 @@ interface SingleDateFilter {
   getDateRangeForQuery: () => { from: string; to: string } | null
   clearDateFilter: () => void
   isDateSelected: boolean
+  timePeriod: 'all' | 'past' | 'upcoming'
+  setTimePeriod: (period: 'all' | 'past' | 'upcoming') => void
+  getTimePeriodRangeForQuery: () => { from: string; to: string } | null
 }
 
 interface TicketFiltersProps {
@@ -141,36 +144,79 @@ export const TicketFilters = ({
               { value: 'paid', label: 'Paid', color: 'text-green-700' },
               { value: 'pending', label: 'Pending Payment', color: 'text-yellow-700' },
               { value: 'cancelled', label: 'Cancelled', color: 'text-red-700' },
-            ].map((status) => (
-              <label
-                key={status.value}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200 hover:shadow-sm"
-              >
-                <input
-                  type="checkbox"
-                  checked={statusFilters.includes(status.value)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setStatusFilters([...statusFilters, status.value])
-                    } else {
-                      setStatusFilters(statusFilters.filter((s) => s !== status.value))
-                    }
-                  }}
-                  className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 transition-all duration-200"
-                />
-                <span
-                  className={`text-sm font-medium ${status.color} transition-colors duration-200`}
+              { value: 'expired', label: 'Expired', color: 'text-orange-700' },
+            ].map((status) => {
+              const isChecked = statusFilters.includes(status.value)
+              return (
+                <label
+                  key={status.value}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                    isChecked ? 'bg-orange-50 border border-orange-200' : 'hover:bg-gray-50'
+                  }`}
                 >
-                  {status.label}
-                </span>
-              </label>
-            ))}
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={(e) => {
+                      e.stopPropagation()
+                      const newFilters = e.target.checked
+                        ? [...statusFilters, status.value]
+                        : statusFilters.filter((s) => s !== status.value)
+                      setStatusFilters(newFilters)
+                    }}
+                    className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 transition-all duration-200"
+                  />
+                  <span
+                    className={`text-sm font-medium ${status.color} transition-colors duration-200`}
+                  >
+                    {status.label}
+                  </span>
+                </label>
+              )
+            })}
           </div>
         </div>
 
-        {/* Date Filter */}
+        {/* Date-based Filters */}
         <div className="transition-all duration-200">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Trip Date</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">Time Period</label>
+          <div className="space-y-2 mb-4">
+            {[
+              { value: 'all', label: 'All Tickets' },
+              { value: 'past', label: 'Past Trips' },
+              { value: 'upcoming', label: 'Upcoming Trips' },
+            ].map((period) => {
+              const isSelected = singleDateFilter.timePeriod === period.value
+              return (
+                <label
+                  key={period.value}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                    isSelected ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="timePeriod"
+                    value={period.value}
+                    checked={isSelected}
+                    onChange={(e) => {
+                      e.stopPropagation()
+                      singleDateFilter.setTimePeriod(e.target.value as 'all' | 'past' | 'upcoming')
+                    }}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2 transition-all duration-200"
+                  />
+                  <span className="text-sm font-medium text-gray-900 transition-colors duration-200">
+                    {period.label}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Specific Date Filter */}
+        <div className="transition-all duration-200">
+          <label className="block text-sm font-medium text-gray-700 mb-3">Specific Date</label>
           <div className="space-y-3">
             {singleDateFilter.dateFilter ? (
               <div className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg">
@@ -210,12 +256,19 @@ export const TicketFilters = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">From Location</label>
             <div className="space-y-2 max-h-40 overflow-y-auto transition-all duration-200">
-              <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200 hover:shadow-sm">
+              <label
+                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                  !routeFilters.from ? 'bg-orange-50 border border-orange-200' : 'hover:bg-gray-50'
+                }`}
+              >
                 <input
                   type="radio"
                   name="routeFrom"
                   checked={!routeFilters.from}
-                  onChange={() => setRouteFilters({ ...routeFilters, from: '' })}
+                  onChange={(e) => {
+                    e.stopPropagation()
+                    setRouteFilters({ ...routeFilters, from: '' })
+                  }}
                   className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 focus:ring-2 transition-all duration-200"
                 />
                 <span className="text-sm text-gray-900 transition-colors duration-200">
@@ -225,13 +278,20 @@ export const TicketFilters = ({
               {uniqueRoutes.from.map((route, index) => (
                 <label
                   key={index}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200 hover:shadow-sm"
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                    routeFilters.from === route.name
+                      ? 'bg-orange-50 border border-orange-200'
+                      : 'hover:bg-gray-50'
+                  }`}
                 >
                   <input
                     type="radio"
                     name="routeFrom"
                     checked={routeFilters.from === route.name}
-                    onChange={() => setRouteFilters({ ...routeFilters, from: route.name })}
+                    onChange={(e) => {
+                      e.stopPropagation()
+                      setRouteFilters({ ...routeFilters, from: route.name })
+                    }}
                     className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 focus:ring-2 transition-all duration-200"
                   />
                   <div>
@@ -250,12 +310,19 @@ export const TicketFilters = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">To Location</label>
             <div className="space-y-2 max-h-40 overflow-y-auto transition-all duration-200">
-              <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200 hover:shadow-sm">
+              <label
+                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                  !routeFilters.to ? 'bg-orange-50 border border-orange-200' : 'hover:bg-gray-50'
+                }`}
+              >
                 <input
                   type="radio"
                   name="routeTo"
                   checked={!routeFilters.to}
-                  onChange={() => setRouteFilters({ ...routeFilters, to: '' })}
+                  onChange={(e) => {
+                    e.stopPropagation()
+                    setRouteFilters({ ...routeFilters, to: '' })
+                  }}
                   className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 focus:ring-2 transition-all duration-200"
                 />
                 <span className="text-sm text-gray-900 transition-colors duration-200">
@@ -265,13 +332,20 @@ export const TicketFilters = ({
               {uniqueRoutes.to.map((route, index) => (
                 <label
                   key={index}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200 hover:shadow-sm"
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                    routeFilters.to === route.name
+                      ? 'bg-orange-50 border border-orange-200'
+                      : 'hover:bg-gray-50'
+                  }`}
                 >
                   <input
                     type="radio"
                     name="routeTo"
                     checked={routeFilters.to === route.name}
-                    onChange={() => setRouteFilters({ ...routeFilters, to: route.name })}
+                    onChange={(e) => {
+                      e.stopPropagation()
+                      setRouteFilters({ ...routeFilters, to: route.name })
+                    }}
                     className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 focus:ring-2 transition-all duration-200"
                   />
                   <div>

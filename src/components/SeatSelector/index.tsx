@@ -48,18 +48,47 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
         toggleSeat(seatId)
         return
       }
+
+      // For booked/unpaid seats, check if the booking is expired
       const booking = getBookingForSeat(seatId)
-      if (!booking) return
-      const name = booking.passenger?.fullName || 'another passenger'
-      const statusText = status === 'booked' ? t.messages.seatBookedBy : t.messages.seatReservedBy
-      const msg = (
-        <div>
-          {t.seatTypes.seat} {statusText} <strong>{name}</strong>
-          <br />
-          {t.messages.ticket}: {booking.ticketNumber}
-        </div>
-      )
-      status === 'booked' ? toast.error(msg) : toast.warning(msg)
+      if (booking) {
+        // Check if booking is expired
+        const isExpired = (() => {
+          if (!booking.paymentDeadline || booking.isPaid || booking.isCancelled) {
+            return false
+          }
+          try {
+            const deadline = new Date(booking.paymentDeadline)
+            const now = new Date()
+            return !isNaN(deadline.getTime()) && deadline < now
+          } catch {
+            return false
+          }
+        })()
+
+        // If expired, allow selection
+        if (isExpired) {
+          toggleSeat(seatId)
+          return
+        }
+
+        // If not expired, show blocking message
+        const name = booking.passenger?.fullName || 'another passenger'
+        const statusText = status === 'booked' ? t.messages.seatBookedBy : t.messages.seatReservedBy
+        const msg = (
+          <div>
+            {t.seatTypes.seat} {statusText} <strong>{name}</strong>
+            <br />
+            {t.messages.ticket}: {booking.ticketNumber}
+          </div>
+        )
+        status === 'booked' ? toast.error(msg) : toast.warning(msg)
+        return
+      }
+
+      // Fallback: if no booking found but status suggests it's blocked, allow selection
+      // This handles edge cases where the seat appears blocked but shouldn't be
+      toggleSeat(seatId)
     },
     [getSeatStatus, toggleSeat, getBookingForSeat, readOnly, t],
   )

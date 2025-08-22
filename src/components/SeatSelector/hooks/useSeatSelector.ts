@@ -401,13 +401,28 @@ export const useSeatSelector = ({
       const bookedSeats = ticket.bookedSeats || []
       if (!Array.isArray(bookedSeats)) return
 
+      // Check if ticket is expired
+      const isExpired = (() => {
+        if (!ticket.paymentDeadline || ticket.isPaid || ticket.isCancelled) {
+          return false
+        }
+        try {
+          const deadline = new Date(ticket.paymentDeadline)
+          const now = new Date()
+          return !isNaN(deadline.getTime()) && deadline < now
+        } catch {
+          return false
+        }
+      })()
+
       bookedSeats.forEach((seatData) => {
         const seatId = extractSeatId(seatData)
         if (!seatId) return
 
         if (ticket.id === currentTicketId) {
           originalSeats.add(seatId)
-        } else if (!ticket.isCancelled) {
+        } else if (!ticket.isCancelled && !isExpired) {
+          // Only block seats for non-cancelled and non-expired tickets
           map.set(seatId, ticket)
         }
       })
