@@ -123,6 +123,20 @@ export interface BookedSeat {
 }
 
 /**
+ * User information for bookedBy field
+ */
+export interface User {
+  id: string
+  email?: string
+  phone?: string
+  profile?: {
+    fullName?: string
+    [key: string]: any
+  }
+  [key: string]: any
+}
+
+/**
  * Ticket document from API
  */
 export interface BookedTicket {
@@ -137,6 +151,7 @@ export interface BookedTicket {
   pricePerTicket?: number
   date?: string
   paymentDeadline?: string
+  bookedBy?: User | string
   createdAt?: string
   updatedAt?: string
 }

@@ -10,7 +10,6 @@ import { PasswordInput } from '../register/components/PasswordInput'
 import { LocationPermissionPrompt } from '../register/components/LocationPermissionPrompt'
 import { Alert } from '../register/components/Alert'
 import { LoginSubmitButton } from './components/LoginSubmitButton'
-import { useLocationPermission } from '@/hooks'
 import { useLoginForm } from './hooks/useLoginForm'
 
 export const LoginClient = () => {
@@ -25,9 +24,6 @@ export const LoginClient = () => {
     clearError,
     () => setSuccess(false),
   )
-
-  const { shouldShowLocationPrompt, isCheckingPermission, permissionState } =
-    useLocationPermission()
 
   // Location permission handlers
   const handleLocationGranted = () => {
@@ -71,24 +67,10 @@ export const LoginClient = () => {
         // Login successful - show success message
         setSuccess(true)
 
-        // Check if we should show location prompt
-        if (shouldShowLocationPrompt && !isCheckingPermission) {
-          // Show location permission prompt after a brief success display
-          setTimeout(() => {
-            setShowLocationPrompt(true)
-          }, 1500)
-        } else {
-          // No location prompt needed, redirect directly
-          const hasAdminRoles =
-            result.user.roles && result.user.roles.some((role: string) => role !== 'customer')
-          const defaultRedirect = hasAdminRoles ? '/admin' : '/'
-          const finalRedirect = redirectTo !== '/' ? redirectTo : defaultRedirect
-
-          setTimeout(() => {
-            router.push(finalRedirect)
-            router.refresh()
-          }, 1500)
-        }
+        // Always show location permission prompt after successful login
+        setTimeout(() => {
+          setShowLocationPrompt(true)
+        }, 1500)
       }
       // Error handling is done in the AuthContext
     } catch (err) {

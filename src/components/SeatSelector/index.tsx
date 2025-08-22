@@ -73,11 +73,30 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
         }
 
         // If not expired, show blocking message
-        const name = booking.passenger?.fullName || 'another passenger'
+        const passengerName = booking.passenger?.fullName || 'another passenger'
+        const bookedByName = (() => {
+          if (typeof booking.bookedBy === 'object' && booking.bookedBy?.profile?.fullName) {
+            return booking.bookedBy.profile.fullName
+          }
+          if (typeof booking.bookedBy === 'object' && booking.bookedBy?.email) {
+            return booking.bookedBy.email
+          }
+          if (typeof booking.bookedBy === 'object' && booking.bookedBy?.phone) {
+            return booking.bookedBy.phone
+          }
+          return null
+        })()
+
         const statusText = status === 'booked' ? t.messages.seatBookedBy : t.messages.seatReservedBy
         const msg = (
           <div>
-            {t.seatTypes.seat} {statusText} <strong>{name}</strong>
+            {t.seatTypes.seat} {statusText} <strong>{passengerName}</strong>
+            {bookedByName && bookedByName !== passengerName && (
+              <>
+                <br />
+                Booked by: <strong>{bookedByName}</strong>
+              </>
+            )}
             <br />
             {t.messages.ticket}: {booking.ticketNumber}
           </div>

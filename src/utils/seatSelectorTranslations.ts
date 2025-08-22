@@ -19,8 +19,8 @@ export const getSeatSelectorTranslations = (lang: 'en' | 'fa' = 'en') => {
           ? 'لطفاً یک سفر و تاریخ سفر را برای مشاهده نقشه صندلی انتخاب کنید.'
           : 'Please select a trip and travel date to view the seat map.',
       loadingSeatMap: lang === 'fa' ? 'در حال بارگذاری نقشه صندلی...' : 'Loading seat map…',
-      seatBookedBy: lang === 'fa' ? 'بوک شده توسط' : 'booked by',
-      seatReservedBy: lang === 'fa' ? 'قید شده توسط' : 'reserved by',
+      seatBookedBy: lang === 'fa' ? 'بوک شده برای' : 'booked for',
+      seatReservedBy: lang === 'fa' ? 'قید شده برای' : 'reserved for',
       ticket: lang === 'fa' ? 'تکت' : 'Ticket',
       clickToSelect:
         lang === 'fa'
