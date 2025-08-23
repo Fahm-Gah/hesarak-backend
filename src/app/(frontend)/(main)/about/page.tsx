@@ -3,92 +3,89 @@ import { Metadata } from 'next'
 import { Shield, Users, MapPin, Award, Clock, Heart } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'About Us | Hesarakbus - Your Trusted Bus Travel Partner',
+  title: 'درباره ما | حصارک‌بس - شریک مطمئن سفر شما',
   description:
-    "Learn about Hesarakbus's mission to provide safe, comfortable, and reliable bus travel across Afghanistan. Discover our story, values, and commitment to passenger safety.",
+    'در مورد ماموریت حصارک‌بس برای ارائه سفر امن، راحت و قابل اعتماد اتوبوس در سراسر افغانستان بیاموزید. داستان، ارزش‌ها و تعهد ما به ایمنی مسافران را کشف کنید.',
 }
 
 export default function AboutPage() {
   const values = [
     {
       icon: Shield,
-      title: 'Safety First',
+      title: 'ایمنی در اولویت',
       description:
-        'Passenger safety is our top priority. All our buses undergo regular maintenance and safety inspections.',
+        'ایمنی مسافران اولویت اصلی ما است. همه اتوبوس‌های ما تحت تعمیرات منظم و بازرسی‌های ایمنی قرار می‌گیرند.',
     },
     {
       icon: Users,
-      title: 'Customer Focus',
+      title: 'تمرکز بر مشتری',
       description:
-        'We put our passengers first, providing exceptional service and support throughout their journey.',
+        'ما مسافران خود را در اولویت قرار می‌دهیم و خدمات و پشتیبانی فوق‌العاده در طول سفرشان ارائه می‌دهیم.',
     },
     {
       icon: MapPin,
-      title: 'Wide Coverage',
-      description:
-        'Extensive network covering major cities and towns across Afghanistan with convenient departure times.',
+      title: 'پوشش گسترده',
+      description: 'شبکه گسترده پوشش شهرهای بزرگ و ولایات سراسر افغانستان با زمان‌های حرکت مناسب.',
     },
     {
       icon: Award,
-      title: 'Quality Service',
-      description:
-        'Committed to maintaining high standards of service with comfortable buses and professional drivers.',
+      title: 'خدمات باکیفیت',
+      description: 'متعهد به حفظ استانداردهای بالای خدمات با اتوبوس‌های راحت و رانندگان حرفه‌ای.',
     },
   ]
 
   const stats = [
-    { number: '10,000+', label: 'Happy Passengers', sublabel: 'Monthly' },
-    { number: '50+', label: 'Routes', sublabel: 'Across Afghanistan' },
-    { number: '99%', label: 'On-Time', sublabel: 'Performance' },
-    { number: '24/7', label: 'Support', sublabel: 'Available' },
+    { number: '10,000+', label: 'مسافران راضی', sublabel: 'ماهانه' },
+    { number: '50+', label: 'مسیرها', sublabel: 'در سراسر افغانستان' },
+    { number: '99%', label: 'به موقع', sublabel: 'عملکرد' },
+    { number: '24/7', label: 'خدمات مشتریان', sublabel: 'در دسترس' },
   ]
 
   const milestones = [
     {
-      year: '2020',
-      title: 'Hesarakbus Founded',
+      year: '۱۳۹۰',
+      title: 'تأسیس حصارک‌بس',
       description:
-        'Started with a vision to revolutionize bus travel in Afghanistan with modern technology and customer-first approach.',
+        'با چشم‌اندازی برای انقلاب در سفرهای اتوبوس در افغانستان با فناوری مدرن و رویکرد مشتری محور آغاز شد.',
     },
     {
-      year: '2021',
-      title: 'First Routes Launched',
+      year: '۱۳۹۱',
+      title: 'راه‌اندازی اولین مسیرها',
       description:
-        'Began operations with key routes connecting Kabul to major cities including Mazaar, Herat, and Kandahar.',
+        'عملیات را با مسیرهای کلیدی که کابل را به شهرهای بزرگ از جمله مزار، هرات و قندهار متصل می‌کند، آغاز کرد.',
     },
     {
-      year: '2022',
-      title: 'Digital Platform Launch',
+      year: '۱۴۰۴',
+      title: 'راه‌اندازی پلتفرم دیجیتال',
       description:
-        'Introduced online booking system making it easier for passengers to book tickets from anywhere.',
+        'سیستم رزرو آنلاین را معرفی کرد که برای مسافران آسان‌تر شد تا از هر کجا تکت اخذ کنند.',
     },
     {
-      year: '2023',
-      title: 'Fleet Expansion',
+      year: '۱۴۰۴',
+      title: 'توسعه ناوگان',
       description:
-        'Expanded our fleet with modern buses equipped with safety features and passenger comfort amenities.',
+        'ناوگان خود را با اتوبوس‌های مدرن مجهز به ویژگی‌های ایمنی و امکانات راحتی مسافران گسترش داد.',
     },
     {
-      year: '2024',
-      title: 'Mobile App Launch',
+      year: '۱۴۰۵',
+      title: 'راه‌اندازی اپلیکیشن موبایل',
       description:
-        'Released mobile application for iOS and Android, providing seamless booking experience on mobile devices.',
+        'اپلیکیشن موبایل برای iOS و Android را منتشر کرد و تجربه رزرو یکپارچه روی دستگاه‌های موبایل فراهم آورد.',
     },
   ]
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" dir="rtl">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              About <span className="text-orange-500">Hesarakbus</span>
+              درباره <span className="text-orange-500">حصارک‌بس</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              We are committed to providing safe, comfortable, and reliable bus travel services
-              across Afghanistan, connecting people and communities with modern transportation
-              solutions.
+              ما متعهد به ارائه خدمات سفر امن، راحت و قابل اعتماد اتوبوس در سراسر افغانستان هستیم و
+              مردم و جوامع را با راه‌حل‌های حمل و نقل مدرن متصل می‌کنیم.
             </p>
           </div>
         </div>
@@ -99,29 +96,27 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">ماموریت ما</h2>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                To transform bus travel in Afghanistan by providing safe, comfortable, and
-                affordable transportation services that connect communities and enable economic
-                growth. We believe that reliable transportation is essential for progress and
-                development.
+                تغییر سفرهای اتوبوس در افغانستان از طریق ارائه خدمات ترانسپورتی امن، راحت و مقرون به
+                صرفه که جوامع را متصل کرده و رشد اقتصادی را امکان‌پذیر می‌سازد. ما معتقدیم که حمل و
+                نقل قابل اعتماد برای پیشرفت و توسعه ضروری است.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
-                Our mission extends beyond just transportation – we aim to contribute to the social
-                and economic development of Afghanistan by facilitating safe and efficient movement
-                of people across the country.
+                ماموریت ما فراتر از حمل و نقل است - هدف ما کمک به توسعه اجتماعی و اقتصادی افغانستان
+                از طریق تسهیل ترانسپورت امن در سراسر کشور است.
               </p>
             </div>
             <div className="bg-gradient-to-br from-orange-50 to-red-50 p-8 rounded-2xl">
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Vision</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">چشم‌انداز ما</h2>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                To be Afghanistan's leading bus travel company, recognized for our commitment to
-                safety, reliability, and customer satisfaction. We envision a future where every
-                Afghan has access to safe and comfortable transportation.
+                پیشرو در خدمات ترانسپورتی افغانستان باشیم که به دلیل تعهدمان به ایمنی، قابلیت اعتماد
+                و رضایت مشتری شناخته شویم. ما آینده‌ای را متصور می‌کنیم که در آن هر افغان به حمل و
+                نقل امن و راحت دسترسی داشته باشد.
               </p>
               <div className="flex items-center text-orange-600">
                 <Heart className="w-6 h-6 mr-2" />
-                <span className="font-semibold">Serving Afghanistan with pride</span>
+                <span className="font-semibold">خدمت به افغانستان با افتخار</span>
               </div>
             </div>
           </div>
@@ -132,9 +127,9 @@ export default function AboutPage() {
       <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Values</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">ارزش‌های ما</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The principles that guide everything we do
+              اصولی که همه کارهای ما را راهنمایی می‌کند
             </p>
           </div>
 
@@ -162,8 +157,8 @@ export default function AboutPage() {
       <section className="py-20 bg-gradient-to-br from-orange-600 to-red-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Our Impact</h2>
-            <p className="text-xl opacity-90">Numbers that tell our story</p>
+            <h2 className="text-4xl font-bold mb-4">تأثیر ما</h2>
+            <p className="text-xl opacity-90">ارقامی که داستان ما را می‌گویند</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -182,34 +177,90 @@ export default function AboutPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Journey</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">سفر ما</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From a small startup to Afghanistan's trusted bus travel partner
+              از یک شرکت کوچک تا بزرگترین شرکت ترانسپورتی افغانستان
             </p>
           </div>
 
+          {/* Production-grade Timeline */}
           <div className="relative">
             {/* Timeline Line */}
-            <div className="absolute left-4 md:left-1/2 transform md:-translate-x-px h-full w-0.5 bg-orange-200"></div>
+            <div className="absolute right-8 md:right-auto md:left-1/2 md:-translate-x-px top-0 h-full w-0.5 bg-gradient-to-b from-orange-200 via-orange-300 to-orange-200"></div>
 
+            {/* Timeline Items */}
             {milestones.map((milestone, index) => (
-              <div key={index} className="relative mb-12">
-                <div
-                  className={`flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                >
+              <div key={index} className="relative mb-12 last:mb-0">
+                {/* Mobile Layout */}
+                <div className="md:hidden">
                   {/* Timeline Dot */}
-                  <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 w-4 h-4 bg-orange-500 rounded-full border-4 border-white shadow-lg z-10"></div>
+                  <div className="absolute right-8 top-8 w-4 h-4 -translate-x-1/2">
+                    <div className="w-4 h-4 bg-orange-500 rounded-full border-4 border-white shadow-md"></div>
+                    <div className="absolute inset-0 w-4 h-4 bg-orange-400 rounded-full animate-ping"></div>
+                  </div>
 
-                  {/* Content */}
-                  <div
-                    className={`ml-12 md:ml-0 md:w-1/2 ${index % 2 === 0 ? 'md:pr-12' : 'md:pl-12'}`}
-                  >
-                    <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-                      <div className="text-orange-600 font-bold text-lg mb-2">{milestone.year}</div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                        {milestone.title}
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed">{milestone.description}</p>
+                  {/* Content Card */}
+                  <div className="mr-16 bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-orange-600 font-bold text-lg">{milestone.year}</span>
+                      <div className="h-px flex-1 bg-gradient-to-l from-orange-200"></div>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{milestone.title}</h3>
+                    <p className="text-gray-600 leading-relaxed">{milestone.description}</p>
+                  </div>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden md:block">
+                  <div className="grid grid-cols-2 gap-12">
+                    {/* Left Content */}
+                    <div className={`${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
+                      {index % 2 === 0 && (
+                        <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                          <div className="flex items-center gap-4 mb-4">
+                            <span className="text-orange-600 font-bold text-xl group-hover:text-orange-700 transition-colors">
+                              {milestone.year}
+                            </span>
+                            <div className="h-px flex-1 bg-gradient-to-l from-orange-200 group-hover:from-orange-300 transition-all"></div>
+                          </div>
+                          <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors">
+                            {milestone.title}
+                          </h3>
+                          <p className="text-gray-600 leading-relaxed text-lg">
+                            {milestone.description}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Center Dot */}
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                      <div className="relative">
+                        <div className="w-5 h-5 bg-orange-500 rounded-full border-4 border-white shadow-lg"></div>
+                        {index === 0 && (
+                          <div className="absolute inset-0 w-5 h-5 bg-orange-400 rounded-full animate-ping"></div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right Content */}
+                    <div className={`${index % 2 === 1 ? 'text-right' : 'text-left'}`}>
+                      {index % 2 === 1 && (
+                        <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="h-px flex-1 bg-gradient-to-r from-orange-200 group-hover:from-orange-300 transition-all"></div>
+                            <span className="text-orange-600 font-bold text-xl group-hover:text-orange-700 transition-colors">
+                              {milestone.year}
+                            </span>
+                          </div>
+                          <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors">
+                            {milestone.title}
+                          </h3>
+                          <p className="text-gray-600 leading-relaxed text-lg">
+                            {milestone.description}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -222,33 +273,33 @@ export default function AboutPage() {
       {/* Team Section */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Commitment</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">تعهد ما</h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
-            Every day, our team of dedicated professionals works tirelessly to ensure your journey
-            is safe, comfortable, and memorable. From our drivers to our customer service
-            representatives, everyone at Hesarakbus is committed to serving you with excellence.
+            هر روز، تیم متخصصان فداکار ما بی‌وقفه تلاش می‌کنند تا اطمینان حاصل کنند که سفر شما امن،
+            راحت و به‌یادماندنی باشد. از رانندگان ما گرفته تا نمایندگان خدمات مشتری، همه در حصارک‌بس
+            متعهد به خدمت‌رسانی به شما به بهترین وجه هستند.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
             <div className="bg-white p-8 rounded-2xl shadow-lg">
               <Clock className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Punctuality</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">دقت در زمان</h3>
               <p className="text-gray-600">
-                We respect your time and ensure on-time departures and arrivals.
+                ما به وقت شما احترام می‌گذاریم و حرکت و رسیدن به موقع را تضمین می‌کنیم.
               </p>
             </div>
             <div className="bg-white p-8 rounded-2xl shadow-lg">
               <Shield className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Safety</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">ایمنی</h3>
               <p className="text-gray-600">
-                Regular maintenance and safety checks ensure your journey is secure.
+                تعمیرات منظم و بررسی‌های ایمنی اطمینان می‌دهد که سفر شما امن باشد.
               </p>
             </div>
             <div className="bg-white p-8 rounded-2xl shadow-lg">
               <Users className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Service</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">خدمات</h3>
               <p className="text-gray-600">
-                Our friendly staff is always ready to assist you with a smile.
+                کارکنان ما همیشه آماده کمک به شما با لبخند صمیمانه هستند.
               </p>
             </div>
           </div>

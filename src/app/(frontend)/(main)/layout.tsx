@@ -6,6 +6,12 @@ import { Footer } from '@/app/(frontend)/components/Footer'
 
 import '../../globals.css'
 
+import { Vazirmatn } from 'next/font/google'
+
+const vazirmatn = Vazirmatn({
+  subsets: ['latin'],
+})
+
 // Force dynamic rendering since we use authentication
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +24,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html lang="en">
+    <html lang="fa" className={vazirmatn.className}>
       <body>
         <AuthProvider>
           <NavBar />
