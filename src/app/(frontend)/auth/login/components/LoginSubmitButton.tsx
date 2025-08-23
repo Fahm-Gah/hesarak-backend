@@ -25,16 +25,16 @@ export const LoginSubmitButton = ({
       <div className="relative z-10">
         {isSuccess ? (
           <div className="flex items-center justify-center">
-            <CheckCircle className="w-6 h-6 mr-2" />
-            <span>Login Successful!</span>
+            <CheckCircle className="w-6 h-6 ml-2" />
+            <span>ورود موفق!</span>
           </div>
         ) : isLoading ? (
           <div className="flex items-center justify-center">
-            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-            Signing in...
+            <Loader2 className="w-5 h-5 animate-spin ml-2" />
+            در حال ورود...
           </div>
         ) : (
-          'Sign In'
+          'ورود'
         )}
       </div>
     </button>

@@ -79,15 +79,18 @@ export const LoginClient = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <div
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4"
+      dir="rtl"
+    >
       <div className="max-w-md w-full">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8">
           {/* Logo */}
           <Logo
             variant="auth"
             size="lg"
-            title="Welcome back"
-            subtitle="Please sign in to your account."
+            title="خوش آمدید"
+            subtitle="لطفاً وارد حساب کاربری خود شوید."
           />
 
           {/* Error Message */}
@@ -95,7 +98,7 @@ export const LoginClient = () => {
 
           {/* Success Message */}
           {success && !showLocationPrompt && (
-            <Alert type="success" message="Login successful! Setting up your session..." />
+            <Alert type="success" message="ورود موفق! در حال تنظیم جلسه شما..." />
           )}
 
           {/* Location Permission Prompt */}
@@ -120,10 +123,10 @@ export const LoginClient = () => {
 
               {/* Password Field */}
               <PasswordInput
-                label="Password"
+                label="رمز عبور"
                 value={formData.password}
                 onChange={(value) => handleInputChange('password', value)}
-                placeholder="Enter your password"
+                placeholder="رمز عبور خود را وارد کنید"
                 disabled={isLoading || success}
                 error={errors.password}
                 autoComplete="current-password"
@@ -143,19 +146,19 @@ export const LoginClient = () => {
             <>
               <div className="my-8 flex items-center">
                 <div className="flex-1 border-t border-gray-300"></div>
-                <div className="px-4 text-sm text-gray-500">or</div>
+                <div className="px-4 text-sm text-gray-500">یا</div>
                 <div className="flex-1 border-t border-gray-300"></div>
               </div>
 
               {/* Sign Up Link */}
               <div className="text-center">
                 <p className="text-gray-600">
-                  Don't have an account?{' '}
+                  حساب کاربری ندارید؟{' '}
                   <Link
                     href={`/auth/register${redirectTo !== '/' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
                     className="text-orange-600 hover:text-orange-700 font-medium"
                   >
-                    Sign up here
+                    اینجا ثبت‌نام کنید
                   </Link>
                 </p>
               </div>
@@ -166,9 +169,9 @@ export const LoginClient = () => {
           {!showLocationPrompt && (
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
               <p className="text-sm text-gray-500">
-                Need help?{' '}
+                به کمک نیاز دارید؟{' '}
                 <Link href="/contact" className="text-orange-600 hover:text-orange-700 font-medium">
-                  Contact Support
+                  تماس با پشتیبانی
                 </Link>
               </p>
             </div>

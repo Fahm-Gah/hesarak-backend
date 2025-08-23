@@ -15,7 +15,7 @@ export const EmailPhoneInput = ({
 }: EmailPhoneInputProps) => {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">Email or Phone *</label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">ایمیل یا شماره تلفن *</label>
       <input
         type="text"
         value={value}
@@ -25,7 +25,7 @@ export const EmailPhoneInput = ({
             ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
             : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
         }`}
-        placeholder="Enter your email or phone number"
+        placeholder="ایمیل یا شماره تلفن خود را وارد کنید"
         required
         disabled={disabled}
         autoComplete={autoComplete}

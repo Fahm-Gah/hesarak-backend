@@ -326,7 +326,7 @@ export default function ContactPageClient() {
                   </div>
                   <div className="flex items-start">
                     <MapPin className="w-5 h-5 ml-3 mt-0.5" />
-                    <span className="font-semibold">Shar-e-Naw, Kabul, Afghanistan</span>
+                    <span className="font-semibold">لوای بابه جان، کابل، افغانستان</span>
                   </div>
                 </div>
               </div>
