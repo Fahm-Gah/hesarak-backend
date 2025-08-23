@@ -3,7 +3,7 @@ import { TripSearchForm } from '../TripSearchForm'
 
 export const HeroSection = () => {
   return (
-    <section className="relative h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+    <section className="relative h-[calc(100vh-4rem)] flex flex-col overflow-visible">
       {/* Modern gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900">
         <div className="absolute inset-0 bg-gradient-to-t from-orange-600/10 via-transparent to-blue-600/5"></div>
@@ -45,7 +45,7 @@ export const HeroSection = () => {
             </div>
 
             {/* Search form */}
-            <div className="w-full max-w-6xl mx-auto mb-6 sm:mb-8 lg:mb-10">
+            <div className="w-full max-w-6xl mx-auto mb-6 sm:mb-8 lg:mb-10 relative z-20 overflow-visible">
               <TripSearchForm />
             </div>
 
