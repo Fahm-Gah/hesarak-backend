@@ -3,26 +3,26 @@ import { Metadata } from 'next'
 import { FileText, AlertTriangle, Clock, RefreshCw, CreditCard, Users } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Terms and Conditions | Hesarakbus - Service Agreement',
+  title: 'شرایط و قوانین | حصارک‌بس - قرارداد خدمات',
   description:
-    'Read the terms and conditions for using Hesarakbus bus booking services, including our cancellation policy and service guidelines.',
+    'شرایط و قوانین استفاده از خدمات تکت بس حصارک‌بس، شامل سیاست لغو و راهنمای خدمات ما را بخوانید.',
 }
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" dir="rtl">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Terms & <span className="text-orange-500">Conditions</span>
+              شرایط و <span className="text-orange-500">قوانین</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Please read these terms carefully before using our services. By booking with
-              Hesarakbus, you agree to these conditions.
+              لطفاً قبل از استفاده از خدمات ما، این شرایط را با دقت بخوانید. با تکت کردن از
+              حصارک‌بس، شما با این شرایط موافقت می‌کنید.
             </p>
-            <p className="text-sm text-gray-400 mt-4">Last updated: December 2024</p>
+            <p className="text-sm text-gray-400 mt-4">آخرین بروزرسانی: سنبله ۱۴۰۴</p>
           </div>
         </div>
       </section>
@@ -31,20 +31,20 @@ export default function TermsPage() {
       <section className="py-12 bg-gradient-to-br from-orange-50 to-red-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Quick Navigation</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">دسترسی سریع</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { title: 'Booking Terms', href: '#booking-terms', icon: FileText },
-              { title: 'Cancellation Policy', href: '#cancellation-policy', icon: RefreshCw },
-              { title: 'Payment Terms', href: '#payment-terms', icon: CreditCard },
+              { title: 'شرایط تکت', href: '#booking-terms', icon: FileText },
+              { title: 'سیاست لغو', href: '#cancellation-policy', icon: RefreshCw },
+              { title: 'شرایط پرداخت', href: '#payment-terms', icon: CreditCard },
               {
-                title: 'Passenger Responsibilities',
+                title: 'مسئولیت‌های مسافر',
                 href: '#passenger-responsibilities',
                 icon: Users,
               },
-              { title: 'Service Limitations', href: '#limitations', icon: AlertTriangle },
-              { title: 'Contact Support', href: '#contact', icon: Clock },
+              { title: 'محدودیت‌های خدمات', href: '#limitations', icon: AlertTriangle },
+              { title: 'تماس با پشتیبانی', href: '#contact', icon: Clock },
             ].map((item, index) => {
               const IconComponent = item.icon
               return (
@@ -70,44 +70,42 @@ export default function TermsPage() {
           <div className="space-y-12">
             {/* General Terms */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">1. General Terms</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">۱. شرایط عمومی</h2>
               <div className="space-y-4 text-gray-700">
                 <p>
-                  By using Hesarakbus's services, you agree to be bound by these terms and
-                  conditions. These terms apply to all users of our website, mobile application, and
-                  booking services.
+                  با استفاده از خدمات حصارک‌بس، شما موافقت می‌کنید که تحت پوشش این شرایط و ضوابط
+                  قرار گیرید. این شرایط برای تمام کاربران وبسایت، برنامه موبایل، و خدمات تکت ما
+                  اعمال می‌شود.
                 </p>
                 <p>
-                  Hesarakbus reserves the right to modify these terms at any time. Changes will be
-                  effective immediately upon posting on our website. Continued use of our services
-                  constitutes acceptance of any modifications.
+                  حصارک‌بس حق دارد که این شرایط را در هر زمان تغییر دهد. تغییرات پس از انتشار در
+                  وبسایت ما فوراً موثر خواهند بود. ادامه استفاده از خدمات ما به معنی پذیرش هرگونه
+                  تغییرات است.
                 </p>
               </div>
             </div>
 
             {/* Booking Terms */}
             <div id="booking-terms">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                2. Booking Terms and Conditions
-              </h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">۲. شرایط و ضوابط تکت</h2>
               <div className="space-y-4 text-gray-700">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Booking Process</h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>All bookings are subject to seat availability</li>
-                    <li>Booking confirmation will be sent via SMS and email</li>
-                    <li>You must provide accurate personal information during booking</li>
-                    <li>Each passenger must have a valid booking confirmation</li>
-                    <li>Children under 2 years travel free when seated on an adult's lap</li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">فرآیند تکت</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>تمام تکت‌ها با توجه به در دسترس بودن چوکی می‌باشد</li>
+                    <li>تایید تکت از طریق پیامک و ایمیل ارسال خواهد شد</li>
+                    <li>شما باید اطلاعات شخصی دقیق ارائه دهید</li>
+                    <li>هر مسافر باید تایید تکت معتبر داشته باشد</li>
+                    <li>کودکان زیر ۲ سال زمانی که روی دامن بزرگسالان بنشینند رایگان سفر می‌کنند</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Ticket Validity</h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Tickets are valid only for the specific date, time, and route booked</li>
-                    <li>Tickets are non-transferable between passengers</li>
-                    <li>You must present valid ID that matches the booking name</li>
-                    <li>Digital tickets on mobile devices are accepted</li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">اعتبار تکت</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>تکت‌ها فقط برای تاریخ، زمان و مسیر مشخص شده معتبر هستند</li>
+                    <li>تکت‌ها بین مسافران قابل انتقال نیستند</li>
+                    <li>شما باید شناسنامه معتبر مطابق با نام تکت ارائه دهید</li>
+                    <li>تکت‌های دیجیتال روی دستگاه‌های موبایل پذیرفته هستند</li>
                   </ul>
                 </div>
               </div>
@@ -115,88 +113,83 @@ export default function TermsPage() {
 
             {/* Cancellation Policy */}
             <div id="cancellation-policy">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">3. Cancellation Policy</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">۳. سیاست لغو</h2>
               <div className="space-y-4 text-gray-700">
                 <div>
                   <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                    Cancellation Timeline & Refunds
+                    زمانبندی لغو و بازپرداخت
                   </h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
+                  <ul className="list-disc list-inside space-y-2 mr-4">
                     <li>
-                      <strong>More than 24 hours before departure:</strong> Full refund minus 5%
-                      processing fee
+                      <strong>بیش از ۲۴ ساعت قبل از حرکت:</strong> بازپرداخت کامل به ازای ۵٪ کارمزد
+                      پردازش
                     </li>
                     <li>
-                      <strong>12-24 hours before departure:</strong> 50% refund of ticket price
+                      <strong>۱۲-۲۴ ساعت قبل از حرکت:</strong> ۵۰٪ بازپرداخت قیمت تکت
                     </li>
                     <li>
-                      <strong>2-12 hours before departure:</strong> 25% refund of ticket price
+                      <strong>۲-۱۲ ساعت قبل از حرکت:</strong> ۲۵٪ بازپرداخت قیمت تکت
                     </li>
                     <li>
-                      <strong>Less than 2 hours before departure:</strong> No refund available
+                      <strong>کمتر از ۲ ساعت قبل از حرکت:</strong> بازپرداخت وجود ندارد
                     </li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">How to Cancel</h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Log into your account and go to "My Tickets"</li>
-                    <li>Select the booking you want to cancel</li>
-                    <li>Click "Cancel Booking" and follow the instructions</li>
-                    <li>You will receive a cancellation confirmation email</li>
-                    <li>Refunds will be processed within 5-7 business days</li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">نحوه لغو</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>به حساب خود لاگ ین کنید و به "تکت‌های من" بروید</li>
+                    <li>تکتی که می‌خواهید لغو کنید را انتخاب کنید</li>
+                    <li>روی "لغو تکت" کلیک کنید و دستورالعمل را دنبال کنید</li>
+                    <li>شما ایمیل تایید لغو دریافت خواهید کرد</li>
+                    <li>بازپرداخت‌ها ظرف ۵-۷ روز کاری پردازش خواهد شد</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                    Special Circumstances
-                  </h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">شرایط ویژه</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
                     <li>
-                      <strong>Medical Emergency:</strong> Full refund with valid medical certificate
+                      <strong>فوریت پزشکی:</strong> بازپرداخت کامل با گواهی پزشکی معتبر
                     </li>
                     <li>
-                      <strong>Trip Cancellation by Hesarakbus:</strong> Full refund or free
-                      rescheduling
+                      <strong>لغو سفر توسط حصارک‌بس:</strong> بازپرداخت کامل یا تغییر زمان رایگان
                     </li>
                     <li>
-                      <strong>Weather/Natural Disasters:</strong> Free rescheduling or full refund
+                      <strong>آب و هوا/بلایای طبیعی:</strong> تغییر زمان رایگان یا بازپرداخت کامل
                     </li>
                     <li>
-                      <strong>Government Restrictions:</strong> Full refund available
+                      <strong>محدودیت‌های دولتی:</strong> بازپرداخت کامل قابل دسترس
                     </li>
                   </ul>
                 </div>
                 <p>
-                  <strong>Important:</strong> Cancellation fees may apply as outlined above. Refunds
-                  will be processed to the original payment method used for booking.
+                  <strong>مهم:</strong> کارمزدهای لغو ممکن است طبق موارد فوق اعمال شود. بازپرداخت‌ها
+                  به روش پرداخت اصلی مورد استفاده برای تکت پردازش خواهد شد.
                 </p>
               </div>
             </div>
 
             {/* Payment Terms */}
             <div id="payment-terms">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">4. Payment Terms</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">۴. شرایط پرداخت</h2>
               <div className="space-y-4 text-gray-700">
                 <div>
                   <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                    Accepted Payment Methods
+                    روش‌های پرداخت پذیرفته شده
                   </h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Credit and debit cards (Visa, Mastercard)</li>
-                    <li>Mobile payment services</li>
-                    <li>Cash payments at authorized agents</li>
-                    <li>Bank transfers (for group bookings)</li>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>کارت‌های اعتباری و نقدی (Visa, Mastercard)</li>
+                    <li>خدمات پرداخت موبایل</li>
+                    <li>پرداخت نقدی نزد نمایندگی‌های مجاز</li>
+                    <li>انتقال بانکی (برای تکت‌های گروهی)</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Payment Security</h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>All payments are processed through secure, encrypted channels</li>
-                    <li>We do not store your complete payment information</li>
-                    <li>
-                      Payment confirmations are sent immediately after successful transactions
-                    </li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">امنیت پرداخت</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>تمام پرداخت‌ها از طریق کانال‌های امن و رمزگذاری شده پردازش می‌شود</li>
+                    <li>ما اطلاعات کامل پرداخت شما را ذخیره نمی‌کنیم</li>
+                    <li>تاییدیه‌های پرداخت فوراً پس از تراکنش‌های موفق ارسال می‌شود</li>
                   </ul>
                 </div>
               </div>
@@ -204,36 +197,34 @@ export default function TermsPage() {
 
             {/* Passenger Responsibilities */}
             <div id="passenger-responsibilities">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                5. Passenger Responsibilities
-              </h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">۵. مسئولیت‌های مسافر</h2>
               <div className="space-y-4 text-gray-700">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Before Travel</h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Arrive at the departure point at least 15 minutes early</li>
-                    <li>Carry valid identification matching your booking</li>
-                    <li>Ensure you have your booking confirmation (digital or printed)</li>
-                    <li>Check departure times and locations before travel</li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">قبل از سفر</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>حداقل ۱۵ دقیقه زودتر در نقطه حرکت حاضر شوید</li>
+                    <li>شناسنامه معتبر مطابق با تکت خود به همراه داشته باشید</li>
+                    <li>اطمینان حاصل کنید که تایید تکت (دیجیتال یا چاپی) دارید</li>
+                    <li>قبل از سفر زمان و مکان حرکت را بررسی کنید</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">During Travel</h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Follow all safety instructions from bus staff</li>
-                    <li>Keep your belongings secure at all times</li>
-                    <li>Respect other passengers and maintain appropriate behavior</li>
-                    <li>No smoking, alcohol consumption, or loud music</li>
-                    <li>Food and non-alcoholic beverages are permitted</li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">حین سفر</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>تمام دستورالعمل‌های ایمنی کارکنان بس را دنبال کنید</li>
+                    <li>وسایل شخصی خود را همیشه بطور امن نگه دارید</li>
+                    <li>به مسافران دیگر احترام بگذارید و رفتار مناسب حفظ کنید</li>
+                    <li>سگرت کشیدن، مصرف الکل، یا موزیک بلند ممنوع است</li>
+                    <li>غذا و نوشیدنی‌های غیر الکلی مجاز است</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Baggage Policy</h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>One carry-on bag and one checked bag per passenger</li>
-                    <li>Maximum checked baggage weight: 20kg per passenger</li>
-                    <li>Prohibited items: weapons, explosives, flammable materials</li>
-                    <li>Hesarakbus is not responsible for lost or damaged personal items</li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">سیاست بار</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>یک کیف دستی و یک کیف بار برای هر مسافر</li>
+                    <li>حداکثر وزن بار: ۲۰ کیلوگرم برای هر مسافر</li>
+                    <li>اشیای ممنوعه: اسلحه، مواد منفجره، مواد قابل اشتعال</li>
+                    <li>حصارک‌بس مسئول گم شدن یا آسیب دیدن وسایل شخصی نیست</li>
                   </ul>
                 </div>
               </div>
@@ -242,26 +233,24 @@ export default function TermsPage() {
             {/* Service Limitations */}
             <div id="limitations">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                6. Service Limitations and Liability
+                ۶. محدودیت‌های خدمات و مسئولیت
               </h2>
               <div className="space-y-4 text-gray-700">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Service Availability</h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Services are subject to weather conditions and road accessibility</li>
-                    <li>Schedule changes may occur due to traffic or unforeseen circumstances</li>
-                    <li>Hesarakbus reserves the right to cancel trips for safety reasons</li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">قابلیت دسترسی خدمات</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>خدمات با توجه به شرایط آب و هوا و دسترسی جاده می‌باشد</li>
+                    <li>تغییرات برنامه ممکن است به دلیل ترافیک یا شرایط غیر قابل پیش‌بینی</li>
+                    <li>حصارک‌بس حق دارد به دلایل ایمنی سفرها را لغو کند</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                    Liability Limitations
-                  </h3>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Hesarakbus's liability is limited to the cost of your ticket</li>
-                    <li>We are not responsible for indirect or consequential damages</li>
-                    <li>Travel insurance is recommended for comprehensive coverage</li>
-                    <li>Claims must be reported within 30 days of incident</li>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">محدودیت‌های مسئولیت</h3>
+                  <ul className="list-disc list-inside space-y-2 mr-4">
+                    <li>مسئولیت حصارک‌بس به هزینه تکت شما محدود است</li>
+                    <li>ما مسئول خسارات غیر مستقیم یا تبعی نیستیم</li>
+                    <li>بیمه سفر برای پوشش جامع توصیه می‌شود</li>
+                    <li>شکایات باید ظرف ۳۰ روز پس از حادثه گزارش شود</li>
                   </ul>
                 </div>
               </div>
@@ -269,20 +258,15 @@ export default function TermsPage() {
 
             {/* Dispute Resolution */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">7. Dispute Resolution</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">۷. حل اختلاف</h2>
               <div className="space-y-4 text-gray-700">
-                <p>
-                  Any disputes arising from these terms or our services will be resolved through:
-                </p>
-                <ol className="list-decimal list-inside space-y-2 ml-4">
-                  <li>Direct negotiation with our customer service team</li>
-                  <li>Mediation through a mutually agreed mediator</li>
-                  <li>Arbitration under Afghan law, if necessary</li>
+                <p>هرگونه اختلاف ناشی از این شرایط یا خدمات ما از طریق زیر حل خواهد شد:</p>
+                <ol className="list-decimal list-inside space-y-2 mr-4">
+                  <li>مذاکره مستقیم با تیم خدمات مشتریان ما</li>
+                  <li>میانجیگری از طریق میانجی متفق الآرای</li>
+                  <li>در صورت ضرورت، داوری طبق قانون افغانستان</li>
                 </ol>
-                <p>
-                  The courts of Afghanistan shall have exclusive jurisdiction over any legal
-                  proceedings.
-                </p>
+                <p>محاکم افغانستان صلاحیت انحصاری بر هرگونه روند حقوقی خواهند داشت.</p>
               </div>
             </div>
 
@@ -291,30 +275,30 @@ export default function TermsPage() {
               id="contact"
               className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8"
             >
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">8. Contact Information</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">۸. اطلاعات تماس</h2>
               <div className="space-y-4 text-gray-700">
-                <p>For questions about these terms or to report issues:</p>
+                <p>برای سوالات در مورد این شرایط یا گزارش مسائل:</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2">Customer Service</h4>
+                    <h4 className="font-semibold text-gray-800 mb-2">خدمات مشتری</h4>
                     <ul className="space-y-1">
                       <li>
-                        <strong>Phone:</strong> +93 70 123 4567
+                        <strong>تلفن:</strong> <span dir="ltr">+93 79 900 4567</span>
                       </li>
                       <li>
-                        <strong>Email:</strong> support@hesaarak.com
+                        <strong>ایمیل:</strong> support@hesarakbus.com
                       </li>
                       <li>
-                        <strong>Hours:</strong> 24/7 Available
+                        <strong>ساعات:</strong> ۲۴/۷ قابل دسترس
                       </li>
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2">Office Address</h4>
+                    <h4 className="font-semibold text-gray-800 mb-2">آدرس دفتر</h4>
                     <address className="not-italic">
-                      Shar-e-Naw
+                      لوای بابه جان
                       <br />
-                      Kabul, Afghanistan
+                      کابل، افغانستان
                     </address>
                   </div>
                 </div>
