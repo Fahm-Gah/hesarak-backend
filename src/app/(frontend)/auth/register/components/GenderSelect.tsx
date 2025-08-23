@@ -16,8 +16,8 @@ interface GenderSelectProps {
 }
 
 const genderOptions: GenderOption[] = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
+  { value: 'male', label: 'مرد' },
+  { value: 'female', label: 'زن' },
 ]
 
 export const GenderSelect = ({ value, onChange, disabled = false, error }: GenderSelectProps) => {
@@ -49,7 +49,7 @@ export const GenderSelect = ({ value, onChange, disabled = false, error }: Gende
 
   return (
     <div className="gender-dropdown">
-      <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">جنسیت</label>
       <div className="relative">
         <button
           type="button"
@@ -85,13 +85,13 @@ export const GenderSelect = ({ value, onChange, disabled = false, error }: Gende
                   onChange(option.value)
                   setShowDropdown(false)
                 }}
-                className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 flex items-center ${
+                className={`w-full px-4 py-3 text-right hover:bg-gray-50 transition-colors duration-150 flex items-center ${
                   value === option.value ? 'bg-orange-50 text-orange-700' : 'text-gray-900'
                 }`}
                 disabled={disabled}
               >
                 <span>{option.label}</span>
-                {value === option.value && <Check className="w-5 h-5 ml-auto text-orange-600" />}
+                {value === option.value && <Check className="w-5 h-5 mr-auto text-orange-600" />}
               </button>
             ))}
           </div>

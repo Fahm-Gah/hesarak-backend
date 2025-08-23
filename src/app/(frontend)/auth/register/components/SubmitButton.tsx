@@ -20,16 +20,16 @@ export const SubmitButton = ({ isLoading, isSuccess, disabled, onClick }: Submit
       <div className="relative z-10">
         {isSuccess ? (
           <div className="flex items-center justify-center">
-            <CheckCircle className="w-6 h-6 mr-2" />
-            <span>Registration Successful!</span>
+            <CheckCircle className="w-6 h-6 ml-2" />
+            <span>ثبت‌نام موفق!</span>
           </div>
         ) : isLoading ? (
           <div className="flex items-center justify-center">
-            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-            Creating Account...
+            <Loader2 className="w-5 h-5 animate-spin ml-2" />
+            در حال ایجاد حساب...
           </div>
         ) : (
-          'Create Account'
+          'ایجاد حساب'
         )}
       </div>
     </button>

@@ -20,11 +20,10 @@ export const PhoneInput = ({ value, onChange, disabled = false, error }: PhoneIn
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-      <div className="flex w-full">
+      <label className="block text-sm font-medium text-gray-700 mb-2">شماره تلفن *</label>
+      <div dir="ltr" className="flex w-full">
         {/* Country Code Selector (Fixed) */}
-        <div className="flex items-center px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100 border-r-0 flex-shrink-0">
-          <span className="text-2xl mr-2">🇦🇫</span>
+        <div className="flex items-center px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100 border-l-0 flex-shrink-0">
           <span className="text-gray-700 font-medium">+93</span>
         </div>
         {/* Phone Number Input */}
@@ -45,7 +44,7 @@ export const PhoneInput = ({ value, onChange, disabled = false, error }: PhoneIn
         />
       </div>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-      <p className="text-xs text-gray-500 mt-1">Enter 9 digits without the leading 0</p>
+      <p className="text-xs text-gray-500 mt-1">۹ رقم بدون صفر اول وارد کنید</p>
     </div>
   )
 }

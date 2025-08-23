@@ -10,15 +10,15 @@ const vazirmatn = Vazirmatn({
 })
 
 export const metadata = {
-  description: 'Authentication pages',
-  title: 'Authentication - Hesarakbus',
+  description: 'صفحات تأیید هویت',
+  title: 'تأیید هویت - حصارک‌بس',
 }
 
 export default async function AuthLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html lang="fa" className={vazirmatn.className}>
+    <html lang="fa" className={vazirmatn.className} dir="rtl">
       <body>
         <AuthProvider>
           <main>{children}</main>
