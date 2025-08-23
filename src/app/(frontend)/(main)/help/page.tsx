@@ -9,7 +9,6 @@ import {
   Mail,
   Clock,
   Ticket,
-  Users,
   Shield,
   RefreshCw,
   AlertTriangle,
@@ -20,14 +19,14 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Help & Support | Hesarakbus - Get Help with Bus Bookings',
+  title: 'کمک و پشتیبانی | حصارک‌بس - کمک برای تکت بس',
   description:
-    'Find answers to common questions about booking bus tickets with Hesarakbus, payment methods, cancellation policies, and get support.',
+    'پاسخ به سوالات رایج در مورد تکت بس با حصارک‌بس، روش‌های پرداخت، سیاست لغو و دریافت پشتیبانی پیدا کنید.',
 }
 
 export default function HelpPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" dir="rtl">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,11 +37,10 @@ export default function HelpPage() {
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 lg:mb-6">
-              Help & <span className="text-orange-500">Support</span>
+              کمک و <span className="text-orange-500">پشتیبانی</span>
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Get help with booking tickets, managing your trips, and using Hesarakbus's bus booking
-              platform.
+              برای تکت کردن، مدیریت سفرهای خود و استفاده از پلتفرم تکت بس حصارک‌بس کمک دریافت کنید.
             </p>
           </div>
         </div>
@@ -53,10 +51,10 @@ export default function HelpPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 lg:mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3 lg:mb-4">
-              What can we help you with?
+              با چه چیزی می‌توانیم کمکتان کنیم؟
             </h2>
             <p className="text-lg lg:text-xl text-gray-600">
-              Choose a category to find answers quickly
+              دسته‌بندی را انتخاب کنید تا به سرعت پاسخ پیدا کنید
             </p>
           </div>
 
@@ -64,43 +62,43 @@ export default function HelpPage() {
             {[
               {
                 icon: Search,
-                title: 'Booking Tickets',
-                description: 'How to search and book bus tickets',
+                title: 'بوک کردن تکت',
+                description: 'نحوه جست‌وجو و بوک کردن تکت در بس',
                 href: '#booking-help',
                 color: 'from-blue-500 to-cyan-500',
               },
               {
                 icon: CreditCard,
-                title: 'Payment & Pricing',
-                description: 'Payment methods and ticket pricing',
+                title: 'پرداخت و قیمت‌گذاری',
+                description: 'روش‌های پرداخت و قیمت‌گذاری تکت',
                 href: '#payment-help',
                 color: 'from-green-500 to-emerald-500',
               },
               {
                 icon: RefreshCw,
-                title: 'Cancellation & Changes',
-                description: 'Cancel or modify your booking',
+                title: 'لغو و تغییرات',
+                description: 'لغو یا تغییر تکت خود',
                 href: '#cancellation-help',
                 color: 'from-red-500 to-pink-500',
               },
               {
                 icon: Ticket,
-                title: 'My Tickets',
-                description: 'Manage and view your bookings',
+                title: 'تکت‌های من',
+                description: 'مدیریت و مشاهده تکت‌های خود',
                 href: '#tickets-help',
                 color: 'from-purple-500 to-indigo-500',
               },
               {
                 icon: Shield,
-                title: 'Account & Security',
-                description: 'Account settings and security',
+                title: 'حساب کاربری و امنیت',
+                description: 'تنظیمات حساب و امنیت',
                 href: '#account-help',
                 color: 'from-orange-500 to-red-500',
               },
               {
                 icon: MessageCircle,
-                title: 'Contact Support',
-                description: 'Get in touch with our team',
+                title: 'تماس با خدمات مشتریان',
+                description: 'با تیم ما در تماس باشید',
                 href: '#contact-help',
                 color: 'from-gray-500 to-gray-700',
               },
@@ -137,31 +135,31 @@ export default function HelpPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
                 <Search className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Booking Tickets</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">بوک کردن تکت</h2>
             </div>
 
             <div className="space-y-4 lg:space-y-6">
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  How do I book a bus ticket?
+                  چگونه تکت بوک کنم؟
                 </h3>
                 <div className="text-sm lg:text-base text-gray-700 space-y-2">
                   <p>
-                    <strong>Step 1:</strong> Go to the home page and enter your departure and
-                    destination cities
+                    <strong>قدم ۱:</strong> به صفحه اصلی بروید و شهر مبداء و مقصد خود را وارد کنید
                   </p>
                   <p>
-                    <strong>Step 2:</strong> Select your travel date using the calendar
+                    <strong>قدم ۲:</strong> تاریخ سفر خود را با استفاده از تقویم انتخاب کنید
                   </p>
                   <p>
-                    <strong>Step 3:</strong> Click "Search Trips" to see available buses
+                    <strong>قدم ۳:</strong> روی «جست‌وجوی سفر» کلیک کنید تا بس‌های موجود را ببینید
                   </p>
                   <p>
-                    <strong>Step 4:</strong> Choose your preferred trip and select your seats
+                    <strong>قدم ۴:</strong> سفر مورد علاقه خود را انتخاب کرده و صندلی‌هایتان را
+                    انتخاب کنید
                   </p>
                   <p>
-                    <strong>Step 5:</strong> Enter passenger details and complete payment
+                    <strong>قدم ۵:</strong> جزئیات مسافران را وارد کرده و پرداخت را تکمیل کنید
                   </p>
                 </div>
               </div>
@@ -169,22 +167,23 @@ export default function HelpPage() {
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  Can I choose my seat?
+                  آیا می‌توانم صندلی خود را انتخاب کنم؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  Yes! After selecting a trip, you'll see a seat map where you can choose your
-                  preferred seats. Available seats are shown in green, and occupied seats in red.
+                  بله! پس از انتخاب سفر، نقشه صندلی‌ها را خواهید دید که می‌توانید صندلی‌های مورد
+                  علاقه خود را انتخاب کنید. صندلی‌های موجود به رنگ زرد و صندلی‌های اشغال شده به رنگ
+                  سیاه نشان داده می‌شوند.
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
-                  How close to departure can I book?
+                  تا چه زمانی قبل از حرکت می‌توانم قید کنم؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  You can book tickets up to 2 hours before departure. After that, booking is closed
-                  for that trip.
+                  می‌توانید تا ۲ ساعت قبل از حرکت تکت قید کنید. پس از آن، چوکی برای آن سفر بسته
+                  می‌شود.
                 </p>
               </div>
             </div>
@@ -196,25 +195,25 @@ export default function HelpPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
                 <CreditCard className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Payment & Pricing</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">پرداخت و قیمت‌گذاری</h2>
             </div>
 
             <div className="space-y-4 lg:space-y-6">
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  What payment methods do you accept?
+                  چه روش‌های پرداختی را می‌پذیرید؟
                 </h3>
                 <div className="text-sm lg:text-base text-gray-700 space-y-2">
                   <p>
-                    <strong>Pay at Pickup:</strong> Pay cash or card directly to the conductor
-                    (Recommended)
+                    <strong>پرداخت در محل:</strong> پرداخت نقدی یا کارتی مستقیماً به کندکتور (توصیه
+                    می‌شود)
                   </p>
                   <p>
-                    <strong>Credit/Debit Cards:</strong> Visa and Mastercard (Coming soon)
+                    <strong>کارت‌های اعتباری/بدهی:</strong> ویزا و مستركارد (به زودی)
                   </p>
                   <p>
-                    <strong>Mobile Wallets:</strong> Various mobile payment services (Coming soon)
+                    <strong>کیف پول‌های موبایل:</strong> خدمات مختلف پرداخت موبایل (به زودی)
                   </p>
                 </div>
               </div>
@@ -222,22 +221,22 @@ export default function HelpPage() {
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  How is the ticket price calculated?
+                  قیمت تکت چگونه محاسبه می‌شود؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  Ticket prices are based on the route distance, bus type, and demand. You'll see
-                  the exact price before completing your booking, including any applicable fees.
+                  قیمت تکت‌ها بر اساس فاصله مسیر، نوع بس و تقاضا محاسبه می‌شود. قبل از تکمیل بوک
+                  کردن، قیمت دقیق از جمله هرگونه هزینه اضافی را خواهید دید.
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  Is my payment secure?
+                  آیا پرداخت من امن است؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  Yes, all online payments are processed through secure, encrypted channels. We
-                  don't store your complete payment information for security.
+                  بله، همه پرداخت‌های آنلاین از طریق کانال‌های امن و رمزگذاری شده پردازش می‌شوند. ما
+                  اطلاعات کامل پرداخت شما را برای امنیت ذخیره نمی‌کنیم.
                 </p>
               </div>
             </div>
@@ -249,29 +248,27 @@ export default function HelpPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <RefreshCw className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                Cancellation & Changes
-              </h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">لغو و تغییرات</h2>
             </div>
 
             <div className="space-y-4 lg:space-y-6">
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  What is your cancellation policy?
+                  سیاست لغو شما چیست؟
                 </h3>
                 <div className="text-sm lg:text-base text-gray-700 space-y-2">
                   <p>
-                    <strong>More than 24 hours:</strong> Full refund minus 5% processing fee
+                    <strong>بیشتر از ۲۴ ساعت:</strong> بازپرداخت کامل منهای ۵٪ هزینه پردازش
                   </p>
                   <p>
-                    <strong>12-24 hours:</strong> 50% refund of ticket price
+                    <strong>۱۲-۲۴ ساعت:</strong> ۵۰٪ بازپرداخت قیمت تکت
                   </p>
                   <p>
-                    <strong>2-12 hours:</strong> 25% refund of ticket price
+                    <strong>۲-۱۲ ساعت:</strong> ۲۵٪ بازپرداخت قیمت تکت
                   </p>
                   <p>
-                    <strong>Less than 2 hours:</strong> No refund available
+                    <strong>کمتر از ۲ ساعت:</strong> بازپرداخت در دسترس نیست
                   </p>
                 </div>
               </div>
@@ -279,14 +276,14 @@ export default function HelpPage() {
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  How do I cancel my booking?
+                  چگونه تکت خود را لغو کنم؟
                 </h3>
                 <div className="text-sm lg:text-base text-gray-700 space-y-2">
-                  <p>1. Go to "My Tickets" in your account</p>
-                  <p>2. Find the booking you want to cancel</p>
-                  <p>3. Click "Cancel Booking" and follow the instructions</p>
-                  <p>4. You'll receive a cancellation confirmation email</p>
-                  <p>5. Refunds will be processed within 5-7 business days</p>
+                  <p>۱. به «تکت‌های من» در حساب کاربری خود بروید</p>
+                  <p>۲. تکتی که می‌خواهید لغو کنید را پیدا کنید</p>
+                  <p>۳. روی «لغو» کلیک کرده و دستورالعمل‌ها را دنبال کنید</p>
+                  <p>۴. یک ایمیل تأیید لغو دریافت خواهید کرد</p>
+                  <p>۵. بازپرداخت‌ها در طی ۵-۷ روز کاری پردازش خواهند شد</p>
                 </div>
               </div>
             </div>
@@ -298,42 +295,45 @@ export default function HelpPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center">
                 <Ticket className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">My Tickets</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">تکت‌های من</h2>
             </div>
 
             <div className="space-y-4 lg:space-y-6">
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  How do I view my bookings?
+                  چگونه تکت‌های خود را مشاهده کنم؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  Log into your account and go to "My Tickets" to see all your current and past
-                  bookings. You can filter by upcoming, past, or all trips.
+                  وارد حساب کاربری خود شوید و به «تکت‌های من» بروید تا همه تکت‌های فعلی و گذشته خود
+                  را ببینید. می‌توانید بر اساس سفرهای آینده، گذشته یا همه سفرها فیلتر کنید.
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  What should I bring when traveling?
+                  هنگام سفر چه چیزی باید به همراه داشته باشم؟
                 </h3>
                 <div className="text-sm lg:text-base text-gray-700 space-y-2">
-                  <p>• Valid ID that matches your booking name</p>
-                  <p>• Your booking confirmation (digital or printed)</p>
-                  <p>• Arrive at departure point 15 minutes early</p>
-                  <p>• Have exact change or card ready for payment (if paying at pickup)</p>
+                  <p>• شناسنامه معتبر که با نام تکت شما مطابقت داشته باشد</p>
+                  <p>• تأیید تکت شما (دیجیتال یا چاپی)</p>
+                  <p>• ۱۵ دقیقه زودتر در نقطه حرکت حاضر شوید</p>
+                  <p>
+                    • پول نقد دقیق یا کارت را برای پرداخت آماده داشته باشید (اگر در محل پرداخت
+                    می‌کنید)
+                  </p>
                 </div>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  Can I modify my booking?
+                  آیا می‌توانم چوکی خود را تغییر دهم؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  Currently, modifications require canceling your existing booking and making a new
-                  one. We're working on adding a direct modification feature.
+                  در حال حاضر، تغییرات مستلزم لغو چوکی موجود و انتخاب چوکی جدید است. ما در حال کار
+                  بر روی اضافه کردن قابلیت تغییر مستقیم هستیم.
                 </p>
               </div>
             </div>
@@ -345,40 +345,41 @@ export default function HelpPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
                 <Shield className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Account & Security</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">حساب کاربری و امنیت</h2>
             </div>
 
             <div className="space-y-4 lg:space-y-6">
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  How do I create an account?
+                  چگونه حساب کاربری ایجاد کنم؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  Click "Register" and enter your phone number. We'll send you a verification code
-                  to complete your registration. Your phone number serves as your login username.
+                  روی «ثبت‌نام» کلیک کرده و شماره تلفن خود را وارد کنید. ما یک کد تأیید برای تکمیل
+                  ثبت‌نام به شما ارسال خواهیم کرد. شماره تلفن شما به عنوان نام کاربری ورود شما عمل
+                  می‌کند.
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  Why do you need my location?
+                  چرا به موقعیت من نیاز دارید؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  Location helps us provide better service by suggesting nearby departure points and
-                  improving our route planning. This information is kept private and secure.
+                  موقعیت به ما کمک می‌کند تا با پیشنهاد نقاط حرکت نزدیک و بهبود برنامه‌ریزی مسیر،
+                  خدمات بهتری ارائه دهیم. این اطلاعات خصوصی و امن نگه داشته می‌شود.
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  How do I reset my password?
+                  چگونه رمز عبور خود را بازنشانی کنم؟
                 </h3>
                 <p className="text-sm lg:text-base text-gray-700">
-                  Since we use phone number authentication, simply enter your phone number on the
-                  login page and we'll send you a new verification code.
+                  از آنجا که ما از تأیید هویت شماره تلفن استفاده می‌کنیم، کافی است شماره تلفن خود را
+                  در صفحه ورود وارد کنید تا یک کد تأیید جدید برای شما ارسال کنیم.
                 </p>
               </div>
             </div>
@@ -399,11 +400,9 @@ export default function HelpPage() {
               </div>
             </div>
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3 lg:mb-4">
-              Still Need Help?
+              هنوز به کمک نیاز دارید؟
             </h2>
-            <p className="text-lg lg:text-xl text-gray-600">
-              Our support team is here to help you 24/7
-            </p>
+            <p className="text-lg lg:text-xl text-gray-600">تیم پشتیبانی ما ۲۴/۷ در خدمت شما است</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -412,13 +411,13 @@ export default function HelpPage() {
                 <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                   <Phone className="w-5 h-5 text-green-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">Phone Support</h3>
+                <h3 className="text-xl font-semibold text-gray-900">پشتیبانی تلفنی</h3>
               </div>
-              <p className="text-gray-600 mb-4">
-                Call us for immediate assistance with your booking
+              <p className="text-gray-600 mb-4">برای کمک فوری با تکت خود با ما تماس بگیرید</p>
+              <p className="text-right text-2xl font-bold text-gray-900" dir="ltr">
+                +93 79 900 4567
               </p>
-              <p className="text-2xl font-bold text-gray-900">+93 70 123 4567</p>
-              <p className="text-sm text-gray-500 mt-2">Available 24/7</p>
+              <p className="text-sm text-gray-500 mt-2">۲۴/۷ در دسترس</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 lg:p-8 shadow-lg">
@@ -426,13 +425,15 @@ export default function HelpPage() {
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Mail className="w-5 h-5 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">Email Support</h3>
+                <h3 className="text-xl font-semibold text-gray-900">پشتیبانی ایمیل</h3>
               </div>
               <p className="text-gray-600 mb-4">
-                Send us an email and we'll respond within 2 hours
+                برای ما ایمیل بفرستید و ما در عرض ۲ ساعت پاسخ خواهیم داد
               </p>
-              <p className="text-lg font-semibold text-gray-900">support@hesaarak.com</p>
-              <p className="text-sm text-gray-500 mt-2">Response within 2 hours</p>
+              <p className="text-right text-lg font-semibold text-gray-900" dir="ltr">
+                support@hesarakbus.com
+              </p>
+              <p className="text-sm text-gray-500 mt-2">پاسخ در عرض ۲ ساعت</p>
             </div>
           </div>
 
@@ -441,17 +442,17 @@ export default function HelpPage() {
               <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                 <MapPin className="w-5 h-5 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Office Location</h3>
+              <h3 className="text-xl font-semibold text-gray-900">موقعیت دفتر</h3>
             </div>
-            <p className="text-gray-600 mb-2">Visit us in person during business hours</p>
+            <p className="text-gray-600 mb-2">در ساعات کاری از ما دیدن کنید</p>
             <address className="text-lg text-gray-900 not-italic">
-              Shar-e-Naw
+              لوای بابه جان
               <br />
-              Kabul, Afghanistan
+              کابل، افغانستان
             </address>
             <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
               <Clock className="w-4 h-4" />
-              <span>Sunday - Thursday: 9:00 AM - 6:00 PM</span>
+              <span>شنبه - جمعه: ۹:۰۰ صبح - ۶:۰۰ عصر</span>
             </div>
           </div>
         </div>
@@ -461,14 +462,14 @@ export default function HelpPage() {
       <section className="py-12 lg:py-16 bg-white border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl lg:text-2xl font-bold text-gray-900 mb-6 lg:mb-8 text-center">
-            Helpful Links
+            لینک‌های مفید
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             {[
-              { title: 'Terms & Conditions', href: '/terms', icon: FileText },
-              { title: 'Privacy Policy', href: '/privacy', icon: Shield },
-              { title: 'My Tickets', href: '/my-tickets', icon: Ticket },
-              { title: 'Book a Trip', href: '/', icon: Calendar },
+              { title: 'شرایط و ضوابط', href: '/terms', icon: FileText },
+              { title: 'سیاست حفظ حریم خصوصی', href: '/privacy', icon: Shield },
+              { title: 'تکت‌های من', href: '/my-tickets', icon: Ticket },
+              { title: 'جستجوی سفر', href: '/', icon: Calendar },
             ].map((link, index) => {
               const IconComponent = link.icon
               return (
