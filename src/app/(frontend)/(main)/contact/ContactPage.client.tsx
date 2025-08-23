@@ -74,7 +74,7 @@ export default function ContactPageClient() {
       icon: MapPin,
       title: 'از دفتر ما دیدن کنید',
       subtitle: 'شخصاً به دیدن ما بیایید',
-      info: 'شهر نو، کابل، افغانستان',
+      info: 'لوای بابه جان، کابل، افغانستان',
       description: 'شنبه تا جمعه، ساعت 8:00 صبح - 6:00 عصر باز است',
     },
     {
