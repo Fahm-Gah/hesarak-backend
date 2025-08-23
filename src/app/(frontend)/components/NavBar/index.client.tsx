@@ -62,22 +62,22 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
   }, [])
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/', label: 'صفحه اصلی' },
+    { href: '/about', label: 'درباره ما' },
+    { href: '/contact', label: 'تماس با ما' },
   ]
 
   const hasAdminRoles = user?.roles && user.roles.some((role) => role !== 'customer')
 
   const profileMenuItems = [
-    ...(hasAdminRoles ? [{ href: '/admin', label: 'Dashboard', icon: '📊' }] : []),
-    { href: '/profile', label: 'Profile', icon: '👤' },
-    { href: '/my-tickets', label: 'My Tickets', icon: '🎫' },
-    { href: '/auth/logout', label: 'Logout', icon: '🚪' },
+    ...(hasAdminRoles ? [{ href: '/admin', label: 'داشبورد', icon: '📊' }] : []),
+    { href: '/profile', label: 'پروفایل', icon: '👤' },
+    { href: '/my-tickets', label: 'تکت‌های من', icon: '🎫' },
+    { href: '/auth/logout', label: 'خروج', icon: '🚪' },
   ]
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-lg border-b border-gray-200">
+    <nav className="sticky top-0 z-50 bg-white shadow-lg border-b border-gray-200" dir="rtl">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
           {/* Logo */}
@@ -85,7 +85,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-reverse space-x-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -100,12 +100,12 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
           </div>
 
           {/* Auth Section */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-reverse space-x-3">
             {user ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={toggleProfileDropdown}
-                  className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
+                  className="flex items-center space-x-reverse space-x-3 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
                   aria-expanded={isProfileDropdownOpen}
                   aria-haspopup="true"
                   aria-label="Open user menu"
@@ -140,7 +140,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                 {/* Profile Dropdown */}
                 {isProfileDropdownOpen && (
                   <div
-                    className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 transform transition-all duration-200 origin-top-right opacity-100 scale-100 translate-y-0"
+                    className="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 transform transition-all duration-200 origin-top-left opacity-100 scale-100 translate-y-0"
                     role="menu"
                     aria-orientation="vertical"
                   >
@@ -158,7 +158,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                         onClick={closeDropdown}
                         role="menuitem"
                       >
-                        <span className="mr-3 text-base" aria-hidden="true">
+                        <span className="ml-3 text-base" aria-hidden="true">
                           {item.icon}
                         </span>
                         {item.label}
@@ -168,18 +168,18 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-reverse space-x-3">
                 <Link
                   href="/auth/login"
-                  className="px-4 py-2 text-gray-700 hover:text-orange-600 font-medium text-sm transition-all duration-200 rounded-lg hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
+                  className="ml-2 px-4 py-2 text-gray-700 hover:text-orange-600 font-medium text-sm transition-all duration-200 rounded-lg hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
                 >
-                  Login
+                  ورود
                 </Link>
                 <Link
                   href="/auth/register"
                   className="px-6 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg font-medium text-sm hover:from-orange-700 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 >
-                  Register
+                  ثبت‌نام
                 </Link>
               </div>
             )}
@@ -241,7 +241,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
               {user ? (
                 <>
                   <div className="px-4 py-3 border-b border-gray-200 mb-2">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-reverse space-x-3">
                       <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
                           {(typeof user.profile === 'object' &&
@@ -265,7 +265,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                       className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:bg-orange-50 focus:text-orange-600"
                       onClick={closeMobileMenu}
                     >
-                      <span className="mr-3 text-base" aria-hidden="true">
+                      <span className="ml-3 text-base" aria-hidden="true">
                         {item.icon}
                       </span>
                       {item.label}
@@ -279,14 +279,14 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                     className="block px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg font-medium text-center transition-all duration-200 focus:outline-none focus:bg-orange-50 focus:text-orange-600"
                     onClick={closeMobileMenu}
                   >
-                    Login
+                    ورود
                   </Link>
                   <Link
                     href="/auth/register"
                     className="block px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg font-medium text-center hover:from-orange-700 hover:to-red-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                     onClick={closeMobileMenu}
                   >
-                    Register
+                    ثبت‌نام
                   </Link>
                 </div>
               )}
