@@ -123,14 +123,15 @@ export const LocationPermissionPrompt = ({
     <div className="mb-8 p-6 bg-orange-50 border border-orange-200 rounded-lg text-center">
       <MapPin className="w-12 h-12 text-orange-600 mx-auto mb-4" />
 
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">Location Permission Required</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">مجوز دسترسی به موقعیت لازم است</h3>
       <p className="text-gray-600 mb-4">
-        Please allow location access in your browser to help us show you the most relevant routes.
+        لطفاً دسترسی به موقعیت را در مرورگر خود فعال کنید تا بتوانیم مسیرهای مناسب را به شما نشان
+        دهیم.
       </p>
 
       <div className="flex items-center justify-center text-sm text-gray-500 mb-4">
-        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-        Waiting for browser permission...
+        <Loader2 className="w-4 h-4 animate-spin ml-2" />
+        در انتظار مجوز مرورگر...
       </div>
 
       <button
@@ -138,11 +139,11 @@ export const LocationPermissionPrompt = ({
         disabled={isRequestingLocation}
         className="text-sm text-gray-500 hover:text-gray-700 underline disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Continue without location
+        بدون موقعیت ادامه دهید
       </button>
 
       <p className="text-xs text-gray-500 mt-4">
-        We'll use your approximate location to show nearby routes and terminals.
+        ما از موقعیت تقریبی شما برای نمایش مسیرها و ترمینال‌های نزدیک استفاده خواهیم کرد.
       </p>
     </div>
   )
