@@ -83,7 +83,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
     }
 
     if (!userProfile?.id) {
-      setError('Profile not found. Please contact support.')
+      setError('پروفایل پیدا نشد. لطفاً با پشتیبانی تماس بگیرید.')
       return
     }
 
@@ -108,17 +108,17 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
       const data = await response.json()
 
       if (response.ok) {
-        setSuccess('Profile updated successfully!')
+        setSuccess('پروفایل با موفقیت به‌روزرسانی شد!')
         setIsEditing(false)
         setShowGenderDropdown(false)
         // Refresh user data
         await refreshUser()
       } else {
-        setError(data.errors?.[0]?.message || data.message || 'Failed to update profile')
+        setError(data.errors?.[0]?.message || data.message || 'به‌روزرسانی پروفایل ناموفق بود')
       }
     } catch (err) {
       console.error('Profile update error:', err)
-      setError('Network error. Please try again.')
+      setError('خطای شبکه. لطفاً دوباره تلاش کنید.')
     } finally {
       setIsLoading(false)
     }
@@ -151,7 +151,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
   }
 
   const getGenderDisplayText = (gender: 'male' | 'female') => {
-    return gender === 'male' ? 'Male' : 'Female'
+    return gender === 'male' ? 'مرد' : 'زن'
   }
 
   // Close dropdown when clicking outside
@@ -169,12 +169,12 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
     }
   }, [showGenderDropdown])
 
-  const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Profile' }]
+  const breadcrumbItems = [{ label: 'صفحه اصلی', href: '/' }, { label: 'پروفایل' }]
 
   // If user doesn't have a profile, show error message
   if (!userProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8" dir="rtl">
         <div className="max-w-4xl mx-auto px-4">
           {/* Breadcrumbs */}
           <div className="mb-4">
@@ -197,16 +197,16 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Profile Not Found</h2>
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">پروفایل پیدا نشد</h2>
               <p className="text-gray-600 mb-6">
-                Your user account doesn't have an associated profile. Please contact support to
-                resolve this issue.
+                حساب کاربری شما پروفایل مرتبط ندارد. لطفاً برای حل این مسئله با پشتیبانی تماس
+                بگیرید.
               </p>
               <button
                 onClick={() => (window.location.href = '/')}
                 className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg font-medium hover:from-orange-700 hover:to-red-700 transition-all duration-200"
               >
-                Go to Home
+                برو به صفحه اصلی
               </button>
             </div>
           </div>
@@ -216,7 +216,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8" dir="rtl">
       <div className="max-w-4xl mx-auto px-4">
         {/* Breadcrumbs */}
         <div className="mb-4">
@@ -228,9 +228,9 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
-                Profile Settings
+                تنظیمات پروفایل
               </h1>
-              <p className="text-gray-600 mt-2">Manage your account information</p>
+              <p className="text-gray-600 mt-2">اطلاعات حساب کاربری خود را مدیریت کنید</p>
             </div>
           </div>
         </div>
@@ -240,7 +240,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center">
               <svg
-                className="w-5 h-5 text-green-500 mr-2"
+                className="w-5 h-5 text-green-500 ml-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -261,7 +261,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
               <svg
-                className="w-5 h-5 text-red-500 mr-2"
+                className="w-5 h-5 text-red-500 ml-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -286,7 +286,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
             <div className="bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-2xl p-6">
               <div className="flex items-start">
                 <svg
-                  className="w-5 h-5 text-orange-600 mr-3 mt-0.5"
+                  className="w-5 h-5 text-orange-600 ml-3 mt-0.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -299,9 +299,9 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                   />
                 </svg>
                 <div>
-                  <h4 className="text-sm font-semibold text-orange-800">Account Security</h4>
+                  <h4 className="text-sm font-semibold text-orange-800">امنیت حساب</h4>
                   <p className="text-sm text-orange-700 mt-1">
-                    To change your email or phone number, please contact support.
+                    برای تغییر ایمیل یا شماره تلفن خود، لطفاً با پشتیبانی تماس بگیرید.
                   </p>
                 </div>
               </div>
@@ -310,15 +310,15 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
             {/* Account Details */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2 pb-3 border-b border-gray-200">
-                Account Details
+                جزئیات حساب
               </h3>
               <div>
                 <div className="py-3">
-                  <span className="text-gray-900">{currentUser.email || 'Not provided'}</span>
+                  <span className="text-gray-900">{currentUser.email || 'ارائه نشده'}</span>
                 </div>
                 <div className="py-3">
-                  <span className="text-gray-900">
-                    {userProfile?.phoneNumber ? userProfile.phoneNumber : 'Not provided'}
+                  <span className="text-gray-900" dir="ltr">
+                    {userProfile?.phoneNumber ? userProfile.phoneNumber : 'ارائه نشده'}
                   </span>
                 </div>
               </div>
@@ -329,13 +329,13 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           <div className="lg:col-span-2">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
+                <h2 className="text-xl font-semibold text-gray-800">اطلاعات شخصی</h2>
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
                     className="px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg font-medium hover:from-orange-700 hover:to-red-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                   >
-                    Edit Profile
+                    ویرایش پروفایل
                   </button>
                 ) : (
                   <div className="flex space-x-3">
@@ -344,7 +344,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                       disabled={isLoading}
                       className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 disabled:opacity-50"
                     >
-                      Cancel
+                      لغو
                     </button>
                     <button
                       onClick={handleSave}
@@ -353,11 +353,11 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                     >
                       {isLoading ? (
                         <div className="flex items-center">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                          Saving...
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2"></div>
+                          در حال ذخیره...
                         </div>
                       ) : (
-                        'Save Changes'
+                        'ذخیره تغییرات'
                       )}
                     </button>
                   </div>
@@ -367,7 +367,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
               <div className="space-y-6">
                 {/* Full Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">نام کامل</label>
                   {isEditing ? (
                     <>
                       <input
@@ -379,7 +379,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                             ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                             : 'border-gray-300 focus:ring-orange-500 focus:border-orange-500'
                         }`}
-                        placeholder="Enter your full name"
+                        placeholder="نام کامل خود را وارد کنید"
                         disabled={isLoading}
                       />
                       {errors.fullName && (
@@ -388,35 +388,33 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                     </>
                   ) : (
                     <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
-                      {userProfile?.fullName || 'Not provided'}
+                      {userProfile?.fullName || 'ارائه نشده'}
                     </p>
                   )}
                 </div>
 
                 {/* Father Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Father Name
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">نام پدر</label>
                   {isEditing ? (
                     <input
                       type="text"
                       value={formData.fatherName}
                       onChange={(e) => handleInputChange('fatherName', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
-                      placeholder="Enter your father's name (optional)"
+                      placeholder="نام پدر خود را وارد کنید (اختیاری)"
                       disabled={isLoading}
                     />
                   ) : (
                     <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
-                      {userProfile?.fatherName || 'Not provided'}
+                      {userProfile?.fatherName || 'ارائه نشده'}
                     </p>
                   )}
                 </div>
 
                 {/* Gender */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">جنسیت</label>
                   {isEditing ? (
                     <>
                       <div className="relative">
@@ -466,7 +464,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                               }}
                               className="px-4 py-3 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition-colors duration-150 first:rounded-t-lg border-b border-gray-100"
                             >
-                              Male
+                              مرد
                             </div>
                             <div
                               onClick={(e) => {
@@ -475,7 +473,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                               }}
                               className="px-4 py-3 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition-colors duration-150 last:rounded-b-lg"
                             >
-                              Female
+                              زن
                             </div>
                           </div>
                         )}
@@ -486,7 +484,11 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                     </>
                   ) : (
                     <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg capitalize">
-                      {userProfile?.gender || 'Not provided'}
+                      {userProfile?.gender === 'male'
+                        ? 'مرد'
+                        : userProfile?.gender === 'female'
+                          ? 'زن'
+                          : 'ارائه نشده'}
                     </p>
                   )}
                 </div>
