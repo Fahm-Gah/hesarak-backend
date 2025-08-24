@@ -59,125 +59,123 @@ export type SupportedTimezones =
   | 'Pacific/Guam'
   | 'Pacific/Noumea'
   | 'Pacific/Auckland'
-  | 'Pacific/Fiji'
+  | 'Pacific/Fiji';
 
 export interface Config {
   auth: {
-    users: UserAuthOperations
-  }
-  blocks: {}
+    users: UserAuthOperations;
+  };
+  blocks: {};
   collections: {
-    users: User
-    profiles: Profile
-    media: Media
-    posts: Post
-    buses: Bus
-    'bus-types': BusType
-    terminals: Terminal
-    'trip-schedules': TripSchedule
-    tickets: Ticket
-    'trip-records': TripRecord
-    drivers: Driver
-    'payload-jobs': PayloadJob
-    'payload-locked-documents': PayloadLockedDocument
-    'payload-preferences': PayloadPreference
-    'payload-migrations': PayloadMigration
-    'payload-query-presets': PayloadQueryPreset
-  }
-  collectionsJoins: {}
+    users: User;
+    profiles: Profile;
+    media: Media;
+    posts: Post;
+    buses: Bus;
+    'bus-types': BusType;
+    terminals: Terminal;
+    'trip-schedules': TripSchedule;
+    tickets: Ticket;
+    'trip-records': TripRecord;
+    drivers: Driver;
+    'payload-jobs': PayloadJob;
+    'payload-locked-documents': PayloadLockedDocument;
+    'payload-preferences': PayloadPreference;
+    'payload-migrations': PayloadMigration;
+    'payload-query-presets': PayloadQueryPreset;
+  };
+  collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>
-    profiles: ProfilesSelect<false> | ProfilesSelect<true>
-    media: MediaSelect<false> | MediaSelect<true>
-    posts: PostsSelect<false> | PostsSelect<true>
-    buses: BusesSelect<false> | BusesSelect<true>
-    'bus-types': BusTypesSelect<false> | BusTypesSelect<true>
-    terminals: TerminalsSelect<false> | TerminalsSelect<true>
-    'trip-schedules': TripSchedulesSelect<false> | TripSchedulesSelect<true>
-    tickets: TicketsSelect<false> | TicketsSelect<true>
-    'trip-records': TripRecordsSelect<false> | TripRecordsSelect<true>
-    drivers: DriversSelect<false> | DriversSelect<true>
-    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
-    'payload-locked-documents':
-      | PayloadLockedDocumentsSelect<false>
-      | PayloadLockedDocumentsSelect<true>
-    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>
-    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>
-    'payload-query-presets': PayloadQueryPresetsSelect<false> | PayloadQueryPresetsSelect<true>
-  }
+    users: UsersSelect<false> | UsersSelect<true>;
+    profiles: ProfilesSelect<false> | ProfilesSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    buses: BusesSelect<false> | BusesSelect<true>;
+    'bus-types': BusTypesSelect<false> | BusTypesSelect<true>;
+    terminals: TerminalsSelect<false> | TerminalsSelect<true>;
+    'trip-schedules': TripSchedulesSelect<false> | TripSchedulesSelect<true>;
+    tickets: TicketsSelect<false> | TicketsSelect<true>;
+    'trip-records': TripRecordsSelect<false> | TripRecordsSelect<true>;
+    drivers: DriversSelect<false> | DriversSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
+    'payload-query-presets': PayloadQueryPresetsSelect<false> | PayloadQueryPresetsSelect<true>;
+  };
   db: {
-    defaultIDType: string
-  }
-  globals: {}
-  globalsSelect: {}
-  locale: null
+    defaultIDType: string;
+  };
+  globals: {};
+  globalsSelect: {};
+  locale: null;
   user: User & {
-    collection: 'users'
-  }
+    collection: 'users';
+  };
   jobs: {
     tasks: {
-      schedulePublish: TaskSchedulePublish
+      schedulePublish: TaskSchedulePublish;
       inline: {
-        input: unknown
-        output: unknown
-      }
-    }
-    workflows: unknown
-  }
+        input: unknown;
+        output: unknown;
+      };
+    };
+    workflows: unknown;
+  };
 }
 export interface UserAuthOperations {
   forgotPassword:
     | {
-        email: string
+        email: string;
       }
     | {
-        username: string
-      }
+        username: string;
+      };
   login:
     | {
-        email: string
-        password: string
+        email: string;
+        password: string;
       }
     | {
-        password: string
-        username: string
-      }
+        password: string;
+        username: string;
+      };
   registerFirstUser: {
-    password: string
-    username: string
-    email?: string
-  }
+    password: string;
+    username: string;
+    email?: string;
+  };
   unlock:
     | {
-        email: string
+        email: string;
       }
     | {
-        username: string
-      }
+        username: string;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
-  id: string
+  id: string;
   /**
    * E.164 formatted phone number (auto-generated)
    */
-  normalizedPhone?: string | null
+  normalizedPhone?: string | null;
   /**
    * User profile information
    */
-  profile?: (string | null) | Profile
+  profile?: (string | null) | Profile;
   /**
    * User roles and permissions
    */
-  roles: ('customer' | 'editor' | 'agent' | 'driver' | 'admin' | 'superadmin' | 'dev')[]
+  roles: ('customer' | 'editor' | 'agent' | 'driver' | 'admin' | 'superadmin' | 'dev')[];
   /**
    * Whether the user account is active
    */
-  isActive?: boolean | null
-  lastLoginAt?: string | null
+  isActive?: boolean | null;
+  lastLoginAt?: string | null;
   /**
    * User location data from browser or IP geolocation
    */
@@ -186,18 +184,18 @@ export interface User {
      * @minItems 2
      * @maxItems 2
      */
-    coordinates?: [number, number] | null
-    accuracy?: number | null
-    city?: string | null
-    region?: string | null
-    country?: string | null
-    countryCode?: string | null
-    timezone?: string | null
-    source?: ('browser' | 'ip' | 'manual') | null
-    ipAddress?: string | null
-    lastUpdated?: string | null
-    permissionGranted?: boolean | null
-  }
+    coordinates?: [number, number] | null;
+    accuracy?: number | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    countryCode?: string | null;
+    timezone?: string | null;
+    source?: ('browser' | 'ip' | 'manual') | null;
+    ipAddress?: string | null;
+    lastUpdated?: string | null;
+    permissionGranted?: boolean | null;
+  };
   /**
    * Historical location data (last 10 entries)
    */
@@ -207,806 +205,806 @@ export interface User {
          * @minItems 2
          * @maxItems 2
          */
-        coordinates?: [number, number] | null
-        city?: string | null
-        country?: string | null
-        source?: ('browser' | 'ip') | null
-        timestamp?: string | null
-        id?: string | null
+        coordinates?: [number, number] | null;
+        city?: string | null;
+        country?: string | null;
+        source?: ('browser' | 'ip') | null;
+        timestamp?: string | null;
+        id?: string | null;
       }[]
-    | null
-  updatedAt: string
-  createdAt: string
-  email?: string | null
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  email?: string | null;
   /**
    * Phone number in E.164 format (automatically normalized to AF)
    */
-  username: string
-  resetPasswordToken?: string | null
-  resetPasswordExpiration?: string | null
-  salt?: string | null
-  hash?: string | null
-  loginAttempts?: number | null
-  lockUntil?: string | null
+  username: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
   sessions?:
     | {
-        id: string
-        createdAt?: string | null
-        expiresAt: string
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
       }[]
-    | null
-  password?: string | null
+    | null;
+  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "profiles".
  */
 export interface Profile {
-  id: string
-  fullName: string
-  fatherName?: string | null
-  phoneNumber?: string | null
-  gender?: ('male' | 'female') | null
-  updatedAt: string
-  createdAt: string
+  id: string;
+  fullName: string;
+  fatherName?: string | null;
+  phoneNumber?: string | null;
+  gender?: ('male' | 'female') | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
-  id: string
-  alt?: string | null
-  _key?: string | null
-  updatedAt: string
-  createdAt: string
-  url?: string | null
-  thumbnailURL?: string | null
-  filename?: string | null
-  mimeType?: string | null
-  filesize?: number | null
-  width?: number | null
-  height?: number | null
-  focalX?: number | null
-  focalY?: number | null
+  id: string;
+  alt?: string | null;
+  _key?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
 export interface Post {
-  id: string
-  title: string
+  id: string;
+  title: string;
   /**
    * Upload an image for the post
    */
-  image?: (string | null) | Media
+  image?: (string | null) | Media;
   content: {
     root: {
-      type: string
+      type: string;
       children: {
-        type: string
-        version: number
-        [k: string]: unknown
-      }[]
-      direction: ('ltr' | 'rtl') | null
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | ''
-      indent: number
-      version: number
-    }
-    [k: string]: unknown
-  }
-  author?: (string | null) | User
-  publishedAt?: string | null
-  updatedAt: string
-  createdAt: string
-  _status?: ('draft' | 'published') | null
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  author?: (string | null) | User;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "buses".
  */
 export interface Bus {
-  id: string
-  number: string
-  type: string | BusType
+  id: string;
+  number: string;
+  type: string | BusType;
   /**
    * Images of the Bus
    */
-  images?: (string | Media)[] | null
-  updatedAt: string
-  createdAt: string
+  images?: (string | Media)[] | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "bus-types".
  */
 export interface BusType {
-  id: string
+  id: string;
   /**
    * Name of the bus type (e.g., "VIP 2+1", "Standard 2+2")
    */
-  name: string
+  name: string;
   amenities?:
     | {
-        amenity: string
-        id?: string | null
+        amenity: string;
+        id?: string | null;
       }[]
-    | null
+    | null;
   seats:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
-  capacity?: number | null
-  updatedAt: string
-  createdAt: string
+    | null;
+  capacity?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "terminals".
  */
 export interface Terminal {
-  id: string
-  name: string
-  province: string
-  address: string
-  updatedAt: string
-  createdAt: string
+  id: string;
+  name: string;
+  province: string;
+  address: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "trip-schedules".
  */
 export interface TripSchedule {
-  id: string
+  id: string;
   /**
    * "VIP | Kabul - Parwaan - Mazaar | 10:00 AM | Daily"
    */
-  tripName: string
+  tripName: string;
   /**
    * Price per seat
    */
-  price: number
-  bus: string | Bus
+  price: number;
+  bus: string | Bus;
   /**
    * Departure time (recurring)
    */
-  departureTime: string
-  from: string | Terminal
+  departureTime: string;
+  from: string | Terminal;
   stops?:
     | {
-        terminal: string | Terminal
-        time: string
-        id?: string | null
+        terminal: string | Terminal;
+        time: string;
+        id?: string | null;
       }[]
-    | null
-  frequency: 'daily' | 'specific-days'
-  days?: ('sat' | 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri')[] | null
-  isActive?: boolean | null
-  updatedAt: string
-  createdAt: string
+    | null;
+  frequency: 'daily' | 'specific-days';
+  days?: ('sat' | 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri')[] | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tickets".
  */
 export interface Ticket {
-  id: string
-  ticketNumber?: string | null
-  passenger: string | Profile
-  trip: string | TripSchedule
-  from?: (string | null) | Terminal
-  to?: (string | null) | Terminal
-  fromTerminalName?: string | null
-  toTerminalName?: string | null
-  date: string
+  id: string;
+  ticketNumber?: string | null;
+  passenger: string | Profile;
+  trip: string | TripSchedule;
+  from?: (string | null) | Terminal;
+  to?: (string | null) | Terminal;
+  fromTerminalName?: string | null;
+  toTerminalName?: string | null;
+  date: string;
   bookedSeats:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
+    | null;
   /**
    * Override price per seat (leave empty to use the trip's default price)
    */
-  pricePerTicket?: number | null
+  pricePerTicket?: number | null;
   /**
    * Automatically calculated based on seats and price
    */
-  totalPrice?: number | null
-  isPaid?: boolean | null
+  totalPrice?: number | null;
+  isPaid?: boolean | null;
   /**
    * Mark as cancelled (keeps record but frees seats)
    */
-  isCancelled?: boolean | null
-  bookedBy?: (string | null) | User
-  paymentMethod?: ('cash' | 'card' | 'mobile') | null
+  isCancelled?: boolean | null;
+  bookedBy?: (string | null) | User;
+  paymentMethod?: ('cash' | 'card' | 'mobile') | null;
   /**
    * Payment deadline for online payments (auto-populated if not set)
    */
-  paymentDeadline?: string | null
-  updatedAt: string
-  createdAt: string
+  paymentDeadline?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "trip-records".
  */
 export interface TripRecord {
-  id: string
-  driver: string | Driver
-  bus: string | Bus
-  commission: number
-  date?: string | null
-  updatedAt: string
-  createdAt: string
+  id: string;
+  driver: string | Driver;
+  bus: string | Bus;
+  commission: number;
+  date?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "drivers".
  */
 export interface Driver {
-  id: string
-  fullName: string
-  fatherName?: string | null
-  phoneNumber: string
-  licenseNumber?: string | null
-  isActive?: boolean | null
-  updatedAt: string
-  createdAt: string
+  id: string;
+  fullName: string;
+  fatherName?: string | null;
+  phoneNumber: string;
+  licenseNumber?: string | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
-  id: string
+  id: string;
   /**
    * Input data provided to the job
    */
   input?:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
+    | null;
   taskStatus?:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
-  completedAt?: string | null
-  totalTried?: number | null
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
   /**
    * If hasError is true this job will not be retried
    */
-  hasError?: boolean | null
+  hasError?: boolean | null;
   /**
    * If hasError is true, this is the error that caused it
    */
   error?:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
+    | null;
   /**
    * Task execution log
    */
   log?:
     | {
-        executedAt: string
-        completedAt: string
-        taskSlug: 'inline' | 'schedulePublish'
-        taskID: string
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'schedulePublish';
+        taskID: string;
         input?:
           | {
-              [k: string]: unknown
+              [k: string]: unknown;
             }
           | unknown[]
           | string
           | number
           | boolean
-          | null
+          | null;
         output?:
           | {
-              [k: string]: unknown
+              [k: string]: unknown;
             }
           | unknown[]
           | string
           | number
           | boolean
-          | null
-        state: 'failed' | 'succeeded'
+          | null;
+        state: 'failed' | 'succeeded';
         error?:
           | {
-              [k: string]: unknown
+              [k: string]: unknown;
             }
           | unknown[]
           | string
           | number
           | boolean
-          | null
-        id?: string | null
+          | null;
+        id?: string | null;
       }[]
-    | null
-  taskSlug?: ('inline' | 'schedulePublish') | null
-  queue?: string | null
-  waitUntil?: string | null
-  processing?: boolean | null
-  updatedAt: string
-  createdAt: string
+    | null;
+  taskSlug?: ('inline' | 'schedulePublish') | null;
+  queue?: string | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string
+  id: string;
   document?:
     | ({
-        relationTo: 'users'
-        value: string | User
+        relationTo: 'users';
+        value: string | User;
       } | null)
     | ({
-        relationTo: 'profiles'
-        value: string | Profile
+        relationTo: 'profiles';
+        value: string | Profile;
       } | null)
     | ({
-        relationTo: 'media'
-        value: string | Media
+        relationTo: 'media';
+        value: string | Media;
       } | null)
     | ({
-        relationTo: 'posts'
-        value: string | Post
+        relationTo: 'posts';
+        value: string | Post;
       } | null)
     | ({
-        relationTo: 'buses'
-        value: string | Bus
+        relationTo: 'buses';
+        value: string | Bus;
       } | null)
     | ({
-        relationTo: 'bus-types'
-        value: string | BusType
+        relationTo: 'bus-types';
+        value: string | BusType;
       } | null)
     | ({
-        relationTo: 'terminals'
-        value: string | Terminal
+        relationTo: 'terminals';
+        value: string | Terminal;
       } | null)
     | ({
-        relationTo: 'trip-schedules'
-        value: string | TripSchedule
+        relationTo: 'trip-schedules';
+        value: string | TripSchedule;
       } | null)
     | ({
-        relationTo: 'tickets'
-        value: string | Ticket
+        relationTo: 'tickets';
+        value: string | Ticket;
       } | null)
     | ({
-        relationTo: 'trip-records'
-        value: string | TripRecord
+        relationTo: 'trip-records';
+        value: string | TripRecord;
       } | null)
     | ({
-        relationTo: 'drivers'
-        value: string | Driver
+        relationTo: 'drivers';
+        value: string | Driver;
       } | null)
     | ({
-        relationTo: 'payload-jobs'
-        value: string | PayloadJob
-      } | null)
-  globalSlug?: string | null
+        relationTo: 'payload-jobs';
+        value: string | PayloadJob;
+      } | null);
+  globalSlug?: string | null;
   user: {
-    relationTo: 'users'
-    value: string | User
-  }
-  updatedAt: string
-  createdAt: string
+    relationTo: 'users';
+    value: string | User;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string
+  id: string;
   user: {
-    relationTo: 'users'
-    value: string | User
-  }
-  key?: string | null
+    relationTo: 'users';
+    value: string | User;
+  };
+  key?: string | null;
   value?:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
-  updatedAt: string
-  createdAt: string
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string
-  name?: string | null
-  batch?: number | null
-  updatedAt: string
-  createdAt: string
+  id: string;
+  name?: string | null;
+  batch?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-query-presets".
  */
 export interface PayloadQueryPreset {
-  id: string
-  title: string
-  isShared?: boolean | null
+  id: string;
+  title: string;
+  isShared?: boolean | null;
   access?: {
     read?: {
-      constraint?: ('everyone' | 'onlyMe' | 'specificUsers') | null
-      users?: (string | User)[] | null
-    }
+      constraint?: ('everyone' | 'onlyMe' | 'specificUsers') | null;
+      users?: (string | User)[] | null;
+    };
     update?: {
-      constraint?: ('everyone' | 'onlyMe' | 'specificUsers') | null
-      users?: (string | User)[] | null
-    }
+      constraint?: ('everyone' | 'onlyMe' | 'specificUsers') | null;
+      users?: (string | User)[] | null;
+    };
     delete?: {
-      constraint?: ('everyone' | 'onlyMe' | 'specificUsers') | null
-      users?: (string | User)[] | null
-    }
-  }
+      constraint?: ('everyone' | 'onlyMe' | 'specificUsers') | null;
+      users?: (string | User)[] | null;
+    };
+  };
   where?:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
+    | null;
   columns?:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
-  relatedCollection: 'users' | 'profiles' | 'tickets'
+    | null;
+  relatedCollection: 'users' | 'profiles' | 'tickets';
   /**
    * This is a tempoary field used to determine if updating the preset would remove the user's access to it. When `true`, this record will be deleted after running the preset's `validate` function.
    */
-  isTemp?: boolean | null
-  updatedAt: string
-  createdAt: string
+  isTemp?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  normalizedPhone?: T
-  profile?: T
-  roles?: T
-  isActive?: T
-  lastLoginAt?: T
+  normalizedPhone?: T;
+  profile?: T;
+  roles?: T;
+  isActive?: T;
+  lastLoginAt?: T;
   location?:
     | T
     | {
-        coordinates?: T
-        accuracy?: T
-        city?: T
-        region?: T
-        country?: T
-        countryCode?: T
-        timezone?: T
-        source?: T
-        ipAddress?: T
-        lastUpdated?: T
-        permissionGranted?: T
-      }
+        coordinates?: T;
+        accuracy?: T;
+        city?: T;
+        region?: T;
+        country?: T;
+        countryCode?: T;
+        timezone?: T;
+        source?: T;
+        ipAddress?: T;
+        lastUpdated?: T;
+        permissionGranted?: T;
+      };
   locationHistory?:
     | T
     | {
-        coordinates?: T
-        city?: T
-        country?: T
-        source?: T
-        timestamp?: T
-        id?: T
-      }
-  updatedAt?: T
-  createdAt?: T
-  email?: T
-  username?: T
-  resetPasswordToken?: T
-  resetPasswordExpiration?: T
-  salt?: T
-  hash?: T
-  loginAttempts?: T
-  lockUntil?: T
+        coordinates?: T;
+        city?: T;
+        country?: T;
+        source?: T;
+        timestamp?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  username?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
   sessions?:
     | T
     | {
-        id?: T
-        createdAt?: T
-        expiresAt?: T
-      }
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "profiles_select".
  */
 export interface ProfilesSelect<T extends boolean = true> {
-  fullName?: T
-  fatherName?: T
-  phoneNumber?: T
-  gender?: T
-  updatedAt?: T
-  createdAt?: T
+  fullName?: T;
+  fatherName?: T;
+  phoneNumber?: T;
+  gender?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
-  alt?: T
-  _key?: T
-  updatedAt?: T
-  createdAt?: T
-  url?: T
-  thumbnailURL?: T
-  filename?: T
-  mimeType?: T
-  filesize?: T
-  width?: T
-  height?: T
-  focalX?: T
-  focalY?: T
+  alt?: T;
+  _key?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
-  title?: T
-  image?: T
-  content?: T
-  author?: T
-  publishedAt?: T
-  updatedAt?: T
-  createdAt?: T
-  _status?: T
+  title?: T;
+  image?: T;
+  content?: T;
+  author?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "buses_select".
  */
 export interface BusesSelect<T extends boolean = true> {
-  number?: T
-  type?: T
-  images?: T
-  updatedAt?: T
-  createdAt?: T
+  number?: T;
+  type?: T;
+  images?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "bus-types_select".
  */
 export interface BusTypesSelect<T extends boolean = true> {
-  name?: T
+  name?: T;
   amenities?:
     | T
     | {
-        amenity?: T
-        id?: T
-      }
-  seats?: T
-  capacity?: T
-  updatedAt?: T
-  createdAt?: T
+        amenity?: T;
+        id?: T;
+      };
+  seats?: T;
+  capacity?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "terminals_select".
  */
 export interface TerminalsSelect<T extends boolean = true> {
-  name?: T
-  province?: T
-  address?: T
-  updatedAt?: T
-  createdAt?: T
+  name?: T;
+  province?: T;
+  address?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "trip-schedules_select".
  */
 export interface TripSchedulesSelect<T extends boolean = true> {
-  tripName?: T
-  price?: T
-  bus?: T
-  departureTime?: T
-  from?: T
+  tripName?: T;
+  price?: T;
+  bus?: T;
+  departureTime?: T;
+  from?: T;
   stops?:
     | T
     | {
-        terminal?: T
-        time?: T
-        id?: T
-      }
-  frequency?: T
-  days?: T
-  isActive?: T
-  updatedAt?: T
-  createdAt?: T
+        terminal?: T;
+        time?: T;
+        id?: T;
+      };
+  frequency?: T;
+  days?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tickets_select".
  */
 export interface TicketsSelect<T extends boolean = true> {
-  ticketNumber?: T
-  passenger?: T
-  trip?: T
-  from?: T
-  to?: T
-  fromTerminalName?: T
-  toTerminalName?: T
-  date?: T
-  bookedSeats?: T
-  pricePerTicket?: T
-  totalPrice?: T
-  isPaid?: T
-  isCancelled?: T
-  bookedBy?: T
-  paymentMethod?: T
-  paymentDeadline?: T
-  updatedAt?: T
-  createdAt?: T
+  ticketNumber?: T;
+  passenger?: T;
+  trip?: T;
+  from?: T;
+  to?: T;
+  fromTerminalName?: T;
+  toTerminalName?: T;
+  date?: T;
+  bookedSeats?: T;
+  pricePerTicket?: T;
+  totalPrice?: T;
+  isPaid?: T;
+  isCancelled?: T;
+  bookedBy?: T;
+  paymentMethod?: T;
+  paymentDeadline?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "trip-records_select".
  */
 export interface TripRecordsSelect<T extends boolean = true> {
-  driver?: T
-  bus?: T
-  commission?: T
-  date?: T
-  updatedAt?: T
-  createdAt?: T
+  driver?: T;
+  bus?: T;
+  commission?: T;
+  date?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "drivers_select".
  */
 export interface DriversSelect<T extends boolean = true> {
-  fullName?: T
-  fatherName?: T
-  phoneNumber?: T
-  licenseNumber?: T
-  isActive?: T
-  updatedAt?: T
-  createdAt?: T
+  fullName?: T;
+  fatherName?: T;
+  phoneNumber?: T;
+  licenseNumber?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs_select".
  */
 export interface PayloadJobsSelect<T extends boolean = true> {
-  input?: T
-  taskStatus?: T
-  completedAt?: T
-  totalTried?: T
-  hasError?: T
-  error?: T
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
   log?:
     | T
     | {
-        executedAt?: T
-        completedAt?: T
-        taskSlug?: T
-        taskID?: T
-        input?: T
-        output?: T
-        state?: T
-        error?: T
-        id?: T
-      }
-  taskSlug?: T
-  queue?: T
-  waitUntil?: T
-  processing?: T
-  updatedAt?: T
-  createdAt?: T
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
-  document?: T
-  globalSlug?: T
-  user?: T
-  updatedAt?: T
-  createdAt?: T
+  document?: T;
+  globalSlug?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences_select".
  */
 export interface PayloadPreferencesSelect<T extends boolean = true> {
-  user?: T
-  key?: T
-  value?: T
-  updatedAt?: T
-  createdAt?: T
+  user?: T;
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-migrations_select".
  */
 export interface PayloadMigrationsSelect<T extends boolean = true> {
-  name?: T
-  batch?: T
-  updatedAt?: T
-  createdAt?: T
+  name?: T;
+  batch?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-query-presets_select".
  */
 export interface PayloadQueryPresetsSelect<T extends boolean = true> {
-  title?: T
-  isShared?: T
+  title?: T;
+  isShared?: T;
   access?:
     | T
     | {
         read?:
           | T
           | {
-              constraint?: T
-              users?: T
-            }
+              constraint?: T;
+              users?: T;
+            };
         update?:
           | T
           | {
-              constraint?: T
-              users?: T
-            }
+              constraint?: T;
+              users?: T;
+            };
         delete?:
           | T
           | {
-              constraint?: T
-              users?: T
-            }
-      }
-  where?: T
-  columns?: T
-  relatedCollection?: T
-  isTemp?: T
-  updatedAt?: T
-  createdAt?: T
+              constraint?: T;
+              users?: T;
+            };
+      };
+  where?: T;
+  columns?: T;
+  relatedCollection?: T;
+  isTemp?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1014,24 +1012,25 @@ export interface PayloadQueryPresetsSelect<T extends boolean = true> {
  */
 export interface TaskSchedulePublish {
   input: {
-    type?: ('publish' | 'unpublish') | null
-    locale?: string | null
+    type?: ('publish' | 'unpublish') | null;
+    locale?: string | null;
     doc?: {
-      relationTo: 'posts'
-      value: string | Post
-    } | null
-    global?: string | null
-    user?: (string | null) | User
-  }
-  output?: unknown
+      relationTo: 'posts';
+      value: string | Post;
+    } | null;
+    global?: string | null;
+    user?: (string | null) | User;
+  };
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {
-  [k: string]: unknown
+  [k: string]: unknown;
 }
+
 
 declare module 'payload' {
   export interface GeneratedTypes extends Config {}

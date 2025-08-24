@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { X } from 'lucide-react'
 import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
 import { Pagination } from '@/components/Pagination'
 import { SearchBar } from './components/SearchBar'
@@ -267,7 +268,7 @@ export const SearchPageClient = ({
             />
 
             {/* Pagination */}
-            {data.pagination && data.trips.length > 0 && (
+            {data.pagination && data.trips.length > 0 && data.pagination.totalCount > 0 && (
               <div className="mt-8">
                 <Pagination
                   currentPage={data.pagination.currentPage}
@@ -289,7 +290,7 @@ export const SearchPageClient = ({
         >
           <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300" />
           <div
-            className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-white transform transition-transform duration-300 ease-in-out ${showFilters ? 'translate-x-0' : 'translate-x-full'}`}
+            className={`absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white transform transition-transform duration-300 ease-in-out ${showFilters ? 'translate-x-0' : '-translate-x-full'}`}
           >
             <div className="filter-menu h-full overflow-y-auto">
               {/* Filter Header */}
@@ -299,14 +300,7 @@ export const SearchPageClient = ({
                   onClick={() => setShowFilters(false)}
                   className="p-2 hover:bg-orange-100 rounded-lg transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 

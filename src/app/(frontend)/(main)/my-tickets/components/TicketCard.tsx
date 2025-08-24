@@ -6,14 +6,47 @@ import { Copy, Clock, Check, XCircle } from 'lucide-react'
 import { UserTicket } from '../types'
 import { convertGregorianToPersianDisplay } from '@/utils/dateUtils'
 
-// Function to convert 24-hour time to 12-hour format
+// Function to convert numbers to Persian digits
+const convertToPersianDigits = (num: number | string): string => {
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
+  return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
+}
+
+// Function to format duration to Persian with full words
+const formatDurationToPersian = (duration: string): string => {
+  if (!duration || duration === 'Unknown' || duration === 'نامشخص') {
+    return 'نامشخص'
+  }
+
+  // Parse duration like "9h 30m" or "9h 0m"
+  const hourMatch = duration.match(/(\d+)h/)
+  const minuteMatch = duration.match(/(\d+)m/)
+
+  const hours = hourMatch ? parseInt(hourMatch[1]) : 0
+  const minutes = minuteMatch ? parseInt(minuteMatch[1]) : 0
+
+  let result = ''
+
+  if (hours > 0) {
+    result += `${convertToPersianDigits(hours)} ساعت`
+  }
+
+  if (minutes > 0) {
+    if (result) result += ' '
+    result += `${convertToPersianDigits(minutes)} دقیقه`
+  }
+
+  return result || 'نامشخص'
+}
+
+// Function to convert 24-hour time to 12-hour format with Persian
 const formatTo12Hour = (time24: string): string => {
-  if (!time24) return 'N/A'
+  if (!time24) return 'نامشخص'
   const [hours, minutes] = time24.split(':')
   const hour = parseInt(hours, 10)
-  const period = hour >= 12 ? 'PM' : 'AM'
+  const period = hour >= 12 ? 'ب.ظ' : 'ق.ظ'
   const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
-  return `${hour12}:${minutes} ${period}`
+  return `${convertToPersianDigits(hour12)}:${convertToPersianDigits(minutes)} ${period}`
 }
 
 // Function to format date in Jalaali format
@@ -25,13 +58,20 @@ const formatJalaaliDate = (dateString: string): string => {
   }
 }
 
-// Function to format date with day of the week
+// Function to format date with day of the week in Persian
 const formatJalaaliDateWithDay = (dateString: string): { date: string; day: string } => {
   try {
     const date = new Date(dateString)
     const jalaaliDate = convertGregorianToPersianDisplay(dateString)
-    const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' })
-    return { date: jalaaliDate, day: dayOfWeek }
+
+    // Get day of week in Persian
+    const dayNames = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه']
+    const dayOfWeek = dayNames[date.getDay()]
+
+    // Convert date to Persian digits
+    const persianDate = convertToPersianDigits(jalaaliDate)
+
+    return { date: persianDate, day: dayOfWeek }
   } catch {
     return { date: dateString, day: '' }
   }
@@ -42,10 +82,11 @@ const formatJalaaliDateTime = (dateString: string): string => {
   try {
     const date = new Date(dateString)
     const jalaaliDate = convertGregorianToPersianDisplay(dateString)
+    const persianDate = convertToPersianDigits(jalaaliDate)
     const time = formatTo12Hour(
       date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
     )
-    return `${jalaaliDate} at ${time}`
+    return `${persianDate} در ساعت ${time}`
   } catch {
     return dateString
   }
@@ -92,7 +133,7 @@ const getStatusBadge = (ticket: UserTicket) => {
   if (ticket.status.isExpired) {
     return (
       <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">
-        Expired
+        منقضی شده
       </span>
     )
   }
@@ -100,7 +141,7 @@ const getStatusBadge = (ticket: UserTicket) => {
   if (ticket.status.isCancelled) {
     return (
       <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
-        Cancelled
+        لغو شده
       </span>
     )
   }
@@ -108,14 +149,14 @@ const getStatusBadge = (ticket: UserTicket) => {
   if (ticket.status.isPaid) {
     return (
       <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
-        Paid
+        پرداخت شده
       </span>
     )
   }
 
   return (
     <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">
-      Pending Payment
+      در انتظار پرداخت
     </span>
   )
 }
@@ -211,6 +252,7 @@ export const TicketCard = ({
 
   const CopyButton = ({ isMobile = false }: { isMobile?: boolean }) => (
     <button
+      dir="ltr"
       onClick={handleCopyClick}
       className="group relative flex items-center justify-between transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-transparent shadow-md hover:shadow-lg"
       title={`Click to copy: ${ticket.ticketNumber}`}
@@ -224,13 +266,13 @@ export const TicketCard = ({
           {copiedTickets.has(ticket.id) ? (
             <div className="flex items-center gap-1 animate-in slide-in-from-right-2 duration-200">
               <Check className="w-4 h-4 text-green-200" />
-              <span className="text-xs font-semibold text-green-200">Copied!</span>
+              <span className="text-xs font-semibold text-green-200">کپی شد!</span>
             </div>
           ) : (
             <div className="flex items-center gap-1 group-hover:animate-pulse">
               <Copy className="w-4 h-4 text-white/70 group-hover:text-white transition-colors duration-200" />
               <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors duration-200">
-                Copy
+                کپی
               </span>
             </div>
           )}
@@ -254,7 +296,7 @@ export const TicketCard = ({
         <div className="flex flex-col gap-3 md:hidden">
           {/* Top row: Ticket # and Status */}
           <div className="flex items-center justify-between">
-            <span className="text-white/80 text-sm font-medium">Ticket #</span>
+            <span className="text-white/80 text-sm font-medium">شماره تکت</span>
             {getStatusBadge(ticket)}
           </div>
 
@@ -268,7 +310,7 @@ export const TicketCard = ({
         <div className="hidden md:flex md:items-center md:justify-between">
           {/* Left side: Ticket # and Copy button */}
           <div className="flex items-center gap-4">
-            <span className="text-white/80 text-sm font-medium">Ticket #</span>
+            <span className="text-white/80 text-sm font-medium">شماره تکت</span>
             <CopyButton />
           </div>
 
@@ -293,13 +335,13 @@ export const TicketCard = ({
                 </p>
                 <p className="text-xs text-gray-500 hidden sm:block">{ticket.trip.from.province}</p>
               </div>
-              <div className="flex-1 flex items-center px-2 sm:px-4">
+              <div className="flex-1 flex items-center px-1 sm:px-2">
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-green-300 via-blue-300 to-red-300 rounded-full relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-green-300 via-blue-300 to-red-300 rounded-full animate-pulse"></div>
                 </div>
-                <div className="mx-2 sm:mx-4 text-center bg-white rounded-lg px-2 sm:px-3 py-1 shadow-sm border">
-                  <p className="text-xs font-medium text-gray-600">
-                    {ticket.trip.duration || 'N/A'}
+                <div className="mx-1 sm:mx-2 text-center bg-white rounded-lg px-1 sm:px-2 py-1 shadow-sm border min-w-0 flex-shrink-0">
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-600 whitespace-nowrap">
+                    {formatDurationToPersian(ticket.trip.duration || '')}
                   </p>
                 </div>
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-green-300 via-blue-300 to-red-300 rounded-full"></div>
@@ -307,10 +349,10 @@ export const TicketCard = ({
               <div className="text-center flex-1">
                 <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 mx-auto mb-1 sm:mb-2"></div>
                 <p className="text-lg sm:text-2xl font-bold text-gray-900 mb-1">
-                  {ticket.trip.arrivalTime ? formatTo12Hour(ticket.trip.arrivalTime) : 'N/A'}
+                  {ticket.trip.arrivalTime ? formatTo12Hour(ticket.trip.arrivalTime) : 'نامشخص'}
                 </p>
                 <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                  {ticket.trip.to?.name || 'Destination'}
+                  {ticket.trip.to?.name || 'مقصد'}
                 </p>
                 <p className="text-xs text-gray-500 hidden sm:block">
                   {ticket.trip.to?.province || ''}
@@ -319,12 +361,12 @@ export const TicketCard = ({
             </div>
           </div>
 
-          {/* Trip Details - 2x2 on mobile, 3 columns on larger screens */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+          {/* Trip Details - 3 columns on all screen sizes */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {/* Travel Date with day of the week */}
             <div className="bg-white/70 rounded-xl p-2 sm:p-3 text-center border-0 backdrop-blur-sm shadow-sm">
               <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
-                Travel Date
+                تاریخ سفر
               </p>
               <p className="text-xs sm:text-sm font-bold text-gray-900">
                 {(() => {
@@ -341,14 +383,16 @@ export const TicketCard = ({
 
             {/* Bus */}
             <div className="bg-white/70 rounded-xl p-2 sm:p-3 text-center border-0 backdrop-blur-sm shadow-sm">
-              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">Bus</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                اتوبوس
+              </p>
               <p className="text-xs sm:text-sm font-bold text-gray-900">{ticket.trip.bus.number}</p>
             </div>
 
-            {/* Seats - spans 2 columns on mobile, 1 on larger screens */}
-            <div className="bg-white/70 rounded-xl p-2 sm:p-3 text-center border-0 backdrop-blur-sm shadow-sm col-span-2 sm:col-span-1">
+            {/* Seats */}
+            <div className="bg-white/70 rounded-xl p-2 sm:p-3 text-center border-0 backdrop-blur-sm shadow-sm">
               <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
-                Seats
+                چوکی ها
               </p>
               <div className="flex items-center justify-center gap-1 flex-wrap">
                 {ticket.booking.seats.map((seat) => (
@@ -402,7 +446,7 @@ export const TicketCard = ({
                           ticket.status.isExpired ? 'text-red-700' : 'text-yellow-600'
                         }`}
                       >
-                        {ticket.status.isExpired ? 'Expired At:' : 'Payment Deadline'}
+                        {ticket.status.isExpired ? 'منقضی شده در:' : 'مهلت پرداخت'}
                       </p>
                       <p
                         className={`text-xs sm:text-sm font-bold ${
@@ -436,12 +480,11 @@ export const TicketCard = ({
               {/* Price */}
               <div className="text-right">
                 <p className="text-xs text-gray-500">
-                  {ticket.booking.pricePerSeat.toLocaleString()} AF × {ticket.booking.seats.length}{' '}
-                  seat
-                  {ticket.booking.seats.length > 1 ? 's' : ''}
+                  {convertToPersianDigits(ticket.booking.pricePerSeat.toLocaleString())} افغانی ×{' '}
+                  {convertToPersianDigits(ticket.booking.seats.length)} چوکی
                 </p>
                 <p className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  {ticket.booking.totalPrice.toLocaleString()} AF
+                  {convertToPersianDigits(ticket.booking.totalPrice.toLocaleString())} افغانی
                 </p>
               </div>
             </div>

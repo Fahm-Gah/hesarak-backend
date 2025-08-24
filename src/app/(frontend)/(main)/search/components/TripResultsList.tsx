@@ -188,24 +188,6 @@ export const TripResultsList = ({
       {/* Mobile Layout */}
       <div className="lg:hidden mb-4">
         <div className="flex items-center justify-between mb-2">
-          {/* Mobile Filter Button */}
-          {showFilters && (
-            <button
-              onClick={showFilters}
-              className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors text-sm"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                />
-              </svg>
-              فیلترها
-            </button>
-          )}
-
           {/* Sort Dropdown */}
           <div className="relative">
             <div
@@ -237,7 +219,7 @@ export const TripResultsList = ({
             </div>
 
             {showSortDropdown && (
-              <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[200px]">
+              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[200px]">
                 {[
                   { value: 'departureTime', label: 'زمان حرکت' },
                   { value: 'priceAsc', label: 'قیمت (کم به زیاد)' },
@@ -263,6 +245,24 @@ export const TripResultsList = ({
               </div>
             )}
           </div>
+
+          {/* Mobile Filter Button */}
+          {showFilters && (
+            <button
+              onClick={showFilters}
+              className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                />
+              </svg>
+              فیلترها
+            </button>
+          )}
         </div>
         <p className="text-sm text-gray-600">
           {convertToPersianDigits(filteredAndSortedTrips.length)} از{' '}

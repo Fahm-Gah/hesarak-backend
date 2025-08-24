@@ -7,7 +7,6 @@ import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
 import { Pagination } from '@/components/Pagination'
 import type { User } from '@/payload-types'
 import { UserTicket } from './types'
-import { TicketsHeader } from './components/TicketsHeader'
 import { TicketFilters } from './components/TicketFilters'
 import { TicketCard } from './components/TicketCard'
 import { EmptyTicketsState } from './components/EmptyTicketsState'
@@ -22,6 +21,12 @@ interface TicketsPageClientProps {
     totalPages: number
     hasMore: boolean
   }
+}
+
+// Function to convert numbers to Persian digits
+const convertToPersianDigits = (num: number): string => {
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
+  return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
 }
 
 export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClientProps) => {
@@ -59,7 +64,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
     singleDateFilter,
   } = useServerFilters(tickets || [])
 
-  const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'My Tickets' }]
+  const breadcrumbItems = [{ label: 'خانه', href: '/' }, { label: 'تکت های من' }]
 
   // Sort tickets
   const sortedTickets = React.useMemo(() => {
@@ -144,7 +149,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading tickets...</p>
+          <p className="mt-4 text-gray-600">در حال بارگیری تکت ها...</p>
         </div>
       </div>
     )
@@ -158,7 +163,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4" dir="rtl">
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumbs */}
         <div className="mb-4">
@@ -169,24 +174,24 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">My Tickets</h1>
-              <p className="text-gray-600">Manage your bus tickets and travel history</p>
+              <h1 className="text-2xl font-bold text-gray-800 mb-2">تکت های من</h1>
+              <p className="text-gray-600">تکت های اتوبوس و تاریخچه سفرهای خود را مدیریت کنید</p>
             </div>
 
             {/* Search Bar */}
             <div className="relative w-full lg:w-80 lg:flex-shrink-0">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 transition-colors duration-200" />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 transition-colors duration-200" />
               <input
                 type="text"
-                placeholder="Search by ticket number, route, or bus..."
+                placeholder="جستجو بر اساس شماره تکت، مسیر، یا اتوبوس..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition-all duration-200 hover:border-orange-300"
+                className="w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition-all duration-200 hover:border-orange-300"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-all duration-200 hover:scale-110 active:scale-95"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-all duration-200 hover:scale-110 active:scale-95"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -203,7 +208,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
               <div className="p-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <Filter className="w-5 h-5 text-orange-600" />
-                  Filters
+                  فیلترها
                   {hasActiveFilters && (
                     <span className="bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {
@@ -224,7 +229,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                     onClick={clearAllFilters}
                     className="mt-2 text-sm text-red-600 hover:text-red-700 font-medium"
                   >
-                    Clear all filters
+                    پاک کردن همه فیلترها
                   </button>
                 )}
               </div>
@@ -260,30 +265,8 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
 
           {/* Tickets List */}
           <div className="flex-1">
-            {/* Mobile controls - Filters (left) and Sort (right) */}
+            {/* Mobile controls - Sort (left) and Filters (right) */}
             <div className="lg:hidden mb-4 flex justify-between gap-3">
-              <button
-                onClick={() => setShowFilters(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 bg-white shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg hover:scale-105 active:scale-95"
-              >
-                <Filter className="w-4 h-4 transition-transform duration-200" />
-                <span>Filters</span>
-                {hasActiveFilters && (
-                  <span className="bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
-                    {
-                      [
-                        statusFilters.length > 0,
-                        !!dateRange.from,
-                        !!dateRange.to,
-                        !!routeFilters.from,
-                        !!routeFilters.to,
-                        singleDateFilter.isDateSelected,
-                      ].filter(Boolean).length
-                    }
-                  </span>
-                )}
-              </button>
-
               {/* Sort Dropdown */}
               <div className="relative">
                 <button
@@ -295,7 +278,15 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                   ) : (
                     <SortAsc className="w-4 h-4 transition-transform duration-200" />
                   )}
-                  <span className="capitalize">{sortBy}</span>
+                  <span>
+                    {sortBy === 'date'
+                      ? 'تاریخ'
+                      : sortBy === 'price'
+                        ? 'قیمت'
+                        : sortBy === 'route'
+                          ? 'مسیر'
+                          : 'وضعیت'}
+                  </span>
                   <ArrowUpDown className="w-3 h-3 text-gray-400" />
                 </button>
 
@@ -304,10 +295,10 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                   <div className="sort-menu absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
                     <div className="p-2">
                       {[
-                        { value: 'date', label: 'Trip Date', desc: 'Sort by departure date' },
-                        { value: 'price', label: 'Price', desc: 'Sort by ticket price' },
-                        { value: 'route', label: 'Route', desc: 'Sort alphabetically by route' },
-                        { value: 'status', label: 'Status', desc: 'Sort by payment status' },
+                        { value: 'date', label: 'تاریخ سفر', desc: 'بر اساس تاریخ حرکت' },
+                        { value: 'price', label: 'قیمت', desc: 'بر اساس قیمت تکت' },
+                        { value: 'route', label: 'مسیر', desc: 'بر اساس مسیر سفر' },
+                        { value: 'status', label: 'وضعیت', desc: 'بر اساس وضعیت پرداخت' },
                       ].map((sort) => (
                         <button
                           key={sort.value}
@@ -320,7 +311,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                             }
                             setShowSortDropdown(false)
                           }}
-                          className={`w-full text-left px-3 py-2 rounded-md transition-colors duration-200 hover:bg-gray-50 ${
+                          className={`w-full text-right px-3 py-2 rounded-md transition-colors duration-200 hover:bg-gray-50 ${
                             sortBy === sort.value ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
                           }`}
                         >
@@ -345,6 +336,28 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                   </div>
                 )}
               </div>
+
+              <button
+                onClick={() => setShowFilters(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 bg-white shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg hover:scale-105 active:scale-95"
+              >
+                <Filter className="w-4 h-4 transition-transform duration-200" />
+                <span>فیلترها</span>
+                {hasActiveFilters && (
+                  <span className="bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                    {
+                      [
+                        statusFilters.length > 0,
+                        !!dateRange.from,
+                        !!dateRange.to,
+                        !!routeFilters.from,
+                        !!routeFilters.to,
+                        singleDateFilter.isDateSelected,
+                      ].filter(Boolean).length
+                    }
+                  </span>
+                )}
+              </button>
             </div>
 
             {sortedTickets.length === 0 ? (
@@ -371,7 +384,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
 
             {/* Footer - Always show for consistent alignment */}
             <div className="mt-8">
-              {pagination && pagination.totalPages > 1 ? (
+              {pagination && pagination.totalPages > 1 && sortedTickets.length > 0 ? (
                 <Pagination
                   currentPage={pagination.currentPage}
                   totalPages={pagination.totalPages}
@@ -388,13 +401,13 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                   <div className="flex items-center justify-center">
                     <p className="text-sm text-gray-600">
                       {sortedTickets.length === 0
-                        ? 'No tickets found'
+                        ? 'هیچ تکتی پیدا نشد'
                         : sortedTickets.length === 1
-                          ? 'Showing 1 ticket'
-                          : `Showing ${sortedTickets.length} tickets`}
+                          ? 'نمایش ۱ تکت'
+                          : `نمایش ${convertToPersianDigits(sortedTickets.length)} تکت`}
                       {hasActiveFilters && tickets.length > sortedTickets.length && (
-                        <span className="ml-1 text-gray-500">
-                          (filtered from {tickets.length} total)
+                        <span className="mr-1 text-gray-500">
+                          (فیلتر شده از {convertToPersianDigits(tickets.length)} تکت کل)
                         </span>
                       )}
                     </p>
@@ -414,14 +427,14 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
             onClick={() => setShowFilters(false)}
           />
           <div
-            className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-white transform transition-transform duration-300 ease-in-out ${showFilters ? 'translate-x-0' : 'translate-x-full'}`}
+            className={`absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white transform transition-transform duration-300 ease-in-out ${showFilters ? 'translate-x-0' : '-translate-x-full'}`}
           >
             <div className="filter-menu h-full overflow-y-auto">
               {/* Filter Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-orange-50">
                 <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   <Filter className="w-5 h-5 text-orange-600" />
-                  Filters
+                  فیلترها
                   {hasActiveFilters && (
                     <span className="bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {

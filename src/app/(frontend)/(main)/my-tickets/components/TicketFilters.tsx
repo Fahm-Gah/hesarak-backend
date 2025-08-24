@@ -135,16 +135,16 @@ export const TicketFilters = ({
   }
   if (isSidebar) {
     return (
-      <div className="space-y-6 animate-in fade-in-50 duration-300">
+      <div className="space-y-6 animate-in fade-in-50 duration-300" dir="rtl">
         {/* Status Filter */}
         <div className="transition-all duration-200">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">وضعیت</label>
           <div className="space-y-2">
             {[
-              { value: 'paid', label: 'Paid', color: 'text-green-700' },
-              { value: 'pending', label: 'Pending Payment', color: 'text-yellow-700' },
-              { value: 'cancelled', label: 'Cancelled', color: 'text-red-700' },
-              { value: 'expired', label: 'Expired', color: 'text-orange-700' },
+              { value: 'paid', label: 'پرداخت شده', color: 'text-green-700' },
+              { value: 'pending', label: 'در انتظار پرداخت', color: 'text-yellow-700' },
+              { value: 'cancelled', label: 'لغو شده', color: 'text-red-700' },
+              { value: 'expired', label: 'منقضی شده', color: 'text-orange-700' },
             ].map((status) => {
               const isChecked = statusFilters.includes(status.value)
               return (
@@ -179,12 +179,12 @@ export const TicketFilters = ({
 
         {/* Date-based Filters */}
         <div className="transition-all duration-200">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Time Period</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">دوره زمانی</label>
           <div className="space-y-2 mb-4">
             {[
-              { value: 'all', label: 'All Tickets' },
-              { value: 'past', label: 'Past Trips' },
-              { value: 'upcoming', label: 'Upcoming Trips' },
+              { value: 'all', label: 'همه تکت ها' },
+              { value: 'past', label: 'سفرهای گذشته' },
+              { value: 'upcoming', label: 'سفرهای آینده' },
             ].map((period) => {
               const isSelected = singleDateFilter.timePeriod === period.value
               return (
@@ -216,7 +216,7 @@ export const TicketFilters = ({
 
         {/* Specific Date Filter */}
         <div className="transition-all duration-200">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Specific Date</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">تاریخ مشخص</label>
           <div className="space-y-3">
             {singleDateFilter.dateFilter ? (
               <div className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg">
@@ -229,7 +229,7 @@ export const TicketFilters = ({
                 <button
                   onClick={() => singleDateFilter.clearDateFilter()}
                   className="p-1 hover:bg-orange-100 rounded-full transition-colors"
-                  title="Clear date filter"
+                  title="پاک کردن فیلتر تاریخ"
                 >
                   <X className="w-4 h-4 text-orange-600" />
                 </button>
@@ -246,7 +246,7 @@ export const TicketFilters = ({
             />
 
             {singleDateFilter.dateFilter && (
-              <p className="text-xs text-gray-500">Showing tickets for the selected date only</p>
+              <p className="text-xs text-gray-500">نمایش تکت ها فقط برای تاریخ انتخاب شده</p>
             )}
           </div>
         </div>
@@ -254,7 +254,7 @@ export const TicketFilters = ({
         {/* Route Filters */}
         <div className="space-y-4 transition-all duration-200">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">From Location</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">مبدأ</label>
             <div className="space-y-2 max-h-40 overflow-y-auto transition-all duration-200">
               <label
                 className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
@@ -272,7 +272,7 @@ export const TicketFilters = ({
                   className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 focus:ring-2 transition-all duration-200"
                 />
                 <span className="text-sm text-gray-900 transition-colors duration-200">
-                  All locations
+                  همه مکان ها
                 </span>
               </label>
               {uniqueRoutes.from.map((route, index) => (
@@ -308,7 +308,7 @@ export const TicketFilters = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">To Location</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">مقصد</label>
             <div className="space-y-2 max-h-40 overflow-y-auto transition-all duration-200">
               <label
                 className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
@@ -326,7 +326,7 @@ export const TicketFilters = ({
                   className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 focus:ring-2 transition-all duration-200"
                 />
                 <span className="text-sm text-gray-900 transition-colors duration-200">
-                  All destinations
+                  همه مقاصد
                 </span>
               </label>
               {uniqueRoutes.to.map((route, index) => (
@@ -374,19 +374,19 @@ export const TicketFilters = ({
                   }}
                   className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95"
                 >
-                  Clear All
+                  پاک کردن همه
                 </button>
               )}
               <button
                 onClick={onApplyFilters}
                 className="flex-1 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95"
               >
-                Apply Filters
+                اعمال فیلترها
               </button>
             </div>
             <div className="mt-3 text-center transition-opacity duration-200">
               <span className="text-sm text-gray-600">
-                {filteredCount} of {totalCount} tickets
+                {filteredCount} از {totalCount} تکت
               </span>
             </div>
           </div>

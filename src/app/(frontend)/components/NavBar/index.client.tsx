@@ -140,7 +140,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                 {/* Profile Dropdown */}
                 {isProfileDropdownOpen && (
                   <div
-                    className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 transform transition-all duration-200 origin-top-right opacity-100 scale-100 translate-y-0 z-50"
+                    className="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 transform transition-all duration-200 origin-top-left opacity-100 scale-100 translate-y-0 z-50"
                     role="menu"
                     aria-orientation="vertical"
                   >
