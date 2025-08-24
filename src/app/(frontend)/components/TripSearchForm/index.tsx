@@ -1,6 +1,6 @@
 import React from 'react'
 import { TripSearchFormClient } from './index.client'
-import { getClientSideURL } from '@/utils/getURL'
+import { getServerSideURL } from '@/utils/getURL'
 
 interface Province {
   success: boolean
@@ -14,9 +14,8 @@ export const TripSearchForm = async () => {
   let provinces: string[] = []
 
   try {
-    const response = await fetch(`${getClientSideURL()}/api/provinces`, {
-      cache: 'force-cache',
-      next: { revalidate: 3600 }, // Cache for 1 hour
+    const response = await fetch(`${getServerSideURL()}/api/provinces`, {
+      cache: 'no-store',
     })
 
     if (response.ok) {
