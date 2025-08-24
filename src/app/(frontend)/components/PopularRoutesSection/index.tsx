@@ -1,69 +1,86 @@
 import React from 'react'
 import Link from 'next/link'
 import { ArrowRight, Clock, MapPin } from 'lucide-react'
+import { getServerSideURL } from '@/utils/getURL'
 
-export const PopularRoutesSection = () => {
-  const popularRoutes = [
-    {
-      from: 'Kabul',
-      to: 'Mazaar',
-      duration: '8 hours',
-      price: '1,500 AF',
-      frequency: '6 trips daily',
-      image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=200&fit=crop',
-    },
-    {
-      from: 'Kabul',
-      to: 'Herat',
-      duration: '12 hours',
-      price: '2,200 AF',
-      frequency: '4 trips daily',
-      image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=200&fit=crop',
-    },
-    {
-      from: 'Kabul',
-      to: 'Kandahar',
-      duration: '9 hours',
-      price: '1,800 AF',
-      frequency: '5 trips daily',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop',
-    },
-    {
-      from: 'Mazaar',
-      to: 'Herat',
-      duration: '10 hours',
-      price: '2,000 AF',
-      frequency: '3 trips daily',
-      image: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=400&h=200&fit=crop',
-    },
-    {
-      from: 'Kabul',
-      to: 'Jalalabad',
-      duration: '3 hours',
-      price: '800 AF',
-      frequency: '8 trips daily',
-      image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400&h=200&fit=crop',
-    },
-    {
-      from: 'Herat',
-      to: 'Kandahar',
-      duration: '7 hours',
-      price: '1,600 AF',
-      frequency: '4 trips daily',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop',
-    },
-  ]
+interface PopularRoute {
+  from: string
+  to: string
+  duration: string
+  price: string
+  frequency: string
+  tripsPerWeek: number
+  avgPrice: number
+}
+
+// Helper function to convert numbers to Persian
+const toPersianNumber = (num: number | string): string => {
+  const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
+  return String(num).replace(/[0-9]/g, (digit) => persian[parseInt(digit)])
+}
+
+// Helper function to format duration to Persian
+const formatDurationToPersian = (duration: string): string => {
+  return duration
+    .replace(/h/, ' ساعت')
+    .replace(/m/, ' دقیقه')
+    .replace(/[0-9]/g, (digit) => toPersianNumber(digit))
+}
+
+// Server-side data fetching
+const getPopularRoutes = async (): Promise<PopularRoute[]> => {
+  try {
+    const baseURL = getServerSideURL()
+    const response = await fetch(`${baseURL}/api/popular-routes`, {
+      cache: 'no-store', // Always get fresh data
+    })
+
+    if (!response.ok) {
+      console.error('Failed to fetch popular routes:', response.status, response.statusText)
+      return []
+    }
+
+    const data = await response.json()
+
+    if (data.success && data.data) {
+      // Transform the data to match our component interface
+      return data.data.map((route: any) => ({
+        from: route.from,
+        to: route.to,
+        duration: formatDurationToPersian(route.duration),
+        price: `${toPersianNumber(route.avgPrice.toLocaleString())} افغانی`,
+        frequency: `${toPersianNumber(route.tripsPerWeek)} سفر در هفته`,
+        tripsPerWeek: route.tripsPerWeek,
+        avgPrice: route.avgPrice,
+      }))
+    } else {
+      console.error('API returned unsuccessful response:', data)
+      return []
+    }
+  } catch (err) {
+    console.error('Error fetching popular routes:', err)
+    return []
+  }
+}
+
+export const PopularRoutesSection = async () => {
+  const popularRoutes = await getPopularRoutes()
+
+  // If no routes available, don't render the section
+  if (popularRoutes.length === 0) {
+    return null
+  }
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-white" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Popular <span className="text-orange-600">Routes</span>
+            مسیرهای <span className="text-orange-600">محبوب</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover our most traveled routes with frequent departures and competitive prices
+            مسیرهای پر تردد ما را با حرکت مکرر و قیمت‌های رقابتی کشف کنید
           </p>
         </div>
 
@@ -80,18 +97,18 @@ export const PopularRoutesSection = () => {
                 <div className="relative z-10 p-6 h-full flex flex-col justify-between">
                   <div className="flex items-center justify-between text-white">
                     <div className="flex items-center">
-                      <MapPin className="w-5 h-5 mr-2" />
+                      <MapPin className="w-5 h-5 ml-2" />
                       <span className="font-semibold">{route.from}</span>
                     </div>
-                    <ArrowRight className="w-6 h-6" />
+                    <ArrowRight className="w-6 h-6 rotate-180" />
                     <div className="flex items-center">
                       <span className="font-semibold">{route.to}</span>
-                      <MapPin className="w-5 h-5 ml-2" />
+                      <MapPin className="w-5 h-5 mr-2" />
                     </div>
                   </div>
                   <div className="text-white">
                     <div className="text-3xl font-bold">{route.price}</div>
-                    <div className="text-sm opacity-90">starting from</div>
+                    <div className="text-sm opacity-90">شروع از</div>
                   </div>
                 </div>
               </div>
@@ -100,7 +117,7 @@ export const PopularRoutesSection = () => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center text-gray-600">
-                    <Clock className="w-4 h-4 mr-2" />
+                    <Clock className="w-4 h-4 ml-2" />
                     <span className="text-sm">{route.duration}</span>
                   </div>
                   <div className="text-sm text-gray-600">{route.frequency}</div>
@@ -110,8 +127,8 @@ export const PopularRoutesSection = () => {
                   href={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
                   className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-orange-700 hover:to-red-700 transition-all duration-300 flex items-center justify-center group-hover:scale-105"
                 >
-                  Book Now
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  همین حالا بوک کنید
+                  <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
                 </Link>
               </div>
             </div>

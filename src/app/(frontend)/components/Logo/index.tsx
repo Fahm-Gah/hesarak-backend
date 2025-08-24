@@ -23,15 +23,15 @@ export const Logo = ({
   const sizeConfig = {
     sm: {
       icon: 'w-8 h-8',
-      text: 'text-xl',
+      text: 'text-md',
     },
     md: {
       icon: 'w-12 h-12',
-      text: 'text-2xl',
+      text: 'text-lg',
     },
     lg: {
       icon: 'w-16 h-16',
-      text: 'text-3xl',
+      text: 'text-xl',
     },
   }
 
