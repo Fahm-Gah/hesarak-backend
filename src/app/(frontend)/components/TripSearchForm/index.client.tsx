@@ -92,31 +92,43 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
     return provinces.filter((province) => province !== excludeValue)
   }
 
-  // Close dropdowns when clicking outside
+  // Close dropdowns when clicking outside or pressing escape
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       setShowFromDropdown(false)
       setShowToDropdown(false)
     }
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowFromDropdown(false)
+        setShowToDropdown(false)
+      }
+    }
+
     if (showFromDropdown || showToDropdown) {
       document.addEventListener('click', handleClickOutside)
+      document.addEventListener('keydown', handleKeyDown)
     }
 
     return () => {
       document.removeEventListener('click', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
     }
   }, [showFromDropdown, showToDropdown])
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-2xl border border-gray-200 p-4 max-w-4xl mx-auto shadow-2xl">
+    <div
+      className="bg-white/95 backdrop-blur-sm rounded-2xl border border-gray-200 p-4 max-w-4xl mx-auto shadow-2xl"
+      dir="rtl"
+    >
       <form onSubmit={handleSearch} className="space-y-4">
         {/* First Line: Form Controls */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-3 w-full">
           {/* From Field */}
           <div className="flex-1 min-w-0 w-full lg:flex-1">
             <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
-              FROM
+              مبدأ
             </label>
             <div className="relative">
               <div
@@ -128,7 +140,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
                 className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
               >
                 <span className={formData.from ? 'text-gray-900' : 'text-gray-500'}>
-                  {formData.from || 'Select city'}
+                  {formData.from || 'شهر را انتخاب کنید'}
                 </span>
                 <ChevronDown
                   className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showFromDropdown ? 'rotate-180' : ''}`}
@@ -151,7 +163,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
                   ))}
                   {formData.to && (
                     <div className="px-4 py-2 text-sm text-gray-500 italic border-t border-gray-100">
-                      {formData.to} is already selected as destination
+                      {formData.to} قبلاً به عنوان مقصد انتخاب شده است
                     </div>
                   )}
                 </div>
@@ -165,7 +177,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
               type="button"
               onClick={handleSwap}
               className="p-2.5 bg-orange-600 hover:bg-orange-700 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group transform hover:scale-110 active:scale-95 flex-shrink-0 lg:mb-1"
-              aria-label="Swap cities"
+              aria-label="تعویض شهرها"
             >
               <ArrowLeftRight className="w-5 h-5 text-white transform group-hover:rotate-180 transition-transform duration-500" />
             </button>
@@ -174,7 +186,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
           {/* To Field */}
           <div className="flex-1 min-w-0 w-full lg:flex-1">
             <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
-              TO
+              مقصد
             </label>
             <div className="relative">
               <div
@@ -186,7 +198,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
                 className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
               >
                 <span className={formData.to ? 'text-gray-900' : 'text-gray-500'}>
-                  {formData.to || 'Select city'}
+                  {formData.to || 'شهر را انتخاب کنید'}
                 </span>
                 <ChevronDown
                   className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showToDropdown ? 'rotate-180' : ''}`}
@@ -209,7 +221,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
                   ))}
                   {formData.from && (
                     <div className="px-4 py-2 text-sm text-gray-500 italic border-t border-gray-100">
-                      {formData.from} is already selected as departure
+                      {formData.from} قبلاً به عنوان مبدأ انتخاب شده است
                     </div>
                   )}
                 </div>
@@ -222,7 +234,7 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
             <JalaaliDatePicker
               value={selectedJalaaliDate}
               onChange={handleDateChange}
-              label="DATE"
+              label="تاریخ"
             />
           </div>
         </div>
@@ -246,12 +258,12 @@ export const TripSearchFormClient = ({ provinces }: TripSearchFormClientProps) =
             {isLoading ? (
               <div className="flex items-center space-x-3 relative z-10">
                 <Loader2 className="animate-spin h-5 w-5 text-white" />
-                <span>SEARCHING...</span>
+                <span>در حال جستجو...</span>
               </div>
             ) : (
               <div className="flex items-center space-x-3 relative z-10">
                 <Search className="w-5 h-5 transform group-hover:scale-110 transition-transform duration-200" />
-                <span>SEARCH BUSES</span>
+                <span>جستجوی سفر</span>
               </div>
             )}
           </button>

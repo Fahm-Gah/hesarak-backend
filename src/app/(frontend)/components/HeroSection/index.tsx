@@ -3,7 +3,7 @@ import { TripSearchForm } from '../TripSearchForm'
 
 export const HeroSection = () => {
   return (
-    <section className="relative h-[calc(100vh-4rem)] flex flex-col overflow-visible">
+    <section className="relative h-[calc(100vh-4rem)] flex flex-col overflow-visible" dir="rtl">
       {/* Modern gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900">
         <div className="absolute inset-0 bg-gradient-to-t from-orange-600/10 via-transparent to-blue-600/5"></div>
@@ -33,15 +33,11 @@ export const HeroSection = () => {
             {/* Main heading and description */}
             <div className="text-center mb-6 sm:mb-8 lg:mb-10">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-[1.1]">
-                <span className="block">Your Journey</span>
-                <span className="block bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                  Starts Here
+                <span className="block bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent py-1">
+                  بزرگترین شرکت
                 </span>
+                <span className="block">ترانسپورتی افغانستان</span>
               </h1>
-              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 font-medium max-w-3xl mx-auto leading-relaxed px-4">
-                Experience comfortable and reliable bus travel across Afghanistan with modern
-                amenities.
-              </p>
             </div>
 
             {/* Search form */}
@@ -53,29 +49,29 @@ export const HeroSection = () => {
             <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto text-center">
               <div className="flex flex-col">
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-orange-400 mb-1 sm:mb-2">
-                  10K+
+                  ۱۰,۰۰۰+
                 </div>
                 <div className="text-xs sm:text-sm lg:text-base text-gray-300 font-medium leading-tight">
-                  Happy
-                  <br className="sm:hidden" /> Passengers
+                  مسافران
+                  <br className="sm:hidden" /> راضی
                 </div>
               </div>
               <div className="flex flex-col">
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-orange-400 mb-1 sm:mb-2">
-                  50+
+                  ۵۰+
                 </div>
                 <div className="text-xs sm:text-sm lg:text-base text-gray-300 font-medium leading-tight">
-                  Bus
-                  <br className="sm:hidden" /> Routes
+                  مسیرهای
+                  <br className="sm:hidden" /> اتوبوس
                 </div>
               </div>
               <div className="flex flex-col">
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-orange-400 mb-1 sm:mb-2">
-                  24/7
+                  ۲۴/۷
                 </div>
                 <div className="text-xs sm:text-sm lg:text-base text-gray-300 font-medium leading-tight">
-                  Customer
-                  <br className="sm:hidden" /> Support
+                  خدمات
+                  <br className="sm:hidden" /> مشتریان
                 </div>
               </div>
             </div>

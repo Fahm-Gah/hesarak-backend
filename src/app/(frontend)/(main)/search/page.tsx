@@ -1,7 +1,7 @@
 import React from 'react'
 import { Metadata } from 'next'
 import { SearchPageClient } from './page.client'
-import { getClientSideURL } from '@/utils/getURL'
+import { getServerSideURL } from '@/utils/getURL'
 import moment from 'moment-jalaali'
 
 export const dynamic = 'force-dynamic'
@@ -58,7 +58,7 @@ async function fetchSearchResults(
     if (page) searchParamsObj.set('page', page)
 
     const response = await fetch(
-      `${getClientSideURL()}/api/trips/search?${searchParamsObj.toString()}`,
+      `${getServerSideURL()}/api/trips/search?${searchParamsObj.toString()}`,
       {
         cache: 'no-store', // Always fetch fresh data for search results
       },
@@ -79,7 +79,7 @@ async function fetchSearchResults(
 // Fetch provinces for dropdowns
 async function fetchProvinces(): Promise<string[]> {
   try {
-    const response = await fetch(`${getClientSideURL()}/api/provinces`, {
+    const response = await fetch(`${getServerSideURL()}/api/provinces`, {
       cache: 'force-cache',
       next: { revalidate: 3600 }, // Cache for 1 hour
     })
