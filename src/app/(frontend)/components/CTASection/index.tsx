@@ -87,7 +87,7 @@ export const CTASection = () => {
             </div>
             <div>
               <div className="text-2xl font-bold mb-2">Email Us</div>
-              <div className="opacity-90">support@hesarakbus.com</div>
+              <div className="opacity-90">support@hesaarak.com</div>
             </div>
             <div>
               <div className="text-2xl font-bold mb-2">Visit Us</div>

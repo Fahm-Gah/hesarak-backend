@@ -1,7 +1,5 @@
 import React from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import logoImage from '/public/images/logo.png'
 
 interface LogoProps {
   variant?: 'nav' | 'auth'
@@ -20,22 +18,22 @@ export const Logo = ({
   linkTo,
   className = '',
 }: LogoProps) => {
-  // Size configurations for the logo image
+  // Size configurations
   const sizeConfig = {
     sm: {
-      width: 50,
-      height: 50,
-      text: 'text-lg',
+      icon: 'w-8 h-8',
+      text: 'text-xl',
+      iconText: 'text-sm',
     },
     md: {
-      width: 80,
-      height: 80,
-      text: 'text-xl',
+      icon: 'w-12 h-12',
+      text: 'text-2xl',
+      iconText: 'text-lg',
     },
     lg: {
-      width: 120,
-      height: 120,
+      icon: 'w-16 h-16',
       text: 'text-3xl',
+      iconText: 'text-xl',
     },
   }
 
@@ -44,17 +42,11 @@ export const Logo = ({
   // Logo content
   const logoContent = (
     <>
-      {/* Logo Image */}
+      {/* Icon */}
       <div
-        className={`flex items-center justify-center ${variant === 'nav' ? 'group-hover:scale-105 transition-transform duration-200' : 'mb-4'}`}
+        className={`${config.icon} bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center ${variant === 'nav' ? 'group-hover:scale-105 transition-transform duration-200' : 'mb-4'}`}
       >
-        <Image
-          alt="حصارک پنجشیر لوگو"
-          width={config.width}
-          height={config.height}
-          src={logoImage}
-          priority={variant === 'nav'} // Prioritize nav logo loading
-        />
+        <span className={`text-white font-bold ${config.iconText}`}>H</span>
       </div>
 
       {/* Text */}
@@ -62,7 +54,7 @@ export const Logo = ({
         <h1
           className={`${config.text} font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent ${variant === 'auth' ? 'mb-2' : ''}`}
         >
-          {title || 'حصارک‌بس'}
+          {title || 'Hesarakbus'}
         </h1>
 
         {subtitle && variant === 'auth' && <p className="text-gray-600">{subtitle}</p>}
@@ -73,9 +65,7 @@ export const Logo = ({
   // Wrapper based on variant
   if (variant === 'nav') {
     const content = (
-      <div className={`group flex items-center space-x-reverse space-x-3 ${className}`}>
-        {logoContent}
-      </div>
+      <div className={`group flex items-center space-x-2 ${className}`}>{logoContent}</div>
     )
 
     return linkTo ? (
@@ -89,9 +79,7 @@ export const Logo = ({
 
   // Auth variant (centered)
   return (
-    <div
-      className={`${variant === 'auth' ? 'text-center mb-8' : 'flex items-center justify-center'} ${className}`}
-    >
+    <div className={`${variant === 'auth' ? 'text-center mb-8' : ''} ${className}`}>
       {linkTo ? <Link href={linkTo}>{logoContent}</Link> : logoContent}
     </div>
   )

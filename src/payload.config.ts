@@ -33,7 +33,7 @@ import { Drivers } from './collections/Drivers'
 const allowedOrigins = [
   'http://localhost:3000',
   'https://hesarak-backend.vercel.app',
-  'https://hesarakbus.com',
+  'https://gheyasi.com',
 ]
 
 const filename = fileURLToPath(import.meta.url)
