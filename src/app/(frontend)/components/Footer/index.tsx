@@ -8,18 +8,18 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gradient-to-br from-gray-800 to-gray-900 text-white">
+    <footer className="bg-gradient-to-br from-gray-800 to-gray-900 text-white" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-bold text-orange-400 mb-4">Hesarakbus</h3>
+            <h3 className="text-xl font-bold text-orange-400 mb-4">حصارک‌بس</h3>
             <p className="text-gray-300 mb-4 leading-relaxed">
-              Your trusted partner for safe and comfortable bus travel across Afghanistan. Book your
-              journey with confidence.
+              شریک مطمئن شما برای سفرهای امن و راحت در سراسر افغانستان. سفر خود را با اطمینان تکت
+              کنید.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex gap-3">
               <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors">
                 <Facebook size={20} />
               </a>
@@ -34,11 +34,11 @@ export const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">لینک‌های سریع</h4>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-300 hover:text-orange-400 transition-colors">
-                  Home
+                  صفحه اصلی
                 </Link>
               </li>
               <li>
@@ -46,7 +46,7 @@ export const Footer = () => {
                   href="/about"
                   className="text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  About Us
+                  درباره ما
                 </Link>
               </li>
               <li>
@@ -54,7 +54,7 @@ export const Footer = () => {
                   href="/search"
                   className="text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  Search Trips
+                  جستجوی سفرها
                 </Link>
               </li>
               <li>
@@ -62,7 +62,7 @@ export const Footer = () => {
                   href="/my-tickets"
                   className="text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  My Tickets
+                  تکت‌های من
                 </Link>
               </li>
               <li>
@@ -70,7 +70,7 @@ export const Footer = () => {
                   href="/contact"
                   className="text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  Contact
+                  تماس با ما
                 </Link>
               </li>
               <li>
@@ -78,7 +78,7 @@ export const Footer = () => {
                   href="/terms"
                   className="text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  Terms & Conditions
+                  شرایط و ضوابط
                 </Link>
               </li>
               <li>
@@ -86,7 +86,7 @@ export const Footer = () => {
                   href="/privacy"
                   className="text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  Privacy Policy
+                  حریم خصوصی
                 </Link>
               </li>
             </ul>
@@ -94,31 +94,31 @@ export const Footer = () => {
 
           {/* Services */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Services</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">خدمات</h4>
             <ul className="space-y-2 text-gray-300">
-              <li>Bus Ticket Booking</li>
-              <li>Seat Selection</li>
-              <li>24/7 Customer Support</li>
-              <li>Multiple Payment Options</li>
-              <li>Trip Management</li>
+              <li>تکت اتوبوس</li>
+              <li>انتخاب چوکی</li>
+              <li>خدمات ۲۴ ساعته</li>
+              <li>گزینه‌های متعدد پرداخت</li>
+              <li>مدیریت سفر</li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Contact Us</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">تماس با ما</h4>
             <div className="space-y-3">
               <div className="flex items-center text-gray-300">
-                <Phone size={16} className="mr-3 text-orange-400" />
-                <span>+93 70 123 4567</span>
+                <Phone size={16} className="ml-3 text-orange-400" />
+                <span dir="ltr">+93 79 900 4567</span>
               </div>
               <div className="flex items-center text-gray-300">
-                <Mail size={16} className="mr-3 text-orange-400" />
-                <span>support@hesaarak.com</span>
+                <Mail size={16} className="ml-3 text-orange-400" />
+                <span dir="ltr">support@hesarakbus.com</span>
               </div>
               <div className="flex items-start text-gray-300">
-                <MapPin size={16} className="mr-3 text-orange-400 mt-1" />
-                <span>Kabul, Afghanistan</span>
+                <MapPin size={16} className="ml-3 text-orange-400 mt-1" />
+                <span>لوای بابه جان، کابل، افغانستان</span>
               </div>
             </div>
           </div>
@@ -127,27 +127,25 @@ export const Footer = () => {
         {/* Divider */}
         <div className="border-t border-gray-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              © {currentYear} Hesarakbus. All rights reserved.
-            </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
+            <p className="text-gray-400 text-sm">© {currentYear} حصارک‌بس. تمام حقوق محفوظ است.</p>
+            <div className="flex gap-6 mt-4 md:mt-0">
               <Link
                 href="/privacy"
                 className="text-gray-400 hover:text-orange-400 text-sm transition-colors"
               >
-                Privacy Policy
+                حریم خصوصی
               </Link>
               <Link
                 href="/terms"
                 className="text-gray-400 hover:text-orange-400 text-sm transition-colors"
               >
-                Terms of Service
+                شرایط خدمات
               </Link>
               <Link
                 href="/help"
                 className="text-gray-400 hover:text-orange-400 text-sm transition-colors"
               >
-                Help
+                کمک
               </Link>
             </div>
           </div>
