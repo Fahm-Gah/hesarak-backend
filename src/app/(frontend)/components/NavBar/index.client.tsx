@@ -241,7 +241,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
               {user ? (
                 <>
                   <div className="px-4 py-3 border-b border-gray-200 mb-2">
-                    <div className="flex items-center space-x-reverse space-x-3">
+                    <div className="flex items-center">
                       <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
                           {(typeof user.profile === 'object' &&
@@ -249,7 +249,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                             user.email?.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 mr-3">
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {(typeof user.profile === 'object' && user.profile?.fullName) ||
                             user.email}

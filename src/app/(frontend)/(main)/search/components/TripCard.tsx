@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, Bus, Wifi, Tv, Wind, Coffee, UtensilsCrossed } from 'lucide-react'
+import { ChevronRight, Bus, Wifi, Tv, Wind, Coffee, UtensilsCrossed, Toilet } from 'lucide-react'
 
 interface Trip {
   id: string
@@ -74,13 +74,52 @@ interface TripCardProps {
   }
 }
 
-// Function to convert 24-hour time to 12-hour format
-const formatTo12Hour = (time24: string): string => {
+// Function to convert 24-hour time to 12-hour format with Persian AM/PM
+const formatToPersian12Hour = (time24: string): string => {
   const [hours, minutes] = time24.split(':')
   const hour = parseInt(hours, 10)
-  const period = hour >= 12 ? 'PM' : 'AM'
+  const minute = parseInt(minutes, 10)
+  const period = hour >= 12 ? 'ب.ظ' : 'ق.ظ'
   const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
-  return `${hour12}:${minutes} ${period}`
+
+  // Convert to Persian digits
+  const persianHour = convertToPersianDigits(hour12)
+  const persianMinutes = convertToPersianDigits(minute).padStart(2, '۰')
+
+  return `${persianHour}:${persianMinutes} ${period}`
+}
+
+// Function to convert English digits to Persian digits
+const convertToPersianDigits = (num: number): string => {
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
+  return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
+}
+
+// Function to format duration to Persian with full words
+const formatDurationToPersian = (duration: string): string => {
+  if (!duration || duration === 'Unknown' || duration === 'نامشخص') {
+    return 'نامشخص'
+  }
+
+  // Parse duration like "9h 30m" or "9h 0m"
+  const hourMatch = duration.match(/(\d+)h/)
+  const minuteMatch = duration.match(/(\d+)m/)
+
+  const hours = hourMatch ? parseInt(hourMatch[1]) : 0
+  const minutes = minuteMatch ? parseInt(minuteMatch[1]) : 0
+
+  let result = ''
+
+  if (hours > 0) {
+    result += `${convertToPersianDigits(hours)} ساعت`
+  }
+
+  if (minutes > 0) {
+    if (result) result += ' '
+    result += `${convertToPersianDigits(minutes)} دقیقه`
+  }
+
+  return result || 'نامشخص'
 }
 
 export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: TripCardProps) => {
@@ -134,6 +173,7 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
           ? 'opacity-60 cursor-not-allowed'
           : 'cursor-pointer hover:shadow-xl hover:-translate-y-1'
       }`}
+      dir="rtl"
     >
       {/* Gradient accent bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-red-500"></div>
@@ -141,9 +181,9 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
       <div className="p-6">
         {/* Header: Trip Times */}
         <div className="flex items-center justify-between mb-5">
-          <div className="text-left">
-            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
-              {formatTo12Hour(trip.departureTime)}
+          <div className="text-right">
+            <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+              {formatToPersian12Hour(trip.departureTime)}
             </div>
             <div className="text-xs sm:text-sm font-medium text-gray-600">{trip.from.name}</div>
           </div>
@@ -154,8 +194,8 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
                 <div className="absolute inset-0 rounded-full bg-orange-500 animate-ping opacity-25"></div>
               </div>
               <div className="flex-1 h-0.5 bg-gradient-to-r from-orange-500 via-gray-300 to-red-500 mx-2 sm:mx-3 relative flex items-center justify-center">
-                <span className="bg-white px-1 sm:px-2 text-xs font-medium text-gray-500">
-                  {trip.duration || 'N/A'}
+                <span className="bg-white px-1 sm:px-2 text-[10px] sm:text-xs font-medium text-gray-500">
+                  {formatDurationToPersian(trip.duration || '')}
                 </span>
               </div>
               <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 relative">
@@ -164,18 +204,18 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
             </div>
           </div>
 
-          <div className="text-right">
-            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
-              {trip.arrivalTime ? formatTo12Hour(trip.arrivalTime) : 'N/A'}
+          <div className="text-left">
+            <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+              {trip.arrivalTime ? formatToPersian12Hour(trip.arrivalTime) : 'نامشخص'}
             </div>
             <div className="text-xs sm:text-sm font-medium text-gray-600">
-              {trip.to?.name || 'Destination'}
+              {trip.to?.name || 'مقصد'}
             </div>
           </div>
         </div>
 
         {/* Bus Type Badge */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 pt-4 border-t border-gray-100 gap-3">
+        <div className="flex flex-row items-center justify-between mt-4 pt-4 border-t border-gray-100 gap-3">
           {/* Amenities Preview */}
           {trip.bus.type.amenities && trip.bus.type.amenities.length > 0 && (
             <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -191,6 +231,8 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
                   if (
                     lowerAmenity.includes('ac') ||
                     lowerAmenity.includes('air') ||
+                    lowerAmenity.includes('fan') ||
+                    lowerAmenity.includes('cooler') ||
                     lowerAmenity.includes('conditioning')
                   ) {
                     return <Wind className="w-3 h-3" />
@@ -201,22 +243,21 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
                   if (lowerAmenity.includes('food') || lowerAmenity.includes('meal')) {
                     return <UtensilsCrossed className="w-3 h-3" />
                   }
-                  return <Bus className="w-3 h-3" />
+                  if (lowerAmenity.includes('wc') || lowerAmenity.includes('toilet')) {
+                    return <Toilet className="w-3 h-3" />
+                  }
+                  return
                 }
 
                 return (
-                  <div
-                    key={index}
-                    className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-md"
-                  >
-                    <div className="text-gray-600">{getAmenityIcon(amenityObj.amenity)}</div>
+                  <div key={index} className="px-2 py-1 bg-gray-100 rounded-md">
                     <span className="text-xs text-gray-700 font-medium">{amenityObj.amenity}</span>
                   </div>
                 )
               })}
               {trip.bus.type.amenities.length > 4 && (
                 <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded-md">
-                  +{trip.bus.type.amenities.length - 4} more
+                  +{trip.bus.type.amenities.length - 4} بیشتر
                 </span>
               )}
             </div>
@@ -227,7 +268,7 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
               <Bus className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
             </div>
             <span className="text-sm font-medium text-gray-700">{trip.bus.type.name}</span>
-            <span className="text-xs text-gray-500">• Bus {trip.bus.number}</span>
+            <span className="text-xs text-gray-500">• اتوبوس {trip.bus.number}</span>
           </div>
         </div>
 
@@ -246,24 +287,24 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
               }`}
             >
               {!trip.isBookingAllowed
-                ? 'Booking Closed'
+                ? 'تکت کردن بسته است'
                 : trip.availability.availableSeats > 0
-                  ? `${trip.availability.availableSeats} seats left`
-                  : 'Sold Out'}
+                  ? `${convertToPersianDigits(trip.availability.availableSeats)} چوکی خالی`
+                  : 'تمام شده'}
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="text-right">
+            <div className="text-left">
               <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                {trip.price.toLocaleString()} AF
+                {convertToPersianDigits(trip.price).replace(/\B(?=(\d{3})+(?!\d))/g, '،')} افغانی
               </div>
-              <div className="text-xs text-gray-500">per passenger</div>
+              <div className="text-xs text-gray-500">از هر مسافر</div>
             </div>
 
             {/* Arrow indicator */}
             <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-100 group-hover:bg-orange-500 flex items-center justify-center transition-all duration-300">
-              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600 group-hover:text-white transition-colors duration-300" />
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600 group-hover:text-white transition-colors duration-300 rotate-180" />
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@ export const FeaturesSection = () => {
   const features = [
     {
       icon: Shield,
-      title: 'ایمن و مطمئن',
+      title: 'امن و مطمئن',
       description:
         'تمام اتوبوس‌های ما به طور منظم نگهداری و بازرسی می‌شوند تا ایمنی و راحتی شما تضمین شود.',
     },

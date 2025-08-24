@@ -8,7 +8,6 @@ import { SearchBar } from './components/SearchBar'
 import { FiltersSidebar } from './components/FiltersSidebar'
 import { TripResultsList } from './components/TripResultsList'
 import { PopularRoutes } from './components/PopularRoutes'
-import { SearchSuggestions } from './components/SearchSuggestions'
 
 interface Trip {
   id: string
@@ -121,7 +120,6 @@ export const SearchPageClient = ({
     departureTime: [] as string[],
     priceMin: '',
     priceMax: '',
-    busTypes: [] as string[],
     showSoldOut: true,
     availableOnly: false,
   })
@@ -133,7 +131,6 @@ export const SearchPageClient = ({
       departureTime: [],
       priceMin: '',
       priceMax: '',
-      busTypes: [],
       showSoldOut: true,
       availableOnly: false,
     })
@@ -179,7 +176,7 @@ export const SearchPageClient = ({
     }
   }, [showFilters])
 
-  const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Search Trips' }]
+  const breadcrumbItems = [{ label: 'خانه', href: '/' }, { label: 'جستجوی سفرها' }]
 
   // Pagination handlers
   const handlePageChange = (newPage: number) => {
@@ -195,7 +192,7 @@ export const SearchPageClient = ({
   // Handle case when no search parameters are provided
   if (!from || !to) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4" dir="rtl">
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumbs */}
           <div className="mb-4">
@@ -207,9 +204,6 @@ export const SearchPageClient = ({
 
           {/* Popular Routes */}
           <PopularRoutes />
-
-          {/* Search Suggestions */}
-          <SearchSuggestions />
         </div>
       </div>
     )
@@ -218,7 +212,7 @@ export const SearchPageClient = ({
   // Handle error state when search fails
   if (!searchResult?.success || !searchResult?.data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4" dir="rtl">
         <div className="max-w-6xl mx-auto">
           <div className="mb-4">
             <Breadcrumbs items={breadcrumbItems} />
@@ -228,8 +222,8 @@ export const SearchPageClient = ({
 
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">No results found</h2>
-              <p className="text-gray-500">We couldn't find any trips for your search criteria</p>
+              <h2 className="text-xl font-semibold text-gray-700 mb-2">نتیجه‌ای یافت نشد</h2>
+              <p className="text-gray-500">ما نتوانستیم سفری برای معیارهای جستجوی شما پیدا کنیم</p>
             </div>
           </div>
         </div>
@@ -240,11 +234,11 @@ export const SearchPageClient = ({
   const { data } = searchResult
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4" dir="rtl">
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumbs */}
         <div className="mb-4">
-          <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Search Results' }]} />
+          <Breadcrumbs items={[{ label: 'خانه', href: '/' }, { label: 'نتایج جستجو' }]} />
         </div>
 
         {/* Search Bar */}
@@ -300,7 +294,7 @@ export const SearchPageClient = ({
             <div className="filter-menu h-full overflow-y-auto">
               {/* Filter Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-orange-50">
-                <h3 className="text-lg font-semibold text-gray-800">Filters</h3>
+                <h3 className="text-lg font-semibold text-gray-800">فیلترها</h3>
                 <button
                   onClick={() => setShowFilters(false)}
                   className="p-2 hover:bg-orange-100 rounded-lg transition-colors"

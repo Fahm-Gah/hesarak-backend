@@ -102,7 +102,7 @@ export const SearchBar = ({
     }
   }
 
-  // Close dropdowns when clicking outside
+  // Close dropdowns when clicking outside or pressing escape
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
@@ -124,12 +124,21 @@ export const SearchBar = ({
       }
     }
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowFromDropdown(false)
+        setShowToDropdown(false)
+      }
+    }
+
     if (showFromDropdown || showToDropdown) {
       document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleKeyDown)
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
     }
   }, [showFromDropdown, showToDropdown])
 
@@ -163,12 +172,15 @@ export const SearchBar = ({
   const isFormValid = searchFrom && searchTo && searchFrom !== searchTo
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 lg:p-6 mb-6">
+    <div
+      className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 lg:p-6 mb-6"
+      dir="rtl"
+    >
       <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-4 w-full">
         {/* From Field */}
         <div className="flex-1 min-w-0 w-full lg:flex-1">
           <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
-            FROM
+            مبدأ
           </label>
           <div className="relative">
             <div
@@ -180,7 +192,7 @@ export const SearchBar = ({
               className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
             >
               <span className={fromInput ? 'text-gray-900' : 'text-gray-500'}>
-                {fromInput || 'Select city'}
+                {fromInput || 'شهر را انتخاب کنید'}
               </span>
               <ChevronDown
                 className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showFromDropdown ? 'rotate-180' : ''}`}
@@ -208,12 +220,12 @@ export const SearchBar = ({
                     ))}
                     {searchTo && (
                       <div className="px-4 py-2 text-sm text-gray-500 italic border-t border-gray-100">
-                        {searchTo} is already selected as destination
+                        {searchTo} قبلاً به عنوان مقصد انتخاب شده است
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="px-4 py-3 text-center text-gray-500">No cities available</div>
+                  <div className="px-4 py-3 text-center text-gray-500">هیچ شهری در دسترس نیست</div>
                 )}
               </div>
             )}
@@ -225,7 +237,7 @@ export const SearchBar = ({
           <button
             onClick={handleSwap}
             className="p-2 rounded-full bg-gray-100 hover:bg-orange-100 text-gray-600 hover:text-orange-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 group"
-            title="Swap departure and destination"
+            title="تعویض مبدأ و مقصد"
           >
             <ArrowLeftRight className="w-5 h-5 transform group-hover:rotate-180 transition-transform duration-500" />
           </button>
@@ -234,7 +246,7 @@ export const SearchBar = ({
         {/* To Field */}
         <div className="flex-1 min-w-0 w-full lg:flex-1">
           <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
-            TO
+            مقصد
           </label>
           <div className="relative">
             <div
@@ -246,7 +258,7 @@ export const SearchBar = ({
               className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-200 rounded-2xl px-4 py-3.5 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-400/60 focus:border-orange-300 focus:bg-white focus:shadow-lg cursor-pointer hover:bg-gray-50/80 hover:border-gray-300 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
             >
               <span className={toInput ? 'text-gray-900' : 'text-gray-500'}>
-                {toInput || 'Select city'}
+                {toInput || 'شهر را انتخاب کنید'}
               </span>
               <ChevronDown
                 className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showToDropdown ? 'rotate-180' : ''}`}
@@ -274,12 +286,12 @@ export const SearchBar = ({
                     ))}
                     {searchFrom && (
                       <div className="px-4 py-2 text-sm text-gray-500 italic border-t border-gray-100">
-                        {searchFrom} is already selected as departure
+                        {searchFrom} قبلاً به عنوان مبدأ انتخاب شده است
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="px-4 py-3 text-center text-gray-500">No cities available</div>
+                  <div className="px-4 py-3 text-center text-gray-500">هیچ شهری در دسترس نیست</div>
                 )}
               </div>
             )}
@@ -291,7 +303,7 @@ export const SearchBar = ({
           <button
             onClick={handleSwap}
             className="p-2 rounded-full bg-gray-100 hover:bg-orange-100 text-gray-600 hover:text-orange-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 group"
-            title="Swap departure and destination"
+            title="تعویض مبدأ و مقصد"
           >
             <ArrowLeftRight className="w-5 h-5 transform group-hover:rotate-180 transition-transform duration-500" />
           </button>
@@ -302,7 +314,7 @@ export const SearchBar = ({
           <JalaaliDatePicker
             value={searchDate}
             onChange={setSearchDate}
-            label="DATE"
+            label="تاریخ"
             size="sm"
             variant="compact"
             className="w-full lg:hidden"
@@ -310,7 +322,7 @@ export const SearchBar = ({
           <JalaaliDatePicker
             value={searchDate}
             onChange={setSearchDate}
-            label="DATE"
+            label="تاریخ"
             className="w-full hidden lg:block"
           />
         </div>
@@ -326,14 +338,14 @@ export const SearchBar = ({
           ) : (
             <Search className="w-4 h-4" />
           )}
-          {isSearching ? 'Searching...' : 'Search'}
+          {isSearching ? 'در حال جستجو...' : 'جستجو'}
         </button>
       </div>
 
       {/* Quick validation feedback */}
       {searchFrom && searchTo && searchFrom === searchTo && (
         <div className="mt-3 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-          Please select different departure and destination locations.
+          لطفاً مبدأ و مقصد متفاوت انتخاب کنید.
         </div>
       )}
     </div>

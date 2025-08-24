@@ -66,7 +66,6 @@ interface FiltersType {
   departureTime: string[]
   priceMin: string
   priceMax: string
-  busTypes: string[]
   showSoldOut: boolean
   availableOnly: boolean
 }
@@ -86,6 +85,12 @@ interface TripResultsListProps {
   }
   onClearFilters: () => void
   showFilters?: () => void
+}
+
+// Function to convert numbers to Persian digits
+const convertToPersianDigits = (num: number): string => {
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
+  return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
 }
 
 export const TripResultsList = ({
@@ -158,15 +163,6 @@ export const TripResultsList = ({
       filtered = filtered.filter((trip) => trip.price >= minPrice && trip.price <= maxPrice)
     }
 
-    // Filter by bus type
-    if (filters.busTypes.length > 0) {
-      filtered = filtered.filter((trip) =>
-        filters.busTypes.some((type) =>
-          trip.bus.type.name.toLowerCase().includes(type.toLowerCase()),
-        ),
-      )
-    }
-
     // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -188,7 +184,7 @@ export const TripResultsList = ({
   }, [trips, filters, sortBy])
 
   return (
-    <div className="w-full">
+    <div className="w-full" dir="rtl">
       {/* Mobile Layout */}
       <div className="lg:hidden mb-4">
         <div className="flex items-center justify-between mb-2">
@@ -206,7 +202,7 @@ export const TripResultsList = ({
                   d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                 />
               </svg>
-              Filters
+              فیلترها
             </button>
           )}
 
@@ -220,10 +216,10 @@ export const TripResultsList = ({
               className="relative px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white cursor-pointer hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 pr-10 min-w-[160px]"
             >
               <span className="text-gray-900">
-                {sortBy === 'departureTime' && 'Departure'}
-                {sortBy === 'priceAsc' && 'Price ↑'}
-                {sortBy === 'priceDesc' && 'Price ↓'}
-                {sortBy === 'duration' && 'Duration'}
+                {sortBy === 'departureTime' && 'زمان حرکت'}
+                {sortBy === 'priceAsc' && 'قیمت ↑'}
+                {sortBy === 'priceDesc' && 'قیمت ↓'}
+                {sortBy === 'duration' && 'مدت زمان'}
               </span>
               <svg
                 className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform duration-200 ${showSortDropdown ? 'rotate-180' : ''}`}
@@ -243,10 +239,10 @@ export const TripResultsList = ({
             {showSortDropdown && (
               <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[200px]">
                 {[
-                  { value: 'departureTime', label: 'Sort by: Departure Time' },
-                  { value: 'priceAsc', label: 'Sort by: Price (Low to High)' },
-                  { value: 'priceDesc', label: 'Sort by: Price (High to Low)' },
-                  { value: 'duration', label: 'Sort by: Duration' },
+                  { value: 'departureTime', label: 'زمان حرکت' },
+                  { value: 'priceAsc', label: 'قیمت (کم به زیاد)' },
+                  { value: 'priceDesc', label: 'قیمت (زیاد به کم)' },
+                  { value: 'duration', label: 'مدت زمان' },
                 ].map((option, index) => (
                   <div
                     key={option.value}
@@ -269,14 +265,16 @@ export const TripResultsList = ({
           </div>
         </div>
         <p className="text-sm text-gray-600">
-          {filteredAndSortedTrips.length} of {totalTrips} trips found
+          {convertToPersianDigits(filteredAndSortedTrips.length)} از{' '}
+          {convertToPersianDigits(totalTrips)} سفر پیدا شد
         </p>
       </div>
 
       {/* Desktop Layout */}
       <div className="hidden lg:flex items-center justify-between mb-4">
         <p className="text-sm text-gray-600">
-          {filteredAndSortedTrips.length} of {totalTrips} trips found
+          {convertToPersianDigits(filteredAndSortedTrips.length)} از{' '}
+          {convertToPersianDigits(totalTrips)} سفر پیدا شد
         </p>
         <div className="flex items-center gap-3">
           {/* Sort Dropdown */}
@@ -289,10 +287,10 @@ export const TripResultsList = ({
               className="relative px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white cursor-pointer hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 pr-10 min-w-[200px]"
             >
               <span className="text-gray-900">
-                Sort by: {sortBy === 'departureTime' && 'Departure Time'}
-                {sortBy === 'priceAsc' && 'Price (Low to High)'}
-                {sortBy === 'priceDesc' && 'Price (High to Low)'}
-                {sortBy === 'duration' && 'Duration'}
+                ترتیب: {sortBy === 'departureTime' && 'زمان حرکت'}
+                {sortBy === 'priceAsc' && 'قیمت (کم به زیاد)'}
+                {sortBy === 'priceDesc' && 'قیمت (زیاد به کم)'}
+                {sortBy === 'duration' && 'مدت زمان'}
               </span>
               <svg
                 className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform duration-200 ${showSortDropdown ? 'rotate-180' : ''}`}
@@ -312,10 +310,10 @@ export const TripResultsList = ({
             {showSortDropdown && (
               <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[200px]">
                 {[
-                  { value: 'departureTime', label: 'Sort by: Departure Time' },
-                  { value: 'priceAsc', label: 'Sort by: Price (Low to High)' },
-                  { value: 'priceDesc', label: 'Sort by: Price (High to Low)' },
-                  { value: 'duration', label: 'Sort by: Duration' },
+                  { value: 'departureTime', label: 'زمان حرکت' },
+                  { value: 'priceAsc', label: 'قیمت (کم به زیاد)' },
+                  { value: 'priceDesc', label: 'قیمت (زیاد به کم)' },
+                  { value: 'duration', label: 'مدت زمان' },
                 ].map((option, index) => (
                   <div
                     key={option.value}
@@ -355,17 +353,17 @@ export const TripResultsList = ({
       {filteredAndSortedTrips.length === 0 && totalTrips > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
           <h3 className="text-lg font-semibold text-yellow-800 mb-2">
-            No trips match your filters
+            هیچ سفری با فیلترهای شما پیدا نشد
           </h3>
           <p className="text-yellow-700 mb-4">
-            We found {totalTrips} trips for this route, but none match your current filters. Try
-            adjusting your filters or clearing them to see all available trips.
+            ما {convertToPersianDigits(totalTrips)} سفر برای این مسیر پیدا کردیم، اما هیچ کدام با
+            فیلترهای فعلی شما مطابقت ندارد. فیلترهای خود را تنظیم کنید یا آنها را پاک کنید.
           </p>
           <button
             onClick={onClearFilters}
             className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
           >
-            Clear All Filters
+            پاک کردن همه فیلترها
           </button>
         </div>
       )}
@@ -373,10 +371,10 @@ export const TripResultsList = ({
       {/* No Trips Found */}
       {totalTrips === 0 && (
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">No trips found</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">هیچ سفری پیدا نشد</h3>
           <p className="text-gray-600">
-            We couldn't find any trips for this route on the selected date. Please try a different
-            date or route.
+            ما نتوانستیم هیچ سفری برای این مسیر در تاریخ انتخابی پیدا کنیم. لطفاً تاریخ یا مسیر
+            دیگری را امتحان کنید.
           </p>
         </div>
       )}
