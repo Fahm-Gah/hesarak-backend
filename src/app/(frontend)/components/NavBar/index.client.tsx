@@ -81,7 +81,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Logo variant="nav" size="sm" linkTo="/" />
+          <Logo variant="nav" size="md" linkTo="/" />
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">

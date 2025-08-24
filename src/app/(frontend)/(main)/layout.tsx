@@ -3,36 +3,27 @@ import { NavBar } from '@/app/(frontend)/components/NavBar'
 import { AuthProvider } from '@/providers/AuthContext'
 import { Toast } from '@/app/(frontend)/components/Toast'
 import { Footer } from '@/app/(frontend)/components/Footer'
-
-import '../../globals.css'
-
-import { Vazirmatn } from 'next/font/google'
-
-const vazirmatn = Vazirmatn({
-  subsets: ['latin'],
-})
+import type { Metadata } from 'next'
 
 // Force dynamic rendering since we use authentication
 export const dynamic = 'force-dynamic'
 
-export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+export const metadata: Metadata = {
+  title: 'حصارک‌بس - سیستم تکت آنلاین اتوبوس افغانستان',
+  description:
+    'سیستم آنلاین تکت اتوبوس. جستجو و خرید آسان تکت اتوبوس با انتخاب چوکی و پرداخت آنلاین.',
+  keywords: 'اتوبوس,, تکت, پنجشیر, افغانستان, سفر, حمل و نقل',
 }
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
+export default async function MainLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html lang="fa" className={vazirmatn.className}>
-      <body>
-        <AuthProvider>
-          <NavBar />
-          <main>{children}</main>
-          <Footer />
-          <Toast />
-        </AuthProvider>
-      </body>
-    </html>
+    <AuthProvider>
+      <NavBar />
+      <main>{children}</main>
+      <Footer />
+      <Toast />
+    </AuthProvider>
   )
 }
