@@ -39,7 +39,7 @@ interface Stop {
 
 interface TripDetails {
   id: string
-  name: string
+  tripName: string
   price: number
   departureTime: string
   arrivalTime: string | null

@@ -31,7 +31,7 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
       return `${bookingData.trip.from.province} → ${bookingData.trip.to.province}`
     }
     // Fallback to trip name if no terminal info
-    return bookingData.trip.name
+    return bookingData.trip.tripName
   }
 
   const getThemeColors = () => {

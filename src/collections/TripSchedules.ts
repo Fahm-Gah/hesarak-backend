@@ -15,8 +15,8 @@ export const TripSchedules: CollectionConfig = {
   },
   access: tripSchedulesAccess,
   admin: {
-    useAsTitle: 'name',
-    defaultColumns: ['name', 'bus', 'departureTime', 'from', 'to', 'price', 'frequency'],
+    useAsTitle: 'tripName',
+    defaultColumns: ['tripName', 'bus', 'departureTime', 'from', 'to', 'price', 'frequency'],
     group: {
       en: 'Operations',
       fa: 'عملیات',
@@ -24,10 +24,10 @@ export const TripSchedules: CollectionConfig = {
   },
   fields: [
     {
-      name: 'name',
+      name: 'tripName',
       label: {
-        en: 'Name',
-        fa: 'نام',
+        en: 'Trip Name',
+        fa: 'نام سفر',
       },
       type: 'text',
       required: true,

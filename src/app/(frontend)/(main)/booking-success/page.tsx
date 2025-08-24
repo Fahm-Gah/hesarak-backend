@@ -111,10 +111,10 @@ export async function generateMetadata({ searchParams }: BookingSuccessPageProps
 
   return {
     title: ticketDetails
-      ? `Ticket ${ticketDetails.ticketNumber} - ${ticketDetails.trip.name} | Hesarakbus`
+      ? `Ticket ${ticketDetails.ticketNumber} - ${ticketDetails.trip.tripName} | Hesarakbus`
       : 'Booking Details - Hesarakbus',
     description: ticketDetails
-      ? `Your booking for ${ticketDetails.trip.name} - Ticket #${ticketDetails.ticketNumber}`
+      ? `Your booking for ${ticketDetails.trip.tripName} - Ticket #${ticketDetails.ticketNumber}`
       : 'View your booking details and ticket information.',
   }
 }

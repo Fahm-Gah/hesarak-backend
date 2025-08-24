@@ -28,7 +28,7 @@ interface BookingData {
   }
   trip: {
     id: string
-    name: string
+    tripName: string
     price: number
   }
   booking: {
@@ -49,7 +49,7 @@ interface BookingData {
 
 interface TripDetails {
   id: string
-  name: string
+  tripName: string
   price: number
   departureTime: string
   arrivalTime: string | null

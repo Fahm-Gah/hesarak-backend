@@ -6,7 +6,7 @@ interface UserTicket {
   ticketNumber: string
   trip: {
     id: string
-    name: string
+    tripName: string
     from: {
       name: string
       province: string
@@ -329,7 +329,7 @@ export const getUserTickets: Endpoint = {
           ticketNumber: ticket.ticketNumber,
           trip: {
             id: trip?.id || '',
-            name: trip?.name || '',
+            tripName: trip?.tripName || '',
             from: {
               name: userBoardingTerminal?.name || '',
               province: userBoardingTerminal?.province || '',

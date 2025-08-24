@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 interface TripDetails {
   id: string
-  name: string
+  tripName: string
   price: number
   departureTime: string
   arrivalTime: string | null

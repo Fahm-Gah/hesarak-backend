@@ -11,7 +11,7 @@ import { PopularRoutes } from './components/PopularRoutes'
 
 interface Trip {
   id: string
-  name: string
+  tripName: string
   price: number
   departureTime: string
   arrivalTime: string | null

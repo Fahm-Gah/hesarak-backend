@@ -94,7 +94,7 @@ export const getTicketDetails: Endpoint = {
         },
         trip: {
           id: ticket.trip?.id || '',
-          name: ticket.trip?.name || '',
+          tripName: ticket.trip?.tripName || '',
           price: ticket.trip?.price || 0,
           from: userFrom
             ? {

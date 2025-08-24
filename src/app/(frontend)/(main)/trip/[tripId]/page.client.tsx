@@ -28,7 +28,7 @@ interface BusLayoutElement {
 
 interface TripDetails {
   id: string
-  name: string
+  tripName: string
   price: number
   departureTime: string
   arrivalTime: string | null
@@ -145,7 +145,6 @@ export const TripDetailsClient = ({
   const router = useRouter()
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
   const [isBookingLoading, setIsBookingLoading] = useState(false)
-
 
   // Handle initial error from URL parameters
   useEffect(() => {

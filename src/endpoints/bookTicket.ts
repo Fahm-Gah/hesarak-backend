@@ -374,7 +374,7 @@ export const bookTicket: Endpoint = {
             },
             trip: {
               id: trip.id,
-              name: trip.name,
+              tripName: trip.tripName,
               price: trip.price,
               from:
                 ticket.from && typeof ticket.from === 'object'

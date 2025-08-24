@@ -10,7 +10,7 @@ export interface BookingData {
   }
   trip: {
     id: string
-    name: string
+    tripName: string
     price: number
     from?: {
       id: string

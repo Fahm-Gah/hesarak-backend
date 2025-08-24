@@ -3,7 +3,7 @@ export interface UserTicket {
   ticketNumber: string
   trip: {
     id: string
-    name: string
+    tripName: string
     from: {
       name: string
       province: string

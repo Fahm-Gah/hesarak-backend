@@ -22,7 +22,7 @@ interface TripAvailability {
 
 interface SearchedTrip {
   id: string
-  name: string
+  tripName: string
   price: number
   departureTime: string
   arrivalTime: string | null
@@ -338,7 +338,7 @@ export const searchTrips: Endpoint = {
 
           return {
             id: trip.id,
-            name: trip.name,
+            tripName: trip.tripName,
             price: trip.price,
             departureTime: userBoardingTime,
             arrivalTime,

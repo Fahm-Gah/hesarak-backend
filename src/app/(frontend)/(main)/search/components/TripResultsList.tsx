@@ -5,7 +5,7 @@ import { TripCard } from './TripCard'
 
 interface Trip {
   id: string
-  name: string
+  tripName: string
   price: number
   departureTime: string
   arrivalTime: string | null

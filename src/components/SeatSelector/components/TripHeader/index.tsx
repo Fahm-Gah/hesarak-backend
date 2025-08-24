@@ -88,7 +88,7 @@ export const TripHeader = memo<TripHeaderProps>(({ trip }) => {
   return (
     <div className="trip-header">
       <div className="trip-header__title-row">
-        <h3 className="trip-header__title">{trip.name}</h3>
+        <h3 className="trip-header__title">{trip.tripName}</h3>
       </div>
 
       <div className="trip-header__metadata">

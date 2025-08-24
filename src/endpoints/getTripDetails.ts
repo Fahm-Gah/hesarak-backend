@@ -329,7 +329,7 @@ export const getTripDetails: Endpoint = {
         success: true,
         data: {
           id: trip.id,
-          name: trip.name,
+          tripName: trip.tripName,
           price: trip.price,
           departureTime: userBoardingTime,
           arrivalTime,

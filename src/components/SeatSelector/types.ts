@@ -93,7 +93,7 @@ export interface Bus {
  */
 export interface Trip {
   id: string
-  name: string
+  tripName: string
   from: Terminal
   stops: TripStop[]
   bus: Bus

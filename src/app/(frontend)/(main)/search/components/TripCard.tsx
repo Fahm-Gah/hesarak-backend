@@ -6,7 +6,7 @@ import { ChevronRight, Bus, Wifi, Tv, Wind, Coffee, UtensilsCrossed, Toilet } fr
 
 interface Trip {
   id: string
-  name: string
+  tripName: string
   price: number
   departureTime: string
   arrivalTime: string | null
