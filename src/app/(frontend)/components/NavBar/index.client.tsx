@@ -105,21 +105,11 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={toggleProfileDropdown}
-                  className="flex items-center space-x-reverse space-x-3 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
                   aria-expanded={isProfileDropdownOpen}
                   aria-haspopup="true"
-                  aria-label="Open user menu"
+                  aria-label="منوی کاربری"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {(typeof user.profile === 'object' &&
-                        user.profile?.fullName?.charAt(0).toUpperCase()) ||
-                        user.email?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <span className="text-gray-800 font-medium text-sm max-w-32 truncate">
-                    {(typeof user.profile === 'object' && user.profile?.fullName) || user.email}
-                  </span>
                   <svg
                     className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
                       isProfileDropdownOpen ? 'rotate-180' : ''
@@ -135,12 +125,22 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                       d="M19 9l-7 7-7-7"
                     />
                   </svg>
+                  <span className="text-gray-800 font-medium text-sm max-w-32 truncate">
+                    {(typeof user.profile === 'object' && user.profile?.fullName) || user.email}
+                  </span>
+                  <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {(typeof user.profile === 'object' &&
+                        user.profile?.fullName?.charAt(0).toUpperCase()) ||
+                        user.email?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                 </button>
 
                 {/* Profile Dropdown */}
                 {isProfileDropdownOpen && (
                   <div
-                    className="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 transform transition-all duration-200 origin-top-left opacity-100 scale-100 translate-y-0"
+                    className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 transform transition-all duration-200 origin-top-right opacity-100 scale-100 translate-y-0 z-50"
                     role="menu"
                     aria-orientation="vertical"
                   >
@@ -158,7 +158,7 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
                         onClick={closeDropdown}
                         role="menuitem"
                       >
-                        <span className="ml-3 text-base" aria-hidden="true">
+                        <span className="mr-3 text-base" aria-hidden="true">
                           {item.icon}
                         </span>
                         {item.label}
