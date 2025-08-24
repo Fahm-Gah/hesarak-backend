@@ -1,5 +1,7 @@
 import React from 'react'
 import { Metadata } from 'next'
+import { generateSEOMetadata } from '@/components/SEO/SEOHead'
+import { FAQStructuredData } from '@/components/SEO/StructuredData'
 import {
   HelpCircle,
   Search,
@@ -18,15 +20,50 @@ import {
   Calendar,
 } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'کمک و پشتیبانی | حصارک‌بس - کمک برای تکت بس',
+export const metadata: Metadata = generateSEOMetadata({
+  title: 'کمک و پشتیبانی | حصارک‌بس - راهنمای کامل استفاده',
   description:
-    'پاسخ به سوالات رایج در مورد تکت بس با حصارک‌بس، روش‌های پرداخت، سیاست لغو و دریافت پشتیبانی پیدا کنید.',
-}
+    'پاسخ به سوالات رایج در مورد رزرو بلیط اتوبوس، روش‌های پرداخت، سیاست لغو و بازپرداخت، انتخاب صندلی و دریافت پشتیبانی در حصارک‌بس.',
+  keywords:
+    'کمک, پشتیبانی, سوالات متداول, راهنمای استفاده, رزرو بلیط, پرداخت آنلاین, لغو بلیط, بازپرداخت, اتوبوس پنجشیر',
+  url: '/help',
+  type: 'website',
+})
 
 export default function HelpPage() {
+  // FAQ data for structured data
+  const faqs = [
+    {
+      question: 'چگونه بلیط اتوبوس رزرو کنم؟',
+      answer:
+        'برای رزرو بلیط، ابتدا مبدأ و مقصد خود را انتخاب کنید، سپس تاریخ سفر را مشخص کرده و از میان سفرهای موجود یکی را انتخاب کنید. در نهایت صندلی مورد نظر خود را انتخاب کرده و پرداخت را انجام دهید.',
+    },
+    {
+      question: 'آیا می‌توانم بلیط خود را لغو کنم؟',
+      answer:
+        'بله، شما می‌توانید تا ۲ ساعت قبل از زمان حرکت اتوبوس، بلیط خود را لغو کنید. هزینه لغو بسته به زمان لغو محاسبه می‌شود.',
+    },
+    {
+      question: 'چه روش‌های پرداختی پشتیبانی می‌شود؟',
+      answer:
+        'ما از روش‌های مختلف پرداخت شامل کارت‌های بانکی، پرداخت آنلاین، و پرداخت نقدی در دفاتر فروش پشتیبانی می‌کنیم.',
+    },
+    {
+      question: 'چگونه می‌توانم با پشتیبانی تماس بگیرم؟',
+      answer:
+        'شما می‌توانید از طریق تلفن ۷۹ ۹۰۰ ۴۵۶۷ یا ایمیل info@hesarakbus.com با تیم پشتیبانی ما در تماس باشید. ساعات کاری ما شنبه تا پنج‌شنبه از ۸ صبح تا ۸ شب است.',
+    },
+    {
+      question: 'آیا می‌توانم صندلی خود را تغییر دهم؟',
+      answer:
+        'بله، تا ۱ ساعت قبل از زمان حرکت و در صورت موجود بودن صندلی‌های خالی، می‌توانید صندلی خود را تغییر دهید.',
+    },
+  ]
+
   return (
     <div className="min-h-screen" dir="rtl">
+      {/* FAQ Structured Data */}
+      <FAQStructuredData faqs={faqs} />
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

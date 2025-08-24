@@ -2,6 +2,8 @@ import React from 'react'
 import { Metadata } from 'next'
 import { SearchPageClient } from './page.client'
 import { getClientSideURL } from '@/utils/getURL'
+import { generateSEOMetadata } from '@/components/SEO/SEOHead'
+import { ServiceStructuredData } from '@/components/SEO/StructuredData'
 import moment from 'moment-jalaali'
 
 export const dynamic = 'force-dynamic'
@@ -137,14 +139,26 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   const { from, to, date } = await searchParams
 
   if (!from || !to) {
-    return {
-      title: 'Search Trips | Hesarak',
-      description: 'Search for bus trips between cities',
-    }
+    return generateSEOMetadata({
+      title: 'جستجوی سفر | حصارک‌بس - رزرو بلیط اتوبوس',
+      description:
+        'جستجو و رزرو آسان بلیط اتوبوس بین شهرهای افغانستان. انتخاب صندلی، مقایسه قیمت و پرداخت آنلاین امن.',
+      keywords:
+        'جستجو سفر, رزرو بلیط, اتوبوس افغانستان, بلیط آنلاین, حصارک‌بس, سفر بین شهری, پنجشیر',
+      url: '/search',
+      type: 'service',
+    })
   }
 
-  return {
-    title: `${from} to ${to} - Search Results | Hesarak`,
-    description: `Find bus trips from ${from} to ${to} on ${date || 'your selected date'}`,
-  }
+  const formattedDate = date
+    ? moment(date, 'jYYYY-jMM-jDD').format('jDD jMMMM jYYYY')
+    : 'تاریخ انتخابی شما'
+
+  return generateSEOMetadata({
+    title: `${from} به ${to} - ${formattedDate} | حصارک‌بس`,
+    description: `بلیط اتوبوس از ${from} به ${to} در تاریخ ${formattedDate}. مقایسه قیمت، انتخاب صندلی و رزرو آنلاین با حصارک‌بس.`,
+    keywords: `${from}, ${to}, بلیط اتوبوس, رزرو آنلاین, ${formattedDate}, حصارک‌بس, سفر, حمل و نقل`,
+    url: `/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${date}`,
+    type: 'service',
+  })
 }

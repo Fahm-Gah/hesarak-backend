@@ -114,7 +114,7 @@ export const Footer = () => {
               </div>
               <div className="flex items-center text-gray-300">
                 <Mail size={16} className="mr-3 text-orange-400" />
-                <span>support@hesaarak.com</span>
+                <span>support@hesarakbus.com</span>
               </div>
               <div className="flex items-start text-gray-300">
                 <MapPin size={16} className="mr-3 text-orange-400 mt-1" />
