@@ -1,67 +1,280 @@
-# Payload Blank Template
+# حصارک‌بس (Hesarakbus) 🚌
 
-This template comes configured with the bare minimum to get started on anything you need.
+A comprehensive bus ticket booking system built for Afghanistan, featuring Persian/Dari language support, modern web technologies, and a complete admin panel for managing bus schedules, bookings, and user profiles.
 
-## Quick start
+## 🌟 Features
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+- **Multi-language Support**: Primary Persian/Dari with English support
+- **Complete Booking System**: Search trips, select seats, and book tickets
+- **Admin Panel**: Comprehensive management interface powered by PayloadCMS
+- **User Management**: Phone-based authentication with role-based access control
+- **Real-time Seat Selection**: Visual seat maps with real-time availability
+- **Payment Integration**: Multiple payment method support
+- **Location Tracking**: Browser and IP-based geolocation
+- **Responsive Design**: Mobile-first design with RTL support
 
-## Quick Start - local setup
+## 🛠️ Technology Stack
 
-To spin up this template locally, follow these steps:
+- **Backend**: PayloadCMS 3.x with MongoDB
+- **Frontend**: Next.js 15 with React 19
+- **Database**: MongoDB with Mongoose
+- **File Storage**: UploadThing integration
+- **Styling**: TailwindCSS 4.x
+- **Authentication**: Phone-based auth with JWT
+- **Testing**: Vitest (integration) + Playwright (e2e)
+- **Package Manager**: PNPM
 
-### Clone
+## 🚀 Quick Start
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+### Prerequisites
 
-### Development
+- Node.js 18+
+- PNPM package manager
+- MongoDB instance (local or cloud)
+- UploadThing account for file storage
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URI` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+### 1. Clone the Repository
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+```bash
+git clone <your-repo-url>
+cd hesarak-backend
+```
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+### 2. Install Dependencies
 
-#### Docker (Optional)
+```bash
+pnpm install
+```
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+### 3. Environment Setup
 
-To do so, follow these steps:
+Copy the example environment file and configure your settings:
 
-- Modify the `MONGODB_URI` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URI` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+```bash
+cp .env.example .env
+```
 
-## How it works
+Update your `.env` file with the following required variables:
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+```bash
+# Database
+DATABASE_URI=mongodb://127.0.0.1/hesarakbus
 
-### Collections
+# PayloadCMS Secret (generate a secure random string)
+PAYLOAD_SECRET=your-super-secret-key-here
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+# UploadThing (get from https://uploadthing.com)
+UPLOADTHING_TOKEN=your-uploadthing-token
 
-- #### Users (Authentication)
+# Environment
+NODE_ENV=development
+```
 
-  Users are auth-enabled collections that have access to the admin panel.
+### 4. Database Setup
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+If using MongoDB locally, make sure MongoDB is running:
 
-- #### Media
+```bash
+# On macOS with Homebrew
+brew services start mongodb/brew/mongodb-community
 
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
+# On Windows, start MongoDB service
+# On Linux, start with systemctl
+sudo systemctl start mongod
+```
 
-### Docker
+### 5. Generate TypeScript Types
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
+Generate types from PayloadCMS collections:
 
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
+```bash
+pnpm generate:types
+```
 
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
+### 6. Start Development Server
 
-## Questions
+```bash
+pnpm dev
+```
 
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+The application will be available at:
+
+- **Frontend**: http://localhost:3000
+- **Admin Panel**: http://localhost:3000/admin
+
+### 7. Create Admin User
+
+1. Navigate to http://localhost:3000/admin
+2. Follow the on-screen instructions to create your first admin user
+3. Use an Afghan phone number format (e.g., +93 70 123 4567)
+
+## 🐳 Docker Setup (Alternative)
+
+If you prefer using Docker for local development:
+
+### 1. Update Environment
+
+Modify your `.env` file:
+
+```bash
+DATABASE_URI=mongodb://127.0.0.1/hesarakbus
+```
+
+### 2. Start with Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+This will start:
+
+- MongoDB container
+- The application in development mode
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── (frontend)/        # Public-facing application
+│   │   ├── (main)/       # Main app pages
+│   │   ├── auth/         # Authentication pages
+│   │   └── components/   # Shared UI components
+│   └── (payload)/        # Admin panel routes
+├── collections/          # PayloadCMS data models
+│   ├── Users.ts         # User authentication
+│   ├── Tickets.ts       # Booking system
+│   ├── TripSchedules.ts # Trip management
+│   └── ...
+├── components/          # Custom PayloadCMS components
+├── endpoints/           # Custom API endpoints
+├── access/             # Access control functions
+└── utils/              # Utility functions
+```
+
+## 🔧 Available Scripts
+
+```bash
+# Development
+pnpm dev          # Start development server
+pnpm devsafe      # Clean start (removes .next folder)
+
+# Building
+pnpm build        # Build for production
+pnpm start        # Start production server
+
+# Code Quality
+pnpm lint         # Run ESLint
+pnpm generate:types  # Generate TypeScript types
+
+# Testing
+pnpm test         # Run all tests
+pnpm test:int     # Run integration tests
+pnpm test:e2e     # Run end-to-end tests
+
+# PayloadCMS
+pnpm payload      # Access PayloadCMS CLI
+```
+
+## 🌐 Key Features Setup
+
+### Phone Authentication
+
+- Uses Afghan phone number format (+93 XX XXX XXXX)
+- Automatic phone number normalization to E.164 format
+- Role-based access control (customer, agent, driver, admin, etc.)
+
+### Seat Selection System
+
+- Visual seat maps with drag-and-drop designer
+- Real-time seat availability checking
+- Booking conflict prevention
+
+### Persian/Dari Support
+
+- RTL layout support
+- Jalali calendar integration with moment-jalaali
+- Persian number formatting
+- Custom date picker components
+
+### Location Services
+
+- Browser geolocation API
+- IP-based location fallback
+- Privacy-compliant location tracking
+
+## 🔒 Access Control
+
+The application implements role-based access control:
+
+- **Customer**: Book tickets, manage profile
+- **Agent**: Help customers with bookings
+- **Driver**: Access trip information
+- **Editor**: Manage content
+- **Admin**: Full system access
+- **SuperAdmin**: Complete administrative control
+- **Dev**: Development and debugging access
+
+## 📱 API Endpoints
+
+Key custom endpoints:
+
+- `/api/search-trips` - Search available trips
+- `/api/book-ticket` - Create new bookings
+- `/api/get-user-tickets` - Retrieve user bookings
+- `/api/register-user` - User registration
+- `/api/provinces` - Geographic data
+
+## 🧪 Testing
+
+Run tests to ensure everything works:
+
+```bash
+# Run all tests
+pnpm test
+
+# Integration tests only
+pnpm test:int
+
+# End-to-end tests only
+pnpm test:e2e
+```
+
+## 🚀 Production Deployment
+
+1. **Build the application**:
+
+   ```bash
+   pnpm build
+   ```
+
+2. **Set production environment variables**
+3. **Deploy to your hosting platform** (Vercel, Railway, etc.)
+4. **Configure production MongoDB instance**
+5. **Set up UploadThing for file storage**
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes following the existing code patterns
+4. Run tests: `pnpm test`
+5. Commit changes: `git commit -m "Add feature"`
+6. Push to branch: `git push origin feature-name`
+7. Open a pull request
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+
+- Check the [PayloadCMS Documentation](https://payloadcms.com/docs)
+- Review the project's CLAUDE.md file for development guidelines
+- Contact the development team
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+Built with ❤️ for safe and comfortable bus travel across Afghanistan.
