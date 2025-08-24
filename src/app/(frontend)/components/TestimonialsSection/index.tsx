@@ -4,52 +4,52 @@ import { Star, Quote } from 'lucide-react'
 export const TestimonialsSection = () => {
   const testimonials = [
     {
-      name: 'Ahmad Naser',
-      location: 'Kabul',
+      name: 'احمد ناصر',
+      location: 'کابل',
       rating: 5,
       comment:
-        'Excellent service! The bus was comfortable and arrived exactly on time. The booking process was very easy and the staff was helpful.',
-      route: 'Kabul to Mazaar',
+        'خدمات عالی! اتوبوس راحت بود و درست به موقع رسید. فرآیند بوک کردن بسیار آسان و کارکنان مفید بودند.',
+      route: 'کابل به مزارشریف',
     },
     {
-      name: 'Fatima Khan',
-      location: 'Herat',
+      name: 'فاطمه خان',
+      location: 'هرات',
       rating: 5,
       comment:
-        'I travel frequently for business and Hesarakbus has become my go-to choice. Clean buses, professional drivers, and great customer service.',
-      route: 'Herat to Kabul',
+        'برای کار مکرراً سفر می‌کنم و حصارک‌بس انتخاب اول من شده است. اتوبوس‌های تمیز، رانندگان حرفه‌ای و خدمات عالی مشتری.',
+      route: 'هرات به کابل',
     },
     {
-      name: 'Mohammad Ali',
-      location: 'Jalalabad',
+      name: 'محمد علی',
+      location: 'جلال‌آباد',
       rating: 5,
       comment:
-        'Safe and reliable transportation. The online booking system is user-friendly and the prices are very reasonable. Highly recommended!',
-      route: 'Jalalabad to Kabul',
+        'حمل و نقل امن و قابل اعتماد. سیستم بوک کردن آنلاین آسان است و قیمت‌ها بسیار معقول. به شدت توصیه می‌کنم!',
+      route: 'جلال‌آباد به کابل',
     },
     {
-      name: 'Sara Ahmadi',
-      location: 'Kandahar',
+      name: 'سارا احمدی',
+      location: 'قندهار',
       rating: 4,
       comment:
-        'Good experience overall. The bus was comfortable and the journey was smooth. Will definitely book again for my future travels.',
-      route: 'Kandahar to Kabul',
+        'تجربه خوبی در کل. اتوبوس راحت بود و سفر آرام گذشت. حتماً برای سفرهای آینده‌ام دوباره بوک خواهم کرد.',
+      route: 'قندهار به کابل',
     },
     {
-      name: 'Omar Hakim',
-      location: 'Mazaar',
+      name: 'عمر حکیم',
+      location: 'مزارشریف',
       rating: 5,
       comment:
-        'Outstanding service from booking to arrival. The bus was modern, clean, and equipped with all necessary amenities. Great value for money.',
-      route: 'Mazaar to Herat',
+        'خدمات فوق‌العاده از بوک کردن تا رسیدن. اتوبوس مدرن، تمیز و مجهز به تمام امکانات لازم بود. ارزش عالی در برابر پول.',
+      route: 'مزارشریف به هرات',
     },
     {
-      name: 'Maryam Safi',
-      location: 'Kabul',
+      name: 'مریم صافی',
+      location: 'کابل',
       rating: 5,
       comment:
-        'Professional and courteous service. The drivers are experienced and the buses are well-maintained. Feel safe traveling with Hesarakbus.',
-      route: 'Kabul to Kandahar',
+        'خدمات حرفه‌ای و مهربان. رانندگان باتجربه و اتوبوس‌ها خوب نگهداری می‌شوند. احساس امنیت با حصارک‌بس.',
+      route: 'کابل به قندهار',
     },
   ]
 
@@ -63,16 +63,15 @@ export const TestimonialsSection = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
+    <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            What Our <span className="text-orange-600">Passengers</span> Say
+            نظریات <span className="text-orange-600">مسافران</span> ما
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Read testimonials from thousands of satisfied passengers who trust Hesarakbus for their
-            travel needs
+            نظریات هزاران مسافر راضی را بخوانید که به حصارک‌بس برای نیازهای سفرشان اعتماد دارند
           </p>
         </div>
 
@@ -84,7 +83,7 @@ export const TestimonialsSection = () => {
               className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 relative"
             >
               {/* Quote Icon */}
-              <div className="absolute top-4 right-4 text-orange-200">
+              <div className="absolute top-4 left-4 text-orange-200">
                 <Quote className="w-6 h-6" />
               </div>
 
@@ -92,7 +91,9 @@ export const TestimonialsSection = () => {
               <div className="flex items-center mb-4">{renderStars(testimonial.rating)}</div>
 
               {/* Comment */}
-              <p className="text-gray-700 mb-6 leading-relaxed">"{testimonial.comment}"</p>
+              <p className="text-gray-700 mb-6 leading-relaxed text-right">
+                «{testimonial.comment}»
+              </p>
 
               {/* Route */}
               <div className="text-sm text-orange-600 font-medium mb-4">{testimonial.route}</div>
@@ -105,7 +106,7 @@ export const TestimonialsSection = () => {
                     .map((n) => n[0])
                     .join('')}
                 </div>
-                <div className="ml-3">
+                <div className="mr-3">
                   <div className="font-semibold text-gray-900">{testimonial.name}</div>
                   <div className="text-sm text-gray-600">{testimonial.location}</div>
                 </div>
@@ -115,22 +116,22 @@ export const TestimonialsSection = () => {
         </div>
 
         {/* Trust Stats */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+        <div dir="ltr" className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
           <div>
-            <div className="text-3xl font-bold text-orange-600 mb-2">4.9/5</div>
-            <div className="text-gray-600">Average Rating</div>
+            <div className="text-3xl font-bold text-orange-600 mb-2">۴.۹/۵</div>
+            <div className="text-gray-600">میانگین امتیاز</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-orange-600 mb-2">10,000+</div>
-            <div className="text-gray-600">Happy Passengers</div>
+            <div className="text-3xl font-bold text-orange-600 mb-2">+۱۰،۰۰۰</div>
+            <div className="text-gray-600">مسافر راضی</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-orange-600 mb-2">50+</div>
-            <div className="text-gray-600">Routes Available</div>
+            <div className="text-3xl font-bold text-orange-600 mb-2">+۵۰</div>
+            <div className="text-gray-600">مسیر موجود</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-orange-600 mb-2">99%</div>
-            <div className="text-gray-600">On-time Performance</div>
+            <div className="text-3xl font-bold text-orange-600 mb-2">۹۹%</div>
+            <div className="text-gray-600">عملکرد به موقع</div>
           </div>
         </div>
       </div>
