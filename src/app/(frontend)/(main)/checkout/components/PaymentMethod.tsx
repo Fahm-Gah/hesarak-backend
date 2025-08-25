@@ -13,6 +13,7 @@ import {
   HandCoins,
 } from 'lucide-react'
 import clsx from 'clsx'
+import { formatPersianNumber } from '@/utils/persianDigits'
 
 interface PaymentMethodProps {
   totalPrice: number
@@ -41,35 +42,35 @@ export const PaymentMethod = memo<PaymentMethodProps>(
     const paymentOptions = [
       {
         id: 'cash' as PaymentOption,
-        name: 'Pay at Pickup',
-        description: 'Pay when you board the bus',
+        name: 'پرداخت در محل',
+        description: 'هنگام سوار شدن پرداخت کنید',
         icon: HandCoins,
         recommended: true,
-        processingTime: 'No payment required now',
+        processingTime: 'هیچ پرداختی اکنون لازم نیست',
         features: [
-          'Pay directly to the conductor',
-          'Cash or card accepted on bus',
-          'Most convenient option',
+          'مستقیماً به کمک پرداخت کنید',
+          'نقد یا کارت در اتوبوس پذیرفته می‌شود',
+          'راحت‌ترین گزینه',
         ],
       },
       {
         id: 'card' as PaymentOption,
-        name: 'Credit/Debit Card',
-        description: 'Pay now with your card',
+        name: 'کارت اعتباری/بدهی',
+        description: 'اکنون با کارت خود پرداخت کنید',
         icon: CreditCard,
         recommended: false,
-        processingTime: 'Instant processing',
-        features: ['Secure online payment', 'Instant confirmation', 'All major cards accepted'],
+        processingTime: 'پردازش فوری',
+        features: ['پرداخت امن آنلاین', 'تأیید فوری', 'تمام کارت‌های اصلی پذیرفته'],
         disabled: true, // Disabled for now
       },
       {
         id: 'mobile' as PaymentOption,
-        name: 'Mobile Payment',
-        description: 'Pay with mobile wallet',
+        name: 'پرداخت موبایلی',
+        description: 'با کیف پول موبایل پرداخت کنید',
         icon: Wallet,
         recommended: false,
-        processingTime: 'Instant processing',
-        features: ['Mobile wallet payment', 'Quick and secure', 'Various providers supported'],
+        processingTime: 'پردازش فوری',
+        features: ['پرداخت کیف پول موبایل', 'سریع و امن', 'ارائه‌دهندگان مختلف پشتیبانی می‌شوند'],
         disabled: true, // Disabled for now
       },
     ]
@@ -96,12 +97,13 @@ export const PaymentMethod = memo<PaymentMethodProps>(
           'bg-gradient-to-br from-white via-orange-50/20 to-red-50/20 rounded-3xl shadow-xl border border-orange-200/50 p-6 sm:p-8 backdrop-blur-sm',
           className,
         )}
+        dir="rtl"
       >
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
           <div className="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full" />
           <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            Payment Method
+            روش پرداخت
           </h3>
         </div>
 
@@ -109,9 +111,9 @@ export const PaymentMethod = memo<PaymentMethodProps>(
         <div className="bg-gradient-to-r from-orange-100 via-orange-50 to-red-100 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-orange-200/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Amount</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">مجموع مبلغ</p>
               <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                {totalPrice.toLocaleString()} AF
+                {formatPersianNumber(totalPrice)} افغانی
               </p>
             </div>
             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
@@ -123,7 +125,7 @@ export const PaymentMethod = memo<PaymentMethodProps>(
         {/* Payment Options */}
         <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
           <h4 className="font-semibold text-gray-800 mb-3 sm:mb-4 text-sm sm:text-base">
-            Choose Payment Method
+            روش پرداخت را انتخاب کنید
           </h4>
 
           {paymentOptions.map((option) => {
@@ -146,18 +148,18 @@ export const PaymentMethod = memo<PaymentMethodProps>(
               >
                 {/* Recommended Badge */}
                 {option.recommended && !isDisabled && (
-                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
+                  <div className="absolute top-3 sm:top-4 left-3 sm:left-4">
                     <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-2 py-1 rounded-lg font-semibold">
-                      Recommended
+                      توصیه می‌شود
                     </div>
                   </div>
                 )}
 
                 {/* Disabled Badge */}
                 {isDisabled && (
-                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
+                  <div className="absolute top-3 sm:top-4 left-3 sm:left-4">
                     <div className="bg-gray-400 text-white text-xs px-2 py-1 rounded-lg font-semibold">
-                      Coming Soon
+                      به زودی
                     </div>
                   </div>
                 )}
@@ -217,27 +219,27 @@ export const PaymentMethod = memo<PaymentMethodProps>(
             <div className="flex items-start gap-3">
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="text-xs sm:text-sm text-blue-800">
-                <p className="font-semibold mb-2">Payment Instructions</p>
+                <p className="font-semibold mb-2">دستورات پرداخت</p>
                 {selectedPaymentMethod === 'cash' && (
                   <div className="space-y-2">
-                    <p>• Your seats are reserved for 2 hours without payment</p>
-                    <p>• Bring exact change or card for payment on the bus</p>
-                    <p>• Show your booking confirmation to the conductor</p>
-                    <p>• Payment must be completed before departure</p>
+                    <p>• چوکی‌های شما برای ۲ ساعت بدون پرداخت رزرو است</p>
+                    <p>• پول دقیق یا کارت را برای پرداخت در اتوبوس بیاورید</p>
+                    <p>• تأیید رزرو را به کمک نشان دهید</p>
+                    <p>• پرداخت باید قبل از حرکت تکمیل شود</p>
                   </div>
                 )}
                 {selectedPaymentMethod === 'card' && (
                   <div className="space-y-2">
-                    <p>• Your payment will be processed securely</p>
-                    <p>• You will receive instant confirmation</p>
-                    <p>• Refunds available according to our policy</p>
+                    <p>• پرداخت شما به صورت امن پردازش خواهد شد</p>
+                    <p>• تأیید فوری دریافت خواهید کرد</p>
+                    <p>• بازپرداخت مطابق با خط مشی ما ممکن است</p>
                   </div>
                 )}
                 {selectedPaymentMethod === 'mobile' && (
                   <div className="space-y-2">
-                    <p>• Choose your preferred mobile wallet</p>
-                    <p>• Instant payment confirmation</p>
-                    <p>• Secure and convenient</p>
+                    <p>• کیف پول موبایل مورد نظر خود را انتخاب کنید</p>
+                    <p>• تأیید پرداخت فوری</p>
+                    <p>• امن و راحت</p>
                   </div>
                 )}
               </div>
@@ -247,32 +249,58 @@ export const PaymentMethod = memo<PaymentMethodProps>(
 
         {/* Terms and Conditions */}
         <div className="mb-8">
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={acceptedTerms}
-              onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-1 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
-            />
-            <span className="text-sm text-gray-700">
-              I agree to the{' '}
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div className="relative flex-shrink-0 mt-1">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="sr-only"
+              />
+              <div
+                className={clsx(
+                  "w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-200",
+                  acceptedTerms
+                    ? "bg-gradient-to-r from-orange-500 to-red-500 border-orange-500 shadow-lg"
+                    : "bg-white border-gray-300 group-hover:border-orange-400 shadow-sm"
+                )}
+              >
+                {acceptedTerms && (
+                  <svg
+                    className="w-3 h-3 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={3}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                )}
+              </div>
+            </div>
+            <span className="text-sm text-gray-700 leading-relaxed">
+              من با{' '}
               <a
                 href="/terms"
                 target="_blank"
                 className="text-orange-600 hover:text-orange-700 font-semibold underline"
               >
-                Terms and Conditions
+                قوانین و مقررات
               </a>{' '}
-              and{' '}
+              و{' '}
               <a
                 href="/terms#cancellation-policy"
                 target="_blank"
                 className="text-orange-600 hover:text-orange-700 font-semibold underline"
               >
-                Cancellation Policy
-              </a>
-              . I understand that I need to arrive at the pickup location at least 15 minutes before
-              departure time.
+                سیاست لغو
+              </a>{' '}
+              موافقم. می‌دانم که باید حداقل ۱۵ دقیقه قبل از زمان حرکت در
+              محل سواری حضور ڈاشته باشم.
             </span>
           </label>
         </div>
@@ -289,8 +317,8 @@ export const PaymentMethod = memo<PaymentMethodProps>(
                 : 'hover:bg-gray-50 hover:border-gray-400',
             )}
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back
+            <ArrowRight className="w-4 h-4" />
+            برگشت
           </button>
 
           <button
@@ -306,14 +334,14 @@ export const PaymentMethod = memo<PaymentMethodProps>(
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span className="hidden sm:inline">Confirming Booking...</span>
-                <span className="sm:hidden">Confirming...</span>
+                <span className="hidden sm:inline">در حال تأیید رزرو...</span>
+                <span className="sm:hidden">در حال تأیید...</span>
               </>
             ) : (
               <>
-                <span className="hidden sm:inline">Confirm Booking</span>
-                <span className="sm:hidden">Confirm</span>
-                <ArrowRight className="w-4 h-4" />
+                <span className="hidden sm:inline">تأیید رزرو</span>
+                <span className="sm:hidden">تأیید</span>
+                <ArrowLeft className="w-4 h-4" />
               </>
             )}
           </button>

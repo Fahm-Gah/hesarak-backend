@@ -1,6 +1,7 @@
 import React, { memo } from 'react'
 import { MapPin, Clock, Calendar, Users } from 'lucide-react'
 import clsx from 'clsx'
+import { convertToPersianDigits, formatPersianNumber } from '@/utils/persianDigits'
 
 interface TripDetails {
   id: string
@@ -59,12 +60,48 @@ interface CheckoutSummaryProps {
 
 export const CheckoutSummary = memo<CheckoutSummaryProps>(
   ({ tripDetails, selectedSeats, totalPrice, className = '' }) => {
-    const formatTo12Hour = (time24: string): string => {
+    // Function to convert 24-hour time to 12-hour format with Persian AM/PM
+    const formatToPersian12Hour = (time24: string): string => {
       const [hours, minutes] = time24.split(':')
       const hour = parseInt(hours, 10)
-      const period = hour >= 12 ? 'PM' : 'AM'
+      const minute = parseInt(minutes, 10)
+      const period = hour >= 12 ? 'ب.ظ' : 'ق.ظ'
       const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
-      return `${hour12}:${minutes} ${period}`
+
+      // Convert to Persian digits
+      const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
+      const convertToPersianDigits = (num: number): string => {
+        return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
+      }
+
+      const persianHour = convertToPersianDigits(hour12)
+      const persianMinutes = convertToPersianDigits(minute).padStart(2, '۰')
+
+      return `${persianHour}:${persianMinutes} ${period}`
+    }
+
+    // Function to format duration to Persian
+    const formatDurationToPersian = (duration: string): string => {
+      if (!duration) return ''
+      
+      // Parse duration like "9h 30m" or "2h" or "45m"
+      const hourMatch = duration.match(/(\d+)h/)
+      const minuteMatch = duration.match(/(\d+)m/)
+      
+      let result = ''
+      
+      if (hourMatch) {
+        const hours = parseInt(hourMatch[1])
+        result += `${convertToPersianDigits(hours)} ساعت`
+      }
+      
+      if (minuteMatch) {
+        const minutes = parseInt(minuteMatch[1])
+        if (result) result += ' '
+        result += `${convertToPersianDigits(minutes)} دقیقه`
+      }
+      
+      return result
     }
 
     const seatNumbers = selectedSeats
@@ -81,11 +118,12 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
           'bg-gradient-to-br from-white via-orange-50/20 to-red-50/20 rounded-3xl shadow-xl border border-orange-200/50 p-6 sm:p-8 backdrop-blur-sm',
           className,
         )}
+        dir="rtl"
       >
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
           <div className="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full" />
           <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            Booking Summary
+            خلاصه رزرو
           </h3>
         </div>
 
@@ -97,7 +135,7 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
               <MapPin className="w-5 h-5 text-orange-600 flex-shrink-0" />
               <div className="flex-1">
                 <div className="font-bold text-gray-800 text-base sm:text-lg">
-                  {tripDetails.from.name} → {tripDetails.to?.name}
+                  {tripDetails.from.name} ← {tripDetails.to?.name}
                 </div>
               </div>
             </div>
@@ -107,9 +145,9 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
               <Calendar className="w-5 h-5 text-orange-600 flex-shrink-0" />
               <div>
                 <div className="font-semibold text-gray-800 text-sm sm:text-base">
-                  {tripDetails.originalDate}
+                  {convertToPersianDigits(tripDetails.originalDate)}
                 </div>
-                <div className="text-xs sm:text-sm text-gray-600">Travel Date</div>
+                <div className="text-xs sm:text-sm text-gray-600">تاریخ سفر</div>
               </div>
             </div>
 
@@ -117,16 +155,16 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
               <Clock className="w-5 h-5 text-orange-600 flex-shrink-0" />
               <div>
                 <div className="font-semibold text-gray-800 text-sm sm:text-base">
-                  {formatTo12Hour(tripDetails.departureTime)}
+                  {formatToPersian12Hour(tripDetails.departureTime)}
                   {tripDetails.arrivalTime && (
                     <span className="text-gray-600">
                       {' '}
-                      → {formatTo12Hour(tripDetails.arrivalTime)}
+                      ← {formatToPersian12Hour(tripDetails.arrivalTime)}
                     </span>
                   )}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600">
-                  {tripDetails.duration ? `Duration: ${tripDetails.duration}` : 'Departure Time'}
+                  {tripDetails.duration ? `مدت سفر: ${formatDurationToPersian(tripDetails.duration)}` : 'زمان حرکت'}
                 </div>
               </div>
             </div>
@@ -142,14 +180,14 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
                 </svg>
                 <div>
                   <div className="font-semibold text-gray-800 text-sm sm:text-base">
-                    Bus #{tripDetails.bus.number}
+                    اتوبوس #{tripDetails.bus.number}
                     {tripDetails.bus.type && (
-                      <span className="text-xs sm:text-sm text-gray-600 ml-2">
+                      <span className="text-xs sm:text-sm text-gray-600 mr-2">
                         - {tripDetails.bus.type.name}
                       </span>
                     )}
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-600">Bus Details</div>
+                  <div className="text-xs sm:text-sm text-gray-600">جزئیات اتوبوس</div>
                 </div>
               </div>
             )}
@@ -160,10 +198,10 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
         <div className="mb-6 sm:mb-8">
           <h4 className="font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
             <Users className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
-            <span>Selected Seats</span>
+            <span>چوکی های انتخاب شده</span>
             <div className="flex items-center gap-1 bg-gradient-to-r from-orange-100 to-red-100 px-2 py-1 rounded-lg">
               <div className="w-1.5 h-1.5 bg-gradient-to-r from-orange-500 to-red-500 rounded-full" />
-              <span className="text-xs font-semibold text-orange-700">{selectedSeats.length}</span>
+              <span className="text-xs font-semibold text-orange-700">{convertToPersianDigits(selectedSeats.length)}</span>
             </div>
           </h4>
 
@@ -178,11 +216,11 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
                     {seatNumber}
                   </div>
                   <span className="font-semibold text-gray-800 text-sm sm:text-base">
-                    Seat {seatNumber}
+                    چوکی {seatNumber}
                   </span>
                 </div>
                 <span className="font-bold text-gray-800 text-sm sm:text-base">
-                  {tripDetails.price.toLocaleString()} AF
+                  {formatPersianNumber(tripDetails.price)} افغانی
                 </span>
               </div>
             ))}
@@ -194,16 +232,16 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
           <div className="space-y-3">
             <div className="flex items-center justify-between text-xs sm:text-sm">
               <span className="text-gray-600 font-medium">
-                {selectedSeats.length} seat{selectedSeats.length > 1 ? 's' : ''} ×{' '}
-                {tripDetails.price.toLocaleString()} AF
+                {convertToPersianDigits(selectedSeats.length)} چوکی ×{' '}
+                {formatPersianNumber(tripDetails.price)} افغانی
               </span>
-              <span className="text-gray-800 font-semibold">{totalPrice.toLocaleString()} AF</span>
+              <span className="text-gray-800 font-semibold">{formatPersianNumber(totalPrice)} افغانی</span>
             </div>
 
             <div className="flex items-center justify-between text-lg sm:text-xl font-bold pt-3 border-t border-orange-200/30">
-              <span className="text-gray-800">Total Amount</span>
+              <span className="text-gray-800">مجموع مبلغ</span>
               <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                {totalPrice.toLocaleString()} AF
+                {formatPersianNumber(totalPrice)} افغانی
               </span>
             </div>
           </div>
@@ -212,10 +250,10 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
         {/* Payment Info */}
         <div className="bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl p-3 sm:p-4 border border-orange-200/50">
           <div className="text-xs sm:text-sm text-orange-700">
-            <div className="font-semibold mb-2">Next Step:</div>
+            <div className="font-semibold mb-2">مرحله بعدی:</div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0" />
-              <span>Complete payment to confirm booking</span>
+              <span>پرداخت را برای تأیید رزرو تکمیل کنید</span>
             </div>
           </div>
         </div>

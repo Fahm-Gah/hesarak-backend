@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
 import { CheckoutSummary } from './components/CheckoutSummary'
 import { PaymentMethod } from './components/PaymentMethod'
 import toast from 'react-hot-toast'
+import { convertToPersianDigits } from '@/utils/persianDigits'
 
 import type { User as PayloadUser, Profile } from '@/payload-types'
 
@@ -227,10 +228,10 @@ export const CheckoutClient = ({
     const tripUrl = `/trip/${tripDetails.id}?${tripParams.toString()}`
 
     return [
-      { label: 'Home', href: '/' },
-      { label: 'Search Results', href: searchUrl },
-      { label: 'Trip Details', href: tripUrl },
-      { label: 'Checkout' },
+      { label: 'خانه', href: '/' },
+      { label: 'نتایج جستجو', href: searchUrl },
+      { label: 'جزئیات سفر', href: tripUrl },
+      { label: 'پرداخت' },
     ]
   }, [tripDetails, originalSearchParams])
 
@@ -266,7 +267,7 @@ export const CheckoutClient = ({
 
       if (result.success) {
         // Show success toast immediately
-        toast.success('🎉 Booking successful! Redirecting to confirmation page...')
+        toast.success('🎉 رزرو با موفقیت انجام شد! در حال هدایت به صفحه تأیید...')
 
         // Store booking data in both session and local storage for success page
         const bookingData = JSON.stringify(result.data)
@@ -300,7 +301,7 @@ export const CheckoutClient = ({
       }
     } catch (err) {
       console.error('Booking error:', err)
-      toast.error(err instanceof Error ? err.message : 'Booking failed. Please try again.')
+      toast.error(err instanceof Error ? err.message : 'رزرو ناموفق بود. لطفاً دوباره تلاش کنید.')
     } finally {
       setIsLoading(false)
     }
@@ -322,7 +323,7 @@ export const CheckoutClient = ({
   }, [router, tripDetails, originalSearchParams])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumbs */}
         <div className="mb-6">
@@ -332,13 +333,13 @@ export const CheckoutClient = ({
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent pb-2">
-            Complete Your Booking
+            تکمیل رزرو شما
           </h1>
         </div>
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Left Column - Payment Method */}
+          {/* Right Column - Payment Method */}
           <div
             ref={leftColumnRef}
             className="lg:col-span-2 order-2 lg:order-1"
@@ -359,7 +360,7 @@ export const CheckoutClient = ({
             />
           </div>
 
-          {/* Right Column - Checkout Summary */}
+          {/* Left Column - Checkout Summary */}
           <div
             ref={rightColumnRef}
             className="lg:col-span-1 order-1 lg:order-2"
