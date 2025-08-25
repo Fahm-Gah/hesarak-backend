@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-حصارک‌بس is a bus ticket booking system built with PayloadCMS 3.x, Next.js 15, and MongoDB. The application supports Persian (Farsi) as the primary language with English support, featuring a comprehensive admin panel for managing bus schedules, bookings, and user profiles.
+حصارک پنجشیر is a bus ticket booking system built with PayloadCMS 3.x, Next.js 15, and MongoDB. The application supports Persian (Farsi) as the primary language with English support, featuring a comprehensive admin panel for managing bus schedules, bookings, and user profiles.
 
 ## Common Commands
 

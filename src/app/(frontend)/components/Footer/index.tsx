@@ -14,7 +14,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-bold text-orange-400 mb-4">حصارک‌بس</h3>
+            <h3 className="text-xl font-bold text-orange-400 mb-4">حصارک پنجشیر</h3>
             <p className="text-gray-300 mb-4 leading-relaxed">
               شریک مطمئن شما برای سفرهای امن و راحت در سراسر افغانستان. سفر خود را با اطمینان تکت
               کنید.
@@ -127,7 +127,9 @@ export const Footer = () => {
         {/* Divider */}
         <div className="border-t border-gray-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">© {currentYear} حصارک‌بس. تمام حقوق محفوظ است.</p>
+            <p className="text-gray-400 text-sm">
+              © {currentYear} حصارک پنجشیر. تمام حقوق محفوظ است.
+            </p>
             <div className="flex gap-6 mt-4 md:mt-0">
               <Link
                 href="/privacy"

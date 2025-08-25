@@ -10,7 +10,7 @@ interface PopularRoute {
   price: string
   frequency: string
   tripsPerWeek: number
-  avgPrice: number
+  startingPrice: number
 }
 
 // Helper function to convert numbers to Persian
@@ -48,10 +48,10 @@ const getPopularRoutes = async (): Promise<PopularRoute[]> => {
         from: route.from,
         to: route.to,
         duration: formatDurationToPersian(route.duration),
-        price: `${toPersianNumber(route.avgPrice.toLocaleString())} افغانی`,
+        price: `${toPersianNumber(route.startingPrice.toLocaleString())} افغانی`,
         frequency: `${toPersianNumber(route.tripsPerWeek)} سفر در هفته`,
         tripsPerWeek: route.tripsPerWeek,
-        avgPrice: route.avgPrice,
+        startingPrice: route.startingPrice,
       }))
     } else {
       console.error('API returned unsuccessful response:', data)

@@ -3,9 +3,9 @@ import { Metadata } from 'next'
 import { Shield, Users, MapPin, Award, Clock, Heart } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'درباره ما | حصارک‌بس - شریک مطمئن سفر شما',
+  title: 'درباره ما | حصارک پنجشیر - شریک مطمئن سفر شما',
   description:
-    'در مورد ماموریت حصارک‌بس برای ارائه سفر امن، راحت و قابل اعتماد اتوبوس در سراسر افغانستان بیاموزید. داستان، ارزش‌ها و تعهد ما به ایمنی مسافران را کشف کنید.',
+    'در مورد ماموریت حصارک پنجشیر برای ارائه سفر امن، راحت و قابل اعتماد اتوبوس در سراسر افغانستان بیاموزید. داستان، ارزش‌ها و تعهد ما به ایمنی مسافران را کشف کنید.',
 }
 
 export default function AboutPage() {
@@ -44,7 +44,7 @@ export default function AboutPage() {
   const milestones = [
     {
       year: '۱۳۹۰',
-      title: 'تأسیس حصارک‌بس',
+      title: 'تأسیس حصارک پنجشیر',
       description:
         'با چشم‌اندازی برای انقلاب در سفرهای اتوبوس در افغانستان با فناوری مدرن و رویکرد مشتری محور آغاز شد.',
     },
@@ -81,7 +81,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              درباره <span className="text-orange-500">حصارک‌بس</span>
+              درباره <span className="text-orange-500">حصارک پنجشیر</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               ما متعهد به ارائه خدمات سفر امن، راحت و قابل اعتماد اتوبوس در سراسر افغانستان هستیم و
@@ -276,8 +276,8 @@ export default function AboutPage() {
           <h2 className="text-4xl font-bold text-gray-900 mb-6">تعهد ما</h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
             هر روز، تیم متخصصان فداکار ما بی‌وقفه تلاش می‌کنند تا اطمینان حاصل کنند که سفر شما امن،
-            راحت و به‌یادماندنی باشد. از رانندگان ما گرفته تا نمایندگان خدمات مشتری، همه در حصارک‌بس
-            متعهد به خدمت‌رسانی به شما به بهترین وجه هستند.
+            راحت و به‌یادماندنی باشد. از رانندگان ما گرفته تا نمایندگان خدمات مشتری، همه در حصارک
+            پنجشیر متعهد به خدمت‌رسانی به شما به بهترین وجه هستند.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">

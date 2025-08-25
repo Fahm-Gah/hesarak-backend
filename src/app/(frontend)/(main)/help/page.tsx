@@ -19,9 +19,9 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'کمک و پشتیبانی | حصارک‌بس - کمک برای تکت بس',
+  title: 'کمک و پشتیبانی | حصارک پنجشیر - کمک برای تکت بس',
   description:
-    'پاسخ به سوالات رایج در مورد تکت بس با حصارک‌بس، روش‌های پرداخت، سیاست لغو و دریافت پشتیبانی پیدا کنید.',
+    'پاسخ به سوالات رایج در مورد تکت بس با حصارک پنجشیر، روش‌های پرداخت، سیاست لغو و دریافت پشتیبانی پیدا کنید.',
 }
 
 export default function HelpPage() {
@@ -40,7 +40,8 @@ export default function HelpPage() {
               کمک و <span className="text-orange-500">پشتیبانی</span>
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              برای تکت کردن، مدیریت سفرهای خود و استفاده از پلتفرم تکت بس حصارک‌بس کمک دریافت کنید.
+              برای تکت کردن، مدیریت سفرهای خود و استفاده از پلتفرم تکت بس حصارک پنجشیر کمک دریافت
+              کنید.
             </p>
           </div>
         </div>

@@ -42,7 +42,7 @@ export const FeaturesSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            چرا <span className="text-orange-600">حصارک‌بس</span> را انتخاب کنید؟
+            چرا <span className="text-orange-600">حصارک پنجشیر</span> را انتخاب کنید؟
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             بهترین تجربه سفر با اتوبوس را با تعهد ما به ایمنی، راحتی و قابلیت اعتماد تجربه کنید

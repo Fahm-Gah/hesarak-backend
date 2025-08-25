@@ -1,14 +1,15 @@
-import React from 'react'
+'use client'
+
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { MapPin, TrendingUp, Clock, ArrowRight } from 'lucide-react'
 import moment from 'moment-jalaali'
-import { getServerSideURL } from '@/utils/getURL'
 
 interface PopularRoute {
   from: string
   to: string
   tripsPerWeek: number
-  avgPrice: number
+  startingPrice: number
   duration: string
 }
 
@@ -16,25 +17,22 @@ interface PopularRoutesProps {
   onRouteSelect?: (from: string, to: string) => void
 }
 
-// Server-side data fetching
-async function fetchPopularRoutes(): Promise<PopularRoute[]> {
-  try {
-    const response = await fetch(`${getServerSideURL()}/api/popular-routes`, {
-      cache: 'force-cache',
-      next: { revalidate: 300 }, // Cache for 5 minutes
+// Client-side data fetching
+function fetchPopularRoutes(): Promise<PopularRoute[]> {
+  return fetch('/api/popular-routes')
+    .then((response) => {
+      if (response.ok) {
+        return response.json()
+      } else {
+        console.error('Failed to fetch popular routes:', response.status)
+        return { data: [] }
+      }
     })
-
-    if (response.ok) {
-      const data = await response.json()
-      return data.data || []
-    } else {
-      console.error('Failed to fetch popular routes:', response.status)
+    .then((data) => data.data || [])
+    .catch((error) => {
+      console.error('Error fetching popular routes:', error)
       return []
-    }
-  } catch (error) {
-    console.error('Error fetching popular routes:', error)
-    return []
-  }
+    })
 }
 
 // Helper function to convert numbers to Persian
@@ -51,10 +49,32 @@ const formatDurationToPersian = (duration: string): string => {
     .replace(/[0-9]/g, (digit) => toPersianNumber(digit))
 }
 
-export const PopularRoutes: React.FC<PopularRoutesProps> = async ({ onRouteSelect }) => {
-  const routes = await fetchPopularRoutes()
+export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onRouteSelect }) => {
+  const [routes, setRoutes] = useState<PopularRoute[]>([])
+  const [loading, setLoading] = useState(true)
   const today = moment()
   const dateStr = today.format('jYYYY-jMM-jDD')
+
+  useEffect(() => {
+    fetchPopularRoutes()
+      .then(setRoutes)
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6" dir="rtl">
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp className="w-5 h-5 text-orange-600" />
+          <h3 className="text-lg font-semibold text-gray-900">مسیرهای محبوب</h3>
+          <span className="text-sm text-gray-500">امروز</span>
+        </div>
+        <div className="text-center py-8">
+          <div className="text-gray-500">در حال بارگذاری...</div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6" dir="rtl">
@@ -99,7 +119,7 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = async ({ onRouteSelec
                   <span>{formatDurationToPersian(route.duration)}</span>
                 </div>
                 <div className="font-medium text-gray-900">
-                  {toPersianNumber(route.avgPrice.toLocaleString())} افغانی
+                  {toPersianNumber(route.startingPrice.toLocaleString())} افغانی
                 </div>
               </div>
             </Link>

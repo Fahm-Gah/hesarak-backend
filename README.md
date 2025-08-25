@@ -1,4 +1,4 @@
-# حصارک‌بس (Hesarakbus) 🚌
+# حصارک پنجشیر (Hesarakbus) 🚌
 
 A comprehensive bus ticket booking system built for Afghanistan, featuring Persian/Dari language support, modern web technologies, and a complete admin panel for managing bus schedules, bookings, and user profiles.
 

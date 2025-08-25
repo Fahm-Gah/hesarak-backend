@@ -94,7 +94,7 @@ export const RegisterClient = () => {
             variant="auth"
             size="lg"
             title="ایجاد حساب"
-            subtitle="به حصارک‌بس بپیوندید و شروع کنید."
+            subtitle="به حصارک پنجشیر بپیوندید و شروع کنید."
           />
 
           {/* Error Message */}

@@ -80,8 +80,7 @@ async function fetchSearchResults(
 async function fetchProvinces(): Promise<string[]> {
   try {
     const response = await fetch(`${getServerSideURL()}/api/provinces`, {
-      cache: 'force-cache',
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      cache: 'no-store',
     })
 
     if (response.ok) {

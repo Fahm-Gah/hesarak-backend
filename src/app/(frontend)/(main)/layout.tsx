@@ -9,7 +9,7 @@ import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'حصارک‌بس - سیستم تکت آنلاین اتوبوس افغانستان',
+  title: 'حصارک پنجشیر - سیستم تکت آنلاین اتوبوس افغانستان',
   description:
     'سیستم آنلاین تکت اتوبوس. جستجو و خرید آسان تکت اتوبوس با انتخاب چوکی و پرداخت آنلاین.',
   keywords: 'اتوبوس,, تکت, پنجشیر, افغانستان, سفر, حمل و نقل',

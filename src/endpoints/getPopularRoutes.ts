@@ -15,7 +15,7 @@ interface PopularRoute {
   from: string
   to: string
   tripsPerWeek: number
-  avgPrice: number
+  startingPrice: number
   duration: string
 }
 
@@ -139,7 +139,7 @@ export const getPopularRoutes: Endpoint = {
 
           // Calculate trips per week based on trip schedule frequency
           let tripsPerWeek = 0
-          let totalPrice = 0
+          let minPrice = Infinity
           let validPrices = 0
 
           Array.from(route.tripSchedules.values()).forEach((schedule) => {
@@ -152,7 +152,7 @@ export const getPopularRoutes: Endpoint = {
             }
 
             if (schedule.price > 0) {
-              totalPrice += schedule.price
+              minPrice = Math.min(minPrice, schedule.price)
               validPrices++
             }
           })
@@ -161,13 +161,13 @@ export const getPopularRoutes: Endpoint = {
             from: route.from,
             to: route.to,
             tripsPerWeek,
-            // Average price from unique trip schedules
-            avgPrice: validPrices > 0 ? Math.round(totalPrice / validPrices) : 0,
+            // Starting price (minimum price) from unique trip schedules
+            startingPrice: validPrices > 0 ? minPrice : 0,
             // Use the most common actual duration, or provide a fallback
             duration: mostCommonDuration || 'نامشخص',
           }
         })
-        .filter((route) => route.avgPrice > 0) // Only include routes with valid pricing data
+        .filter((route) => route.startingPrice > 0) // Only include routes with valid pricing data
         .sort((a, b) => b.tripsPerWeek - a.tripsPerWeek) // Sort by actual trips per week
         .slice(0, 6) // Top 6 routes
 

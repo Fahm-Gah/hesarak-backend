@@ -116,7 +116,7 @@ export default function ContactPageClient() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              تماس با <span className="text-orange-500">حصارک‌بس</span>
+              تماس با <span className="text-orange-500">حصارک پنجشیر</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               ما اینجا هستیم تا کمکتان کنیم! برای هرگونه سوال، پشتیبانی، یا کمک در مورد نیازهای سفر
