@@ -8,6 +8,8 @@ $cal-icon-width: 18px;
     .date-time-picker {
       .react-datepicker__input-container input {
         padding-right: base(3.4);
+        padding-left: base(0.75);
+        margin: 0;
       }
     }
   }
@@ -99,6 +101,7 @@ $cal-icon-width: 18px;
     .react-datepicker__input-container input {
       @include formInput;
       padding-right: calc(#{base(0.75)} + #{$cal-icon-width});
+      margin: 0;
     }
 
     &--has-error {

@@ -69,6 +69,9 @@ export const Tickets: CollectionConfig = {
       required: true,
       admin: {
         allowCreate: true,
+        components: {
+          Field: '@/components/ProfileSelectorField',
+        },
       },
     },
     {
