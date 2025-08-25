@@ -2,6 +2,7 @@ import React, { useMemo, useCallback, memo } from 'react'
 import { User, DoorOpen, Toilet } from 'lucide-react'
 import clsx from 'clsx'
 import styles from './SeatLayout.module.css'
+import { convertToPersianDigits } from '@/utils/persianDigits'
 
 interface BusLayoutElement {
   id: string
@@ -407,7 +408,7 @@ export const SeatLayout = memo<SeatLayoutProps>(
                 aria-hidden="true"
               />
               <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                Select Your Seats
+                چوکی های خود را انتخاب کنید
               </h3>
             </div>
           </div>
@@ -416,28 +417,28 @@ export const SeatLayout = memo<SeatLayoutProps>(
           <div
             className="flex items-center justify-center flex-wrap gap-4 sm:gap-6"
             role="group"
-            aria-label="Seat status legend"
+            aria-label="راهنمای وضعیت چوکی ها"
           >
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg shadow-sm border border-orange-200/40"
                 aria-hidden="true"
               />
-              <span className="text-xs font-medium text-gray-700">Available</span>
+              <span className="text-xs font-medium text-gray-700">خالی</span>
             </div>
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg shadow-sm border border-orange-300/50"
                 aria-hidden="true"
               />
-              <span className="text-xs font-medium text-gray-700">Selected</span>
+              <span className="text-xs font-medium text-gray-700">انتخابی</span>
             </div>
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 bg-gradient-to-br from-gray-400 to-gray-500 rounded-lg shadow-sm border border-gray-300/50"
                 aria-hidden="true"
               />
-              <span className="text-xs font-medium text-gray-700">Booked</span>
+              <span className="text-xs font-medium text-gray-700">رزرو شده</span>
             </div>
             {hasUserBookedSeats && (
               <>
@@ -446,14 +447,14 @@ export const SeatLayout = memo<SeatLayoutProps>(
                     className="w-3 h-3 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg shadow-sm border border-emerald-400/50 ring-1 ring-emerald-300/40"
                     aria-hidden="true"
                   />
-                  <span className="text-xs font-medium text-gray-700">Yours (Paid)</span>
+                  <span className="text-xs font-medium text-gray-700">شما (پرداخت شده)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div
                     className="w-3 h-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg shadow-sm border border-amber-400/50 ring-1 ring-amber-300/40"
                     aria-hidden="true"
                   />
-                  <span className="text-xs font-medium text-gray-700">Yours (Pending)</span>
+                  <span className="text-xs font-medium text-gray-700">شما (در انتظار)</span>
                 </div>
               </>
             )}
@@ -461,7 +462,10 @@ export const SeatLayout = memo<SeatLayoutProps>(
         </div>
 
         {/* Seat Layout Grid - Luxury Interior */}
-        <div className="relative p-10 bg-gradient-to-b from-orange-50/30 via-white/80 to-red-50/30">
+        <div
+          dir="ltr"
+          className="relative p-10 bg-gradient-to-b from-orange-50/30 via-white/80 to-red-50/30"
+        >
           {/* Elegant Aisle Lines */}
           <div className="absolute inset-x-0 top-10 bottom-10 flex justify-center">
             <div className="w-px bg-gradient-to-b from-transparent via-orange-300/60 to-transparent opacity-80 shadow-sm" />
@@ -475,7 +479,7 @@ export const SeatLayout = memo<SeatLayoutProps>(
               gridTemplateColumns: `repeat(${maxCol}, minmax(48px, auto))`,
             }}
             role="grid"
-            aria-label="Bus seat layout"
+            aria-label="طرح بندی چوکی های اتوبوس"
           >
             {emptyGridCells}
             {renderedElements}
@@ -489,16 +493,18 @@ export const SeatLayout = memo<SeatLayoutProps>(
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg shadow-sm border border-orange-200/40" />
                 <span className="font-medium text-gray-700">
-                  Available:{' '}
+                  خالی:{' '}
                   <span className="font-bold text-orange-700">
-                    {seatAvailability.availableSeats}
+                    {convertToPersianDigits(seatAvailability.availableSeats)}
                   </span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium text-gray-700">
-                  Total:{' '}
-                  <span className="font-bold text-gray-800">{seatAvailability.totalSeats}</span>
+                  کل:{' '}
+                  <span className="font-bold text-gray-800">
+                    {convertToPersianDigits(seatAvailability.totalSeats)}
+                  </span>
                 </span>
               </div>
             </div>

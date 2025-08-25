@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { Bus, MapPin, Clock, Users } from 'lucide-react'
 import { ImageViewer } from './ImageViewer'
+import { convertToPersianDigits } from '@/utils/persianDigits'
 
 interface Terminal {
   id: string
@@ -78,12 +79,49 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
-  const formatTo12Hour = (time24: string): string => {
+  // Function to convert 24-hour time to 12-hour format with Persian AM/PM
+  const formatToPersian12Hour = (time24: string): string => {
     const [hours, minutes] = time24.split(':')
     const hour = parseInt(hours, 10)
-    const period = hour >= 12 ? 'PM' : 'AM'
+    const minute = parseInt(minutes, 10)
+    const period = hour >= 12 ? 'ب.ظ' : 'ق.ظ'
     const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
-    return `${hour12}:${minutes} ${period}`
+
+    // Convert to Persian digits
+
+    const persianHour = convertToPersianDigits(hour12)
+    const persianMinutes = convertToPersianDigits(minute).padStart(2, '۰')
+
+    return `${persianHour}:${persianMinutes} ${period}`
+  }
+
+  // Function to format duration to Persian with full words
+  const formatDurationToPersian = (duration: string): string => {
+    if (!duration || duration === 'Unknown' || duration === 'نامشخص') {
+      return 'نامشخص'
+    }
+
+    // Parse duration like "9h 30m" or "9h 0m"
+    const hourMatch = duration.match(/(\d+)h/)
+    const minuteMatch = duration.match(/(\d+)m/)
+
+    const hours = hourMatch ? parseInt(hourMatch[1]) : 0
+    const minutes = minuteMatch ? parseInt(minuteMatch[1]) : 0
+
+    // Convert to Persian digits
+
+    let result = ''
+
+    if (hours > 0) {
+      result += `${convertToPersianDigits(hours)} ساعت`
+    }
+
+    if (minutes > 0) {
+      if (result) result += ' '
+      result += `${convertToPersianDigits(minutes)} دقیقه`
+    }
+
+    return result || 'نامشخص'
   }
 
   const openImageViewer = (index: number) => {
@@ -96,7 +134,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
   }
 
   return (
-    <div className={`space-y-6 pb-4 ${className}`}>
+    <div className={`space-y-6 pb-4 ${className}`} dir="rtl">
       {/* Trip Details */}
       <div className="bg-gradient-to-br from-white via-orange-50/30 to-red-50/30 rounded-3xl shadow-xl border border-orange-200/50 p-8 backdrop-blur-sm">
         {/* Trip Route Timeline - Compact Mobile-First Design */}
@@ -105,7 +143,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
             {/* Departure */}
             <div className="flex-shrink-0">
               <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-1">
-                {formatTo12Hour(tripDetails.departureTime)}
+                {formatToPersian12Hour(tripDetails.departureTime)}
               </div>
             </div>
 
@@ -116,7 +154,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                 <div className="flex items-center gap-1">
                   <Bus className="w-3 h-3 md:w-4 md:h-4 text-orange-500" />
                   <span className="text-xs md:text-sm font-medium text-orange-600 whitespace-nowrap">
-                    {tripDetails.duration || 'N/A'}
+                    {formatDurationToPersian(tripDetails.duration || '')}
                   </span>
                 </div>
               </div>
@@ -126,7 +164,9 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
             {/* Arrival */}
             <div className="flex-shrink-0">
               <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-1">
-                {tripDetails.arrivalTime ? formatTo12Hour(tripDetails.arrivalTime) : 'N/A'}
+                {tripDetails.arrivalTime
+                  ? formatToPersian12Hour(tripDetails.arrivalTime)
+                  : 'نامشخص'}
               </div>
             </div>
           </div>
@@ -145,7 +185,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                   >
                     <Image
                       src={image.url}
-                      alt={image.alt || `Bus ${tripDetails.bus.number} - Image ${index + 1}`}
+                      alt={image.alt || `اتوبوس ${tripDetails.bus.number} - تصویر ${index + 1}`}
                       width={image.width}
                       height={image.height}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -160,7 +200,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                       {index + 1} / {tripDetails.bus.images.length}
                     </div>
                     <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-orange-600 text-xs px-2 py-1 rounded-full font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      Click to View Full Size
+                      کلیک کنید برای مشاهده اندازه کامل
                     </div>
                   </div>
                 ))}
@@ -191,7 +231,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
         <div className="bg-gradient-to-br from-white via-orange-50/20 to-red-50/20 rounded-3xl shadow-xl border border-orange-200/50 p-8 backdrop-blur-sm">
           <div className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
             <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
-            Complete Journey Route
+            مسیر کامل سفر
           </div>
 
           <div className="relative pl-2">
@@ -215,11 +255,11 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                             {tripDetails.originalTrip.from.name}
                           </h4>
                           <p className="text-sm text-gray-500 mt-1">
-                            Trip starts here (you're not boarding here)
+                            سفر از اینجا شروع می‌شود (شما از اینجا سوار نمی‌شوید)
                           </p>
                         </div>
                         <div className="text-2xl font-bold text-gray-500">
-                          {formatTo12Hour(tripDetails.originalTrip.departureTime)}
+                          {formatToPersian12Hour(tripDetails.originalTrip.departureTime)}
                         </div>
                       </div>
                       {tripDetails.originalTrip.from.address && (
@@ -249,11 +289,11 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                     <div className="flex-1">
                       <h4 className="text-xl font-bold text-green-800">{tripDetails.from.name}</h4>
                       <p className="text-sm text-green-600 font-medium mt-1">
-                        🎯 Your boarding point
+                        🎯 نقطه سوار شدن شما
                       </p>
                     </div>
                     <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
-                      {formatTo12Hour(tripDetails.departureTime)}
+                      {formatToPersian12Hour(tripDetails.departureTime)}
                     </div>
                   </div>
                   {tripDetails.from.address && (
@@ -324,7 +364,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                           </h4>
                         </div>
                         <div className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
-                          {formatTo12Hour(stop.time)}
+                          {formatToPersian12Hour(stop.time)}
                         </div>
                       </div>
                       {stop.terminal.address && (
@@ -353,10 +393,12 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                     <div className="flex flex-row items-center justify-between gap-3">
                       <div className="flex-1">
                         <h4 className="text-xl font-bold text-red-800">{tripDetails.to.name}</h4>
-                        <p className="text-sm text-red-600 font-medium mt-1">🏁 Your destination</p>
+                        <p className="text-sm text-red-600 font-medium mt-1">🏁 مقصد شما</p>
                       </div>
                       <div className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
-                        {tripDetails.arrivalTime ? formatTo12Hour(tripDetails.arrivalTime) : 'N/A'}
+                        {tripDetails.arrivalTime
+                          ? formatToPersian12Hour(tripDetails.arrivalTime)
+                          : 'نامشخص'}
                       </div>
                     </div>
                     {tripDetails.to.address && (
@@ -397,12 +439,10 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                       <div className="flex flex-row items-center justify-between gap-3">
                         <div className="flex-1">
                           <h4 className="text-xl font-bold text-gray-600">{stop.terminal.name}</h4>
-                          <p className="text-sm text-gray-500 mt-1">
-                            Trip continues (after your destination)
-                          </p>
+                          <p className="text-sm text-gray-500 mt-1">ادامه سفر (پس از مقصد شما)</p>
                         </div>
                         <div className="text-2xl font-bold text-gray-500">
-                          {formatTo12Hour(stop.time)}
+                          {formatToPersian12Hour(stop.time)}
                         </div>
                       </div>
                       {stop.terminal.address && (

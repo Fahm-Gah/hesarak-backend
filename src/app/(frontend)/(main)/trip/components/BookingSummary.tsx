@@ -1,6 +1,7 @@
 import React, { useMemo, memo } from 'react'
 import { Loader2, CreditCard, Users } from 'lucide-react'
 import clsx from 'clsx'
+import { convertToPersianDigits, formatPersianNumber } from '@/utils/persianDigits'
 
 interface BusLayoutElement {
   id: string
@@ -80,28 +81,31 @@ const EmptyState = memo<{
   userBookingInfo: UserBookingInfo | null
   isAuthenticated: boolean
 }>(({ userBookingInfo, isAuthenticated }) => (
-  <div className="text-center py-8">
+  <div className="text-center py-8" dir="rtl">
     <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
       <Users className="w-8 h-8 text-orange-600" />
     </div>
     <h4 className="text-lg font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">
-      Select Your Seats
+      چوکی های خود را انتخاب کنید
     </h4>
     <p className="text-gray-600 text-sm">
-      Choose your preferred seats from the layout above to continue.
+      برای ادامه ، چوکی های مورد نظر خود را از طرح بندی بالا انتخاب کنید.
     </p>
 
     {isAuthenticated && userBookingInfo && (
       <div className="mt-6 p-4 bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-xl border border-orange-200/50">
         <div className="text-sm text-orange-700">
-          <p className="font-semibold mb-1">Booking Limits:</p>
+          <p className="font-semibold mb-1">محدودیت رزرو:</p>
           <p>
-            You can book up to{' '}
-            <span className="font-bold">{userBookingInfo.remainingSeatsAllowed}</span> more seats
+            شما می‌توانید حداکثر{' '}
+            <span className="font-bold">
+              {convertToPersianDigits(userBookingInfo.remainingSeatsAllowed)}
+            </span>{' '}
+            چوکی دیگر رزرو کنید
           </p>
           <p className="text-xs mt-1 text-orange-600">
-            ({userBookingInfo.totalBookedSeats} of {userBookingInfo.maxSeatsPerUser} seats already
-            booked)
+            ({convertToPersianDigits(userBookingInfo.totalBookedSeats)} از{' '}
+            {convertToPersianDigits(userBookingInfo.maxSeatsPerUser)} چوکی قبلاً رزرو شده)
           </p>
         </div>
       </div>
@@ -123,12 +127,24 @@ export const BookingSummary = memo<BookingSummaryProps>(
     isLoading = false,
     className = '',
   }) => {
-    const formatTo12Hour = (time24: string): string => {
+    // Function to convert 24-hour time to 12-hour format with Persian AM/PM
+    const formatToPersian12Hour = (time24: string): string => {
       const [hours, minutes] = time24.split(':')
       const hour = parseInt(hours, 10)
-      const period = hour >= 12 ? 'PM' : 'AM'
+      const minute = parseInt(minutes, 10)
+      const period = hour >= 12 ? 'ب.ظ' : 'ق.ظ'
       const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
-      return `${hour12}:${minutes} ${period}`
+
+      // Convert to Persian digits
+      const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
+      const convertToPersianDigits = (num: number): string => {
+        return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
+      }
+
+      const persianHour = convertToPersianDigits(hour12)
+      const persianMinutes = convertToPersianDigits(minute).padStart(2, '۰')
+
+      return `${persianHour}:${persianMinutes} ${period}`
     }
 
     const { selectedSeatNumbers, totalPrice, hasSelectedSeats } = useMemo(() => {
@@ -159,11 +175,12 @@ export const BookingSummary = memo<BookingSummaryProps>(
             'bg-gradient-to-br from-white via-orange-50/20 to-red-50/20 rounded-3xl shadow-xl border border-orange-200/50 p-8 backdrop-blur-sm',
             className,
           )}
+          dir="rtl"
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full" />
             <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              Booking Summary
+              خلاصه رزرو
             </h3>
           </div>
 
@@ -178,11 +195,12 @@ export const BookingSummary = memo<BookingSummaryProps>(
           'bg-gradient-to-br from-white via-orange-50/20 to-red-50/20 rounded-3xl shadow-xl border border-orange-200/50 p-8 backdrop-blur-sm',
           className,
         )}
+        dir="rtl"
       >
         <div className="flex items-center gap-3 mb-8">
           <div className="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full" />
           <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            Booking Summary
+            خلاصه رزرو
           </h3>
         </div>
 
@@ -190,26 +208,26 @@ export const BookingSummary = memo<BookingSummaryProps>(
         <div className="bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl p-6 mb-8 border border-orange-200/30 backdrop-blur-sm">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Route</span>
+              <span className="text-sm font-medium text-gray-600">مسیر</span>
               <span className="font-bold text-gray-800">
-                {tripDetails.from.name} → {tripDetails.to?.name}
+                {tripDetails.from.name} ← {tripDetails.to?.name}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Date</span>
+              <span className="text-sm font-medium text-gray-600">تاریخ</span>
               <span className="font-bold text-gray-800">{tripDetails.originalDate}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Departure</span>
+              <span className="text-sm font-medium text-gray-600">حرکت</span>
               <span className="font-bold text-gray-800">
-                {formatTo12Hour(tripDetails.departureTime)}
+                {formatToPersian12Hour(tripDetails.departureTime)}
               </span>
             </div>
             {tripDetails.arrivalTime && (
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">Arrival</span>
+                <span className="text-sm font-medium text-gray-600">ورود</span>
                 <span className="font-bold text-gray-800">
-                  {formatTo12Hour(tripDetails.arrivalTime)}
+                  {formatToPersian12Hour(tripDetails.arrivalTime)}
                 </span>
               </div>
             )}
@@ -219,10 +237,12 @@ export const BookingSummary = memo<BookingSummaryProps>(
         {/* Selected Seats */}
         <div className="mb-8">
           <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <span>Selected Seats</span>
+            <span>چوکی های انتخاب شده</span>
             <div className="flex items-center gap-1 bg-gradient-to-r from-orange-100 to-red-100 px-2 py-1 rounded-lg">
               <div className="w-1.5 h-1.5 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-pulse" />
-              <span className="text-xs font-semibold text-orange-700">{selectedSeats.length}</span>
+              <span className="text-xs font-semibold text-orange-700">
+                {convertToPersianDigits(selectedSeats.length)}
+              </span>
             </div>
           </h4>
           <div className="space-y-3">
@@ -235,10 +255,10 @@ export const BookingSummary = memo<BookingSummaryProps>(
                   <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-lg">
                     {seatNumber}
                   </div>
-                  <span className="font-semibold text-gray-800">Seat {seatNumber}</span>
+                  <span className="font-semibold text-gray-800">چوکی {seatNumber}</span>
                 </div>
                 <span className="font-bold text-gray-800 text-lg">
-                  {tripDetails.price.toLocaleString()} AF
+                  {formatPersianNumber(tripDetails.price)} افغانی
                 </span>
               </div>
             ))}
@@ -250,15 +270,17 @@ export const BookingSummary = memo<BookingSummaryProps>(
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600 font-medium">
-                {selectedSeats.length} seat{selectedSeats.length > 1 ? 's' : ''} ×{' '}
-                {tripDetails.price.toLocaleString()} AF
+                {convertToPersianDigits(selectedSeats.length)} چوکی ×{' '}
+                {formatPersianNumber(tripDetails.price)} افغانی
               </span>
-              <span className="text-gray-800 font-semibold">{totalPrice.toLocaleString()} AF</span>
+              <span className="text-gray-800 font-semibold">
+                {formatPersianNumber(totalPrice)} افغانی
+              </span>
             </div>
             <div className="flex items-center justify-between text-xl font-bold pt-3 border-t border-orange-200/30">
-              <span className="text-gray-800">Total Amount</span>
+              <span className="text-gray-800">مجموع مبلغ</span>
               <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                {totalPrice.toLocaleString()} AF
+                {formatPersianNumber(totalPrice)} افغانی
               </span>
             </div>
           </div>
@@ -268,17 +290,19 @@ export const BookingSummary = memo<BookingSummaryProps>(
         {userBookingInfo && (
           <div className="mb-8 p-4 bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl border border-orange-200/50">
             <div className="text-sm text-orange-700">
-              <p className="font-semibold mb-1">Booking Status:</p>
+              <p className="font-semibold mb-1">وضعیت رزرو:</p>
               <p>
-                You can book{' '}
+                شما می‌توانید{' '}
                 <span className="font-bold">
-                  {userBookingInfo.remainingSeatsAllowed - selectedSeats.length}
+                  {convertToPersianDigits(
+                    userBookingInfo.remainingSeatsAllowed - selectedSeats.length,
+                  )}
                 </span>{' '}
-                more seats after this booking
+                چوکی دیگر پس از این رزرو بگیرید
               </p>
               <p className="text-xs mt-1 text-orange-600">
-                ({userBookingInfo.totalBookedSeats + selectedSeats.length} of{' '}
-                {userBookingInfo.maxSeatsPerUser} seats will be booked)
+                ({convertToPersianDigits(userBookingInfo.totalBookedSeats + selectedSeats.length)}{' '}
+                از {convertToPersianDigits(userBookingInfo.maxSeatsPerUser)} چوکی رزرو خواهد شد)
               </p>
             </div>
           </div>
@@ -299,14 +323,12 @@ export const BookingSummary = memo<BookingSummaryProps>(
             {isLoading ? (
               <div className="flex items-center justify-center gap-3">
                 <Loader2 className="w-6 h-6 animate-spin" />
-                <span>Processing...</span>
+                <span>در حال پردازش...</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-3">
                 <CreditCard className="w-6 h-6" />
-                <span>
-                  Book {selectedSeats.length} Seat{selectedSeats.length > 1 ? 's' : ''}
-                </span>
+                <span>رزرو {convertToPersianDigits(selectedSeats.length)} چوکی</span>
               </div>
             )}
           </button>
@@ -317,7 +339,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
               disabled={isLoading}
               className="w-full py-3 px-4 border-2 border-orange-200 rounded-2xl font-semibold text-orange-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 hover:border-orange-300 transition-all duration-200 disabled:opacity-50"
             >
-              Clear Selection
+              پاک کردن انتخاب
             </button>
           )}
         </div>
@@ -327,15 +349,18 @@ export const BookingSummary = memo<BookingSummaryProps>(
           <div className="text-xs text-gray-500 space-y-2 leading-relaxed">
             <p className="flex items-start gap-2">
               <span className="w-1 h-1 bg-orange-400 rounded-full mt-2 flex-shrink-0" />
-              <span>Seats are held for 15 minutes during the booking process</span>
+              <span>چوکی ها برای ۱۵ دقیقه در حین فرآیند رزرو نگه داشته می‌شوند</span>
             </p>
             <p className="flex items-start gap-2">
               <span className="w-1 h-1 bg-orange-400 rounded-full mt-2 flex-shrink-0" />
-              <span>Payment must be completed within 24 hours of booking</span>
+              <span>
+                مهلت پرداخت: بیش از ۷ روز (۴۸ ساعت)، ۱-۷ روز (۲۴ ساعت)، کمتر از ۲۴ ساعت (۲ ساعت قبل
+                حرکت)
+              </span>
             </p>
             <p className="flex items-start gap-2">
               <span className="w-1 h-1 bg-orange-400 rounded-full mt-2 flex-shrink-0" />
-              <span>Cancellation policies apply as per terms and conditions</span>
+              <span>سیاست لغو طبق قوانین و مقررات اعمال می‌شود</span>
             </p>
           </div>
         </div>

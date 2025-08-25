@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, Bus, Wifi, Tv, Wind, Coffee, UtensilsCrossed, Toilet } from 'lucide-react'
+import { convertToPersianDigits, formatPersianNumber } from '@/utils/persianDigits'
 
 interface Trip {
   id: string
@@ -90,10 +91,7 @@ const formatToPersian12Hour = (time24: string): string => {
 }
 
 // Function to convert English digits to Persian digits
-const convertToPersianDigits = (num: number): string => {
-  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
-  return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
-}
+// Using imported convertToPersianDigits and formatPersianNumber functions
 
 // Function to format duration to Persian with full words
 const formatDurationToPersian = (duration: string): string => {
@@ -297,7 +295,7 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="text-left">
               <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                {convertToPersianDigits(trip.price).replace(/\B(?=(\d{3})+(?!\d))/g, '،')} افغانی
+                {formatPersianNumber(trip.price)} افغانی
               </div>
               <div className="text-xs text-gray-500">از هر مسافر</div>
             </div>

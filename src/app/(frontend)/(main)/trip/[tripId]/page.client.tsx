@@ -152,14 +152,14 @@ export const TripDetailsClient = ({
       switch (initialError) {
         case 'booking_limit_exceeded':
           toast.error(
-            'You have already booked the maximum number of seats allowed for this trip. Please manage your existing bookings if you need to make changes.',
+            'شما قبلاً حداکثر تعداد چوکی مجاز برای این سفر را رزرو کرده‌اید. لطفاً برای تغییرات، رزروهای موجود خود را مدیریت کنید.',
           )
           break
         case 'too_many_seats':
-          toast.error('You are trying to book more seats than allowed for this trip.')
+          toast.error('شما سعی می‌کنید چوکی‌های بیشتری از حد مجاز برای این سفر رزرو کنید.')
           break
         default:
-          toast.error('An error occurred while processing your booking.')
+          toast.error('خطایی در پردازش رزرو شما رخ داده است.')
       }
       setSelectedSeats([]) // Clear any selected seats
     }
@@ -199,16 +199,14 @@ export const TripDetailsClient = ({
             tripDetails.userBookingInfo &&
             !tripDetails.userBookingInfo.canBookMoreSeats
           ) {
-            toast.error(
-              'You have already booked the maximum number of seats allowed for this trip.',
-            )
+            toast.error('شما قبلاً حداکثر تعداد چوکی مجاز برای این سفر را رزرو کرده‌اید.')
             return prev
           }
 
           // Check if user can select more seats
           const maxSeats = tripDetails.userBookingInfo?.remainingSeatsAllowed ?? 2
           if (prev.length >= maxSeats) {
-            toast.error(`You can only select up to ${maxSeats} seats`)
+            toast.error(`شما فقط می‌توانید حداکثر ${maxSeats} چوکی انتخاب کنید`)
             return prev
           }
 
@@ -222,12 +220,12 @@ export const TripDetailsClient = ({
 
   const handleClearSelection = useCallback(() => {
     setSelectedSeats([])
-    toast.success('Selection cleared')
+    toast.success('انتخاب پاک شد')
   }, [])
 
   const handleProceedToBooking = useCallback(async () => {
     if (selectedSeats.length === 0) {
-      toast.error('Please select at least one seat')
+      toast.error('لطفاً حداقل یک چوکی انتخاب کنید')
       return
     }
 
@@ -236,14 +234,12 @@ export const TripDetailsClient = ({
       const { canBookMoreSeats, remainingSeatsAllowed } = tripDetails.userBookingInfo
 
       if (!canBookMoreSeats) {
-        toast.error('You have already booked the maximum number of seats allowed for this trip.')
+        toast.error('شما قبلاً حداکثر تعداد چوکی مجاز برای این سفر را رزرو کرده‌اید.')
         return
       }
 
       if (selectedSeats.length > remainingSeatsAllowed) {
-        toast.error(
-          `You can only book ${remainingSeatsAllowed} more seat${remainingSeatsAllowed === 1 ? '' : 's'} for this trip.`,
-        )
+        toast.error(`شما فقط می‌توانید ${remainingSeatsAllowed} چوکی دیگر برای این سفر رزرو کنید.`)
         return
       }
     }
@@ -299,7 +295,7 @@ export const TripDetailsClient = ({
       }
     } catch (err) {
       console.error('Booking error:', err)
-      toast.error('Failed to proceed with booking. Please try again.')
+      toast.error('ادامه رزرو ناموفق بود. لطفاً دوباره تلاش کنید.')
       setIsBookingLoading(false)
     }
   }, [
@@ -320,13 +316,13 @@ export const TripDetailsClient = ({
   const searchUrl = `/search?from=${encodeURIComponent(searchFromProvince)}&to=${encodeURIComponent(searchToProvince)}&date=${encodeURIComponent(searchDate)}`
 
   const breadcrumbItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Search Results', href: searchUrl },
-    { label: 'Trip Details' },
+    { label: 'خانه', href: '/' },
+    { label: 'نتایج جستجو', href: searchUrl },
+    { label: 'جزئیات سفر' },
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumbs */}
         <div className="mb-6">
@@ -375,7 +371,7 @@ export const TripDetailsClient = ({
           <div className="flex items-center gap-3 mb-8">
             <div className="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
             <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              Important Information
+              اطلاعات مهم
             </h3>
           </div>
 
@@ -383,38 +379,40 @@ export const TripDetailsClient = ({
             <div className="bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl p-6 border border-orange-200/30 backdrop-blur-sm">
               <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <div className="w-1.5 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
-                Booking Policy
+                سیاست رزرو
               </h4>
               <div className="space-y-3 text-sm text-gray-700">
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    Maximum{' '}
+                    حداکثر{' '}
                     <span className="font-semibold text-orange-700">
                       {tripDetails.userBookingInfo?.maxSeatsPerUser || 2}
                     </span>{' '}
-                    seats per user
+                    چوکی برای هر کاربر. برای قید کردن بیش از دو چوکی به شماره تلفن ما به تماس شوید
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    Payment required within{' '}
-                    <span className="font-semibold text-orange-700">24 hours</span>
+                    مهلت پرداخت: بیش از ۷ روز{' '}
+                    <span className="font-semibold text-orange-700">(۴۸ ساعت)</span>، ۱-۷ روز{' '}
+                    <span className="font-semibold text-orange-700">(۲۴ ساعت)</span>، کمتر از ۲۴
+                    ساعت <span className="font-semibold text-orange-700">(۲ ساعت قبل حرکت)</span>
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    Cancellation allowed up to{' '}
-                    <span className="font-semibold text-orange-700">24 hours</span> before departure
+                    لغو تا <span className="font-semibold text-orange-700">۲۴ ساعت</span> قبل از
+                    حرکت امکان‌پذیر است
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    Refund processing takes{' '}
-                    <span className="font-semibold text-orange-700">3-5 business days</span>
+                    پردازش بازپرداخت{' '}
+                    <span className="font-semibold text-orange-700">۳-۵ روز کاری</span> طول می‌کشد
                   </span>
                 </div>
               </div>
@@ -423,35 +421,35 @@ export const TripDetailsClient = ({
             <div className="bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl p-6 border border-orange-200/30 backdrop-blur-sm">
               <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <div className="w-1.5 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
-                Travel Requirements
+                شرایط سفر
               </h4>
               <div className="space-y-3 text-sm text-gray-700">
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    <span className="font-semibold text-orange-700">Valid ID</span> required for
-                    boarding
+                    <span className="font-semibold text-orange-700">کارت شناسایی معتبر</span> برای
+                    سوار شدن ضروری است
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    Arrive <span className="font-semibold text-orange-700">30 minutes</span> before
-                    departure
+                    <span className="font-semibold text-orange-700">۳۰ دقیقه</span> قبل از حرکت حضور
+                    یابید
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    <span className="font-semibold text-orange-700">No smoking or alcohol</span> on
-                    board
+                    <span className="font-semibold text-orange-700">سیگار و الکل</span> در اتوبوس
+                    ممنوع است
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    Luggage weight limit:{' '}
-                    <span className="font-semibold text-orange-700">20kg per passenger</span>
+                    محدودیت وزن بار:{' '}
+                    <span className="font-semibold text-orange-700">۲۰ کیلو برای هر مسافر</span>
                   </span>
                 </div>
               </div>
@@ -467,11 +465,11 @@ export const TripDetailsClient = ({
             </div>
             <div>
               <h4 className="text-lg font-bold bg-gradient-to-r from-orange-700 to-red-700 bg-clip-text text-transparent mb-2">
-                Need Help?
+                نیاز به کمک دارید؟
               </h4>
               <p className="text-orange-800 text-sm leading-relaxed">
-                Contact our support team for assistance with your booking or travel questions. We're
-                here to make your journey smooth and comfortable.
+                برای کمک در مورد رزرو یا سوالات سفر، با تیم پشتیبانی ما تماس بگیرید. ما اینجا هستیم
+                تا سفر شما راحت و آسان باشد.
               </p>
             </div>
           </div>

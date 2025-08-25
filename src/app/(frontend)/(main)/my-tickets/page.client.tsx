@@ -11,6 +11,7 @@ import { TicketFilters } from './components/TicketFilters'
 import { TicketCard } from './components/TicketCard'
 import { EmptyTicketsState } from './components/EmptyTicketsState'
 import { useServerFilters } from './hooks/useServerFilters'
+import { convertToPersianDigits } from '@/utils/persianDigits'
 
 interface TicketsPageClientProps {
   tickets: UserTicket[]
@@ -23,11 +24,7 @@ interface TicketsPageClientProps {
   }
 }
 
-// Function to convert numbers to Persian digits
-const convertToPersianDigits = (num: number): string => {
-  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
-  return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
-}
+// Using imported convertToPersianDigits function
 
 export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClientProps) => {
   const router = useRouter()

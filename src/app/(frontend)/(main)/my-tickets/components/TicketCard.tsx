@@ -5,12 +5,9 @@ import { useRouter } from 'next/navigation'
 import { Copy, Clock, Check, XCircle } from 'lucide-react'
 import { UserTicket } from '../types'
 import { convertGregorianToPersianDisplay } from '@/utils/dateUtils'
+import { convertToPersianDigits } from '@/utils/persianDigits'
 
-// Function to convert numbers to Persian digits
-const convertToPersianDigits = (num: number | string): string => {
-  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
-  return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)])
-}
+// Using imported convertToPersianDigits function
 
 // Function to format duration to Persian with full words
 const formatDurationToPersian = (duration: string): string => {
