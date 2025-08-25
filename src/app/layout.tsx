@@ -75,13 +75,5 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="fa" className={vazirmatn.className}>
-      <head>
-        <meta name="msapplication-TileColor" content="#f97316" />
-        <meta name="msapplication-config" content="/favicon/browserconfig.xml" />
-      </head>
-      <body suppressHydrationWarning={true}>{children}</body>
-    </html>
-  )
+  return children
 }
