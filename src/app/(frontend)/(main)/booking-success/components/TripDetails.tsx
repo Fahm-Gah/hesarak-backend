@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { MapPin, Calendar, CreditCard, Armchair, Clock } from 'lucide-react'
+import { convertToPersianDigits, formatPersianNumber } from '@/utils/persianDigits'
 import type { BookingData } from './types'
 
 interface TripDetailsProps {
@@ -11,15 +12,19 @@ interface TripDetailsProps {
 export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate, status }) => {
   const seatNumbers = bookingData.booking.seats.map((seat) => seat.seatNumber).sort()
 
-  // Format time function
-  const formatTime = (dateStr: string): string => {
+  // Function to convert 24-hour time to 12-hour format with Persian AM/PM
+  const formatToPersian12Hour = (dateStr: string): string => {
     try {
       const date = new Date(dateStr)
-      return date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      })
+      const hours = date.getHours()
+      const minutes = date.getMinutes()
+      const period = hours >= 12 ? 'ب.ظ' : 'ق.ظ'
+      const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
+
+      const persianHour = convertToPersianDigits(hour12)
+      const persianMinutes = convertToPersianDigits(minutes).padStart(2, '۰')
+
+      return `${persianHour}:${persianMinutes} ${period}`
     } catch {
       return ''
     }
@@ -28,7 +33,7 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
   // Build route display
   const getRouteDisplay = (): string => {
     if (bookingData.trip.from?.province && bookingData.trip.to?.province) {
-      return `${bookingData.trip.from.province} → ${bookingData.trip.to.province}`
+      return `${bookingData.trip.from.province} ← ${bookingData.trip.to.province}`
     }
     // Fallback to trip name if no terminal info
     return bookingData.trip.tripName
@@ -61,11 +66,12 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
   return (
     <div
       className={`${theme.bgGradient} rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 ${theme.border} backdrop-blur-sm`}
+      dir="rtl"
     >
       <div className="flex items-center gap-3 mb-4 sm:mb-6">
         <div className={`w-2 h-8 ${theme.accentBar} rounded-full`} />
         <h3 className={`text-xl font-bold ${theme.textGradient} bg-clip-text text-transparent`}>
-          Trip Details
+          جزئیات سفر
         </h3>
       </div>
 
@@ -79,7 +85,7 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
               <MapPin className={`w-5 h-5 ${theme.iconColor}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-gray-600">Route</p>
+              <p className="text-sm text-gray-600">مسیر</p>
               <p className="font-bold text-gray-800 truncate">{getRouteDisplay()}</p>
             </div>
           </div>
@@ -91,12 +97,12 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
               <Calendar className={`w-5 h-5 ${theme.iconColor}`} />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-600">Travel Date</p>
-              <p className="font-bold text-gray-800">{getTravelDate(bookingData)}</p>
-              {formatTime(bookingData.booking.date) && (
+              <p className="text-sm text-gray-600">تاریخ سفر</p>
+              <p className="font-bold text-gray-800">{convertToPersianDigits(getTravelDate(bookingData))}</p>
+              {formatToPersian12Hour(bookingData.booking.date) && (
                 <p className="text-sm text-gray-600 flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  {formatTime(bookingData.booking.date)}
+                  {formatToPersian12Hour(bookingData.booking.date)}
                 </p>
               )}
             </div>
@@ -116,11 +122,11 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Bus Details</p>
+                <p className="text-sm text-gray-600">جزئیات اتوبوس</p>
                 <p className="font-bold text-gray-800">
-                  Bus #{bookingData.trip.bus.number}
+                  اتوبوس #{bookingData.trip.bus.number}
                   {bookingData.trip.bus.type && (
-                    <span className="text-sm font-normal text-gray-600 ml-2">
+                    <span className="text-sm font-normal text-gray-600 mr-2">
                       - {bookingData.trip.bus.type.name}
                     </span>
                   )}
@@ -139,18 +145,17 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
               <CreditCard className={`w-5 h-5 ${theme.iconColor}`} />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-600">Price Calculation</p>
+              <p className="text-sm text-gray-600">محاسبه قیمت</p>
               <p
                 className={`font-bold text-gray-800 ${status === 'cancelled' ? 'line-through opacity-75' : ''}`}
               >
-                {bookingData.booking.pricePerSeat.toLocaleString()} AF ×{' '}
-                {bookingData.booking.seats.length} seat
-                {bookingData.booking.seats.length > 1 ? 's' : ''}
+                {formatPersianNumber(bookingData.booking.pricePerSeat)} افغانی ×{' '}
+                {convertToPersianDigits(bookingData.booking.seats.length)} چوکی
               </p>
               <p
                 className={`text-sm font-semibold ${status === 'cancelled' ? 'line-through opacity-75' : 'text-green-600'}`}
               >
-                Total: {bookingData.booking.totalPrice.toLocaleString()} AF
+                مجموع: {formatPersianNumber(bookingData.booking.totalPrice)} افغانی
               </p>
             </div>
           </div>
@@ -162,7 +167,7 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
               <Armchair className={`w-5 h-5 ${theme.iconColor}`} />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-600">Seat Number</p>
+              <p className="text-sm text-gray-600">شماره چوکی</p>
               <div className="flex flex-wrap gap-1 mt-1">
                 {seatNumbers.map((seatNumber, index) => (
                   <span

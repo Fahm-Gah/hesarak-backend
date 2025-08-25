@@ -438,7 +438,7 @@ export const SeatLayout = memo<SeatLayoutProps>(
                 className="w-3 h-3 bg-gradient-to-br from-gray-400 to-gray-500 rounded-lg shadow-sm border border-gray-300/50"
                 aria-hidden="true"
               />
-              <span className="text-xs font-medium text-gray-700">رزرو شده</span>
+              <span className="text-xs font-medium text-gray-700">قید شده</span>
             </div>
             {hasUserBookedSeats && (
               <>

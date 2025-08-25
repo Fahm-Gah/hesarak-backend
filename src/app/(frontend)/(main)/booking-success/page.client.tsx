@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { User as PayloadUser, Profile } from '@/payload-types'
 import { convertGregorianToPersianDisplay } from '@/utils/dateUtils'
+import { convertToPersianDigits } from '@/utils/persianDigits'
 import {
   BookingHeader,
   TicketCard,
@@ -59,7 +60,7 @@ export const BookingSuccessClient = ({
       return convertGregorianToPersianDisplay(bookingData.booking.date)
     }
 
-    return 'Unknown Date'
+    return 'تاریخ نامعلوم'
   }
 
   // Helper function to format payment deadline
@@ -102,18 +103,18 @@ export const BookingSuccessClient = ({
       } else {
         console.error('Server fetch failed - Status:', response.status, 'Error:', result.error)
         if (response.status === 401) {
-          setError('Please log in to view your ticket details')
+          setError('لطفاً برای مشاهده جزئیات تکت وارد شوید')
         } else if (response.status === 403) {
-          setError('You do not have permission to view this ticket')
+          setError('شما اجازه مشاهده این تکت را ندارید')
         } else if (response.status === 404) {
-          setError('Ticket not found')
+          setError('تکت یافت نشد')
         } else {
-          setError(result.error || 'Failed to load ticket information')
+          setError(result.error || 'بارگیری اطلاعات تکت ناموفق بود')
         }
       }
     } catch (err) {
       console.error('Error fetching from server:', err)
-      setError('Network error: Failed to load ticket information')
+      setError('خطای شبکه: بارگیری اطلاعات تکت ناموفق بود')
     } finally {
       setIsLoading(false)
     }
@@ -172,13 +173,13 @@ export const BookingSuccessClient = ({
             sessionStorage.removeItem('bookingResult')
           }, 100)
         } else if (mounted) {
-          setError('No booking data found. Please try booking again.')
+          setError('هیچ اطلاعات قیدی یافت نشد. لطفاً دوباره قید کنید.')
           setIsLoading(false)
         }
       } catch (err) {
         console.error('Error reading booking data:', err)
         if (mounted) {
-          setError('Failed to load booking information.')
+          setError('بارگیری اطلاعات قید کردن ناموفق بود.')
           setIsLoading(false)
         }
       }
@@ -194,10 +195,10 @@ export const BookingSuccessClient = ({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center" dir="rtl">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your booking details...</p>
+          <p className="text-gray-600">در حال بارگیری جزئیات قید شما...</p>
         </div>
       </div>
     )
@@ -205,12 +206,12 @@ export const BookingSuccessClient = ({
 
   if (error || !bookingData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center" dir="rtl">
         <div className="max-w-lg mx-auto p-6 sm:p-8">
           <BookingHeader
             status="error"
-            title="Booking Information Not Found"
-            description={error || 'Unable to load booking details.'}
+            title="اطلاعات قید یافت نشد"
+            description={error || 'قادر به بارگیری جزئیات قید نیستیم.'}
           />
           <ActionButtons status="error" />
         </div>
@@ -221,12 +222,12 @@ export const BookingSuccessClient = ({
   // Handle cancelled tickets
   if (bookingData.status.isCancelled) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50" dir="rtl">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <BookingHeader
             status="cancelled"
-            title="Ticket Cancelled"
-            description="This ticket has been cancelled by the administration. Your booking is no longer valid."
+            title="تکت لغو شد"
+            description="این تکت توسط مدیریت لغو شده است. قید شما دیگر معتبر نیست."
           />
 
           <TicketCard bookingData={bookingData} status="cancelled" getTravelDate={getTravelDate}>
@@ -247,12 +248,12 @@ export const BookingSuccessClient = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50" dir="rtl">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <BookingHeader
           status="success"
-          title="Booking Confirmed!"
-          description="Your ticket has been successfully booked. Here are your booking details:"
+          title="قید تأیید شد!"
+          description="تکت شما با موفقیت قید شد. جزئیات قید شما در ادامه آمده است:"
         />
 
         <TicketCard bookingData={bookingData} status="success" getTravelDate={getTravelDate}>

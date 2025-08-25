@@ -1,47 +1,30 @@
 import type { Endpoint } from 'payload'
-import { convertPersianDateToGregorian } from '../utils/dateUtils'
+import { convertPersianDateToGregorian, formatTime } from '../utils/dateUtils'
 import { validateBookingRequest, validateBookingConstraints } from '../validations/booking'
+import { getLocaleFromRequest, createErrorResponse, createSuccessResponse, t } from '../utils/i18n'
 
 export const bookTicket: Endpoint = {
   path: '/book-ticket',
   method: 'post',
   handler: async (req) => {
     const { payload, user } = req
+    const locale = getLocaleFromRequest(req)
 
     if (!user) {
-      return Response.json(
-        {
-          success: false,
-          error: 'Authentication required',
-        },
-        { status: 401 },
-      )
+      return createErrorResponse('AUTH_REQUIRED', 401, locale)
     }
 
     let requestBody: unknown
     try {
       requestBody = (await req.json?.()) || req.body
     } catch (e) {
-      return Response.json(
-        {
-          success: false,
-          error: 'Invalid JSON in request body',
-        },
-        { status: 400 },
-      )
+      return createErrorResponse('INVALID_JSON', 400, locale)
     }
 
     // Validate request using our validation schema
     const validation = validateBookingRequest(requestBody)
     if (!validation.isValid) {
-      return Response.json(
-        {
-          success: false,
-          error: 'Validation failed',
-          details: validation.errors,
-        },
-        { status: 400 },
-      )
+      return createErrorResponse('VALIDATION_FAILED', 400, locale, undefined, validation.errors)
     }
 
     const bookingData = validation.data!
@@ -49,14 +32,7 @@ export const bookTicket: Endpoint = {
     // Validate business constraints
     const constraintValidation = validateBookingConstraints(bookingData)
     if (!constraintValidation.isValid) {
-      return Response.json(
-        {
-          success: false,
-          error: 'Booking constraints violated',
-          details: constraintValidation.errors,
-        },
-        { status: 400 },
-      )
+      return createErrorResponse('BOOKING_CONSTRAINTS_VIOLATED', 400, locale, undefined, constraintValidation.errors)
     }
 
     const {
@@ -79,23 +55,11 @@ export const bookTicket: Endpoint = {
       })) as any
 
       if (!authUser?.isActive) {
-        return Response.json(
-          {
-            success: false,
-            error: 'User account is inactive',
-          },
-          { status: 401 },
-        )
+        return createErrorResponse('USER_INACTIVE', 401, locale)
       }
 
       if (!authUser.profile || typeof authUser.profile === 'string') {
-        return Response.json(
-          {
-            success: false,
-            error: 'Profile required. Please complete your profile before booking tickets.',
-          },
-          { status: 400 },
-        )
+        return createErrorResponse('PROFILE_REQUIRED', 400, locale)
       }
 
       // Get trip information
@@ -106,25 +70,59 @@ export const bookTicket: Endpoint = {
       })) as any
 
       if (!trip?.isActive) {
-        return Response.json(
-          {
-            success: false,
-            error: 'Trip not found or no longer available',
-          },
-          { status: 404 },
-        )
+        return createErrorResponse('TRIP_NOT_FOUND', 404, locale)
+      }
+
+      // Check if booking is allowed based on departure time (2 hour cutoff)
+      try {
+        const now = new Date()
+        let departureTimeToCheck = trip.departureTime
+
+        // If user has specific boarding terminals, find the actual boarding time
+        if (fromTerminalId && trip.stops) {
+          const boardingStop = trip.stops.find((stop: any) => stop.terminal?.id === fromTerminalId)
+          if (boardingStop && boardingStop.time) {
+            departureTimeToCheck = boardingStop.time
+          }
+        }
+
+        if (departureTimeToCheck) {
+          // Extract time string from ISO date or time string using dateUtils
+          const timeString = formatTime(departureTimeToCheck)
+          
+          if (timeString && timeString.includes(':')) {
+            const [hours, minutes] = timeString.split(':').map(Number)
+            
+            // Create departure datetime using the normalized date
+            const departureDateTime = new Date(normalizedDate)
+            departureDateTime.setHours(hours, minutes, 0, 0)
+
+            const timeDiffInHours = (departureDateTime.getTime() - now.getTime()) / (1000 * 60 * 60)
+
+
+            // Prevent booking if trip has already departed
+            if (timeDiffInHours <= 0) {
+              return createErrorResponse('TRIP_ALREADY_DEPARTED', 400, locale)
+            }
+
+            // Prevent booking if within 2 hours of departure
+            if (timeDiffInHours < 2) {
+              return createErrorResponse('BOOKING_TOO_CLOSE', 400, locale)
+            }
+          } else {
+            console.warn('Invalid departure time format:', departureTimeToCheck)
+          }
+        }
+      } catch (departureValidationError) {
+        console.error('Error validating departure time in bookTicket:', departureValidationError)
+        // Don't continue with booking if time validation fails - this is critical for security
+        return createErrorResponse('DEPARTURE_TIME_VALIDATION_FAILED', 500, locale)
       }
 
       // Validate seats exist in bus configuration
       const busType = trip.bus?.type
       if (!busType || !busType.seats) {
-        return Response.json(
-          {
-            success: false,
-            error: 'Bus configuration not found',
-          },
-          { status: 500 },
-        )
+        return createErrorResponse('BUS_CONFIG_NOT_FOUND', 500, locale)
       }
 
       const validSeats = busType.seats.filter(
@@ -135,13 +133,7 @@ export const bookTicket: Endpoint = {
         const invalidIds = uniqueSeatIds.filter(
           (id) => !validSeats.some((seat: any) => seat.id === id),
         )
-        return Response.json(
-          {
-            success: false,
-            error: `Invalid or disabled seat IDs: ${invalidIds.join(', ')}`,
-          },
-          { status: 400 },
-        )
+        return createErrorResponse('INVALID_SEAT_IDS', 400, locale, { seatIds: invalidIds.join(', ') })
       }
 
       // Check for existing bookings with proper date range filtering
@@ -223,13 +215,7 @@ export const bookTicket: Endpoint = {
           .filter((seat: any) => conflictingIds.includes(seat.id))
           .map((seat: any) => seat.seatNumber)
 
-        return Response.json(
-          {
-            success: false,
-            error: `The following seats are already booked: ${conflictedSeats.join(', ')}`,
-          },
-          { status: 409 },
-        )
+        return createErrorResponse('SEATS_ALREADY_BOOKED', 409, locale, { seats: conflictedSeats.join(', ') })
       }
 
       // Check user booking limits - IMPROVED VALIDATION
@@ -237,25 +223,12 @@ export const bookTicket: Endpoint = {
       const totalSeatsAfterBooking = userExistingSeats + uniqueSeatIds.length
 
       if (totalSeatsAfterBooking > maxSeatsPerUser) {
-        const remainingSeats = Math.max(0, maxSeatsPerUser - userExistingSeats)
-        return Response.json(
-          {
-            success: false,
-            error: `Booking limit exceeded. You already have ${userExistingSeats} seat(s) booked for this trip. You can only book ${remainingSeats} more seat(s). Maximum ${maxSeatsPerUser} seats per user per trip.`,
-          },
-          { status: 400 },
-        )
+        return createErrorResponse('BOOKING_LIMIT_EXCEEDED', 400, locale, { maxSeats: maxSeatsPerUser })
       }
 
       // Additional safety check - prevent booking if user already has max seats
       if (userExistingSeats >= maxSeatsPerUser) {
-        return Response.json(
-          {
-            success: false,
-            error: `You have already reached the maximum limit of ${maxSeatsPerUser} seats for this trip.`,
-          },
-          { status: 400 },
-        )
+        return createErrorResponse('MAX_SEATS_REACHED', 400, locale, { maxSeats: maxSeatsPerUser })
       }
 
       // CRITICAL: Re-check user limits right before creating the ticket (race condition protection)
@@ -287,13 +260,7 @@ export const bookTicket: Endpoint = {
       })
 
       if (finalUserSeatCount + uniqueSeatIds.length > maxSeatsPerUser) {
-        return Response.json(
-          {
-            success: false,
-            error: `You have already booked ${finalUserSeatCount} seat(s) for this trip. You can only book a maximum of ${maxSeatsPerUser} seats per trip.`,
-          },
-          { status: 400 },
-        )
+        return createErrorResponse('BOOKING_LIMIT_EXCEEDED', 400, locale, { maxSeats: maxSeatsPerUser })
       }
 
       // Calculate pricing
@@ -330,100 +297,70 @@ export const bookTicket: Endpoint = {
         ticketData.to = toTerminalId
       }
 
-      // Debug logging
-      if (process.env.NODE_ENV === 'development') {
-        console.log('bookTicket - Creating ticket with terminals:', {
-          tripId,
-          fromTerminalId,
-          toTerminalId,
-          hasFromTerminal: !!fromTerminalId,
-          hasToTerminal: !!toTerminalId,
-        })
-      }
 
       const ticket = (await payload.create({
         collection: 'tickets',
         data: ticketData,
       })) as any
 
-      // Debug logging for created ticket
-      if (process.env.NODE_ENV === 'development') {
-        console.log('bookTicket - Ticket created with:', {
+
+      return createSuccessResponse(
+        'BOOKING_SUCCESS',
+        {
           ticketId: ticket.id,
           ticketNumber: ticket.ticketNumber,
-          from: ticket.from,
-          to: ticket.to,
-          fromTerminalName: ticket.fromTerminalName,
-          toTerminalName: ticket.toTerminalName,
-        })
-      }
-
-      return Response.json(
-        {
-          success: true,
-          message: 'Tickets booked successfully',
-          data: {
-            ticketId: ticket.id,
-            ticketNumber: ticket.ticketNumber,
-            passenger: {
-              id: authUser.profile.id,
-              fullName: authUser.profile.fullName,
-              fatherName: authUser.profile.fatherName || '',
-              phoneNumber: authUser.profile.phoneNumber || '',
-              gender: authUser.profile.gender || 'male',
-            },
-            trip: {
-              id: trip.id,
-              tripName: trip.tripName,
-              price: trip.price,
-              from:
-                ticket.from && typeof ticket.from === 'object'
-                  ? {
-                      id: ticket.from.id,
-                      name: ticket.from.name,
-                      province: ticket.from.province,
-                      address: ticket.from.address || '',
-                    }
-                  : null,
-              to:
-                ticket.to && typeof ticket.to === 'object'
-                  ? {
-                      id: ticket.to.id,
-                      name: ticket.to.name,
-                      province: ticket.to.province,
-                      address: ticket.to.address || '',
-                    }
-                  : null,
-            },
-            booking: {
-              date: normalizedDate,
-              originalDate: date,
-              seats: validSeats.map((seat: any) => ({
-                id: seat.id,
-                seatNumber: seat.seatNumber,
-              })),
-              totalPrice,
-              pricePerSeat,
-            },
-            status: {
-              isPaid: ticket.isPaid,
-              isExpired: ticket.isExpired || false,
-              paymentMethod: ticket.paymentMethod || paymentMethod,
-              paymentDeadline: ticket.paymentDeadline || null,
-            },
+          passenger: {
+            id: authUser.profile.id,
+            fullName: authUser.profile.fullName,
+            fatherName: authUser.profile.fatherName || '',
+            phoneNumber: authUser.profile.phoneNumber || '',
+            gender: authUser.profile.gender || 'male',
+          },
+          trip: {
+            id: trip.id,
+            tripName: trip.tripName,
+            price: trip.price,
+            from:
+              ticket.from && typeof ticket.from === 'object'
+                ? {
+                    id: ticket.from.id,
+                    name: ticket.from.name,
+                    province: ticket.from.province,
+                    address: ticket.from.address || '',
+                  }
+                : null,
+            to:
+              ticket.to && typeof ticket.to === 'object'
+                ? {
+                    id: ticket.to.id,
+                    name: ticket.to.name,
+                    province: ticket.to.province,
+                    address: ticket.to.address || '',
+                  }
+                : null,
+          },
+          booking: {
+            date: normalizedDate,
+            originalDate: date,
+            seats: validSeats.map((seat: any) => ({
+              id: seat.id,
+              seatNumber: seat.seatNumber,
+            })),
+            totalPrice,
+            pricePerSeat,
+          },
+          status: {
+            isPaid: ticket.isPaid,
+            isExpired: ticket.isExpired || false,
+            paymentMethod: ticket.paymentMethod || paymentMethod,
+            paymentDeadline: ticket.paymentDeadline || null,
           },
         },
-        { status: 201 },
+        locale
       )
     } catch (error: unknown) {
       console.error('Booking error:', error)
-      return Response.json(
-        {
-          success: false,
-          error: 'Booking failed due to an internal error. Please try again.',
-        },
-        { status: 500 },
-      )
+      return createErrorResponse('INTERNAL_ERROR', 500, locale)
     }
   },
 }

@@ -1,4 +1,5 @@
 import type { CollectionBeforeChangeHook } from 'payload'
+import { formatTime } from '@/utils/dateUtils'
 
 /**
  * Hook to populate payment deadline dynamically based on business requirements
@@ -12,6 +13,8 @@ import type { CollectionBeforeChangeHook } from 'payload'
  *    - <24 hours to departure: 2 hours before departure
  * 4. Explicitly set deadlines take precedence
  * 5. Minimum 15-minute grace period for edge cases
+ *
+ * Note: Departure time validation is handled by validateTicketDate hook
  */
 export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
   data,
@@ -71,21 +74,25 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
       }
 
       // Calculate departure datetime by combining trip date with departure time
-      const departureTime = new Date(trip.departureTime)
       const tripDate = new Date(data.date)
+      
+      // Use formatTime utility to handle both ISO strings and time-only strings
+      const timeString = formatTime(trip.departureTime)
+      const [hours, minutes] = timeString.split(':').map(Number)
 
       const departureDateTime = new Date(
         tripDate.getFullYear(),
         tripDate.getMonth(),
         tripDate.getDate(),
-        departureTime.getHours(),
-        departureTime.getMinutes(),
-        departureTime.getSeconds(),
+        hours,
+        minutes,
+        0, // seconds
       )
 
-      // Calculate payment deadline based on time until departure
+      // Calculate time until departure for payment deadline logic
       const now = new Date()
       const timeToDeparture = departureDateTime.getTime() - now.getTime()
+
       const daysToDeparture = timeToDeparture / (1000 * 60 * 60 * 24)
 
       let paymentDeadline: Date

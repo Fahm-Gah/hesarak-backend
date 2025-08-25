@@ -119,7 +119,7 @@ export const TicketCard = memo<TicketCardProps>(
         return (
           <div className="flex items-center gap-1 animate-in slide-in-from-right-2 duration-200">
             <Check className="w-4 h-4 text-green-200" />
-            <span className="text-xs font-semibold text-green-200">Copied!</span>
+            <span className="text-xs font-semibold text-green-200">کپی شد!</span>
           </div>
         )
       }
@@ -128,7 +128,7 @@ export const TicketCard = memo<TicketCardProps>(
         <div className="flex items-center gap-1 group-hover:animate-pulse">
           <Copy className="w-4 h-4 text-white/70 group-hover:text-white transition-colors duration-200" />
           <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors duration-200 sm:inline">
-            Copy
+            کپی
           </span>
         </div>
       )
@@ -146,8 +146,8 @@ export const TicketCard = memo<TicketCardProps>(
     // Render cancelled ticket number (optimized)
     const renderCancelledTicket = useCallback(
       () => (
-        <div className="text-left" role="status" aria-label="Cancelled ticket">
-          <h2 className="text-lg sm:text-xl font-bold mb-2">Ticket Number:</h2>
+        <div className="text-right" role="status" aria-label="Cancelled ticket" dir="rtl">
+          <h2 className="text-lg sm:text-xl font-bold mb-2">شماره تکت:</h2>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="relative flex-1 min-w-0">
               <div className="absolute inset-0 bg-white/20 blur-sm rounded-lg" />
@@ -155,6 +155,7 @@ export const TicketCard = memo<TicketCardProps>(
                 <span
                   className="text-sm sm:text-lg md:text-xl font-bold tracking-wider text-white font-mono line-through opacity-75 truncate pr-2 min-w-0 flex-1"
                   title={ticketNumber}
+                  dir="ltr"
                 >
                   {ticketNumber}
                 </span>
@@ -162,7 +163,7 @@ export const TicketCard = memo<TicketCardProps>(
             </div>
             <div className="px-2 sm:px-4 py-2 bg-white/30 rounded-xl border border-white/20 backdrop-blur-sm flex-shrink-0">
               <span className="text-xs sm:text-sm font-bold text-white tracking-wide">
-                CANCELLED
+                لغو شده
               </span>
             </div>
           </div>
@@ -174,11 +175,11 @@ export const TicketCard = memo<TicketCardProps>(
     // Render active ticket number (unified responsive component with pulse effect)
     const renderActiveTicket = useCallback(
       () => (
-        <div className="w-full">
+        <div className="w-full" dir="rtl">
           {/* Responsive Layout - Mobile: stacked, Desktop: side by side */}
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-            <h2 className="text-lg font-bold text-center md:text-xl md:text-left md:whitespace-nowrap">
-              Ticket Number:
+            <h2 className="text-lg font-bold text-center md:text-xl md:text-right md:whitespace-nowrap">
+              شماره تکت:
             </h2>
             <button
               onClick={copyTicketNumber}
@@ -192,6 +193,7 @@ export const TicketCard = memo<TicketCardProps>(
                 <span
                   className="text-lg font-bold tracking-wider text-white font-mono truncate pr-3 min-w-0 flex-1"
                   title={ticketNumber}
+                  dir="ltr"
                 >
                   {ticketNumber}
                 </span>
@@ -225,7 +227,7 @@ export const TicketCard = memo<TicketCardProps>(
           <div className={`${theme.headerBg} px-6 sm:px-8 py-6`}>
             <div className="flex justify-center text-white">
               <div className="text-center text-white/80">
-                <span className="text-sm">Invalid ticket data</span>
+                <span className="text-sm">اطلاعات تکت نامعتبر</span>
               </div>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { populateBookedBy } from './hooks/populateBookedBy'
 import { calculateTotalPrice } from './hooks/calculateTotalPrice'
 import { validateBookedSeats } from './hooks/validateBookedSeats'
 import { normalizeDateToMidnight } from './hooks/normalizeDateToMidnight'
-import { validateTripDate } from './hooks/validateTripDate'
+import { validateTicketDate } from './hooks/validateTicketDate'
 import { clearSeatsOnTripDateChange } from './hooks/clearSeatsOnTripDateChange'
 import { populateFromAndTo } from './hooks/populateFromAndTo'
 import { populatePaymentDeadline } from './hooks/populatePaymentDeadline'
@@ -143,7 +143,7 @@ export const Tickets: CollectionConfig = {
       },
       type: 'date',
       required: true,
-      validate: validateTripDate,
+      validate: validateTicketDate,
       index: true,
       admin: {
         date: {

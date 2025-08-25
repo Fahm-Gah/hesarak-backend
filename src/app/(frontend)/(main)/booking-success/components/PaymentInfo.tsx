@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { CreditCard, Clock } from 'lucide-react'
+import { convertToPersianDigits } from '@/utils/persianDigits'
 import type { BookingData } from './types'
 
 interface PaymentInfoProps {
@@ -41,11 +42,12 @@ export const PaymentInfo = memo<PaymentInfoProps>(
     return (
       <div
         className={`${theme.bgGradient} rounded-2xl p-4 sm:p-6 ${theme.border} backdrop-blur-sm`}
+        dir="rtl"
       >
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
           <div className={`w-2 h-8 ${theme.accentBar} rounded-full`} />
           <h3 className={`text-xl font-bold ${theme.textGradient} bg-clip-text text-transparent`}>
-            Payment Information
+            اطلاعات پرداخت
           </h3>
         </div>
 
@@ -57,9 +59,9 @@ export const PaymentInfo = memo<PaymentInfoProps>(
               <CreditCard className={`w-5 h-5 ${theme.statusIconColor}`} />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Payment Status</p>
+              <p className="text-sm text-gray-600">وضعیت پرداخت</p>
               <p className={`font-bold ${theme.statusTextColor}`}>
-                {bookingData.status.isPaid ? 'Paid' : 'Pending Payment'}
+                {bookingData.status.isPaid ? 'پرداخت شده' : 'در انتظار پرداخت'}
               </p>
             </div>
           </div>
@@ -72,12 +74,12 @@ export const PaymentInfo = memo<PaymentInfoProps>(
                 <Clock className="w-5 h-5 text-orange-600" />
               </div>
               <div className="sm:text-right">
-                <p className="text-sm text-gray-600">Payment Deadline</p>
+                <p className="text-sm text-gray-600">مهلت پرداخت</p>
                 <p className="font-bold text-orange-600">
-                  {formatPaymentDeadline(bookingData.status.paymentDeadline).date}
+                  {convertToPersianDigits(formatPaymentDeadline(bookingData.status.paymentDeadline).date)}
                 </p>
                 <p className="text-sm font-semibold text-orange-600">
-                  {formatPaymentDeadline(bookingData.status.paymentDeadline).time}
+                  {convertToPersianDigits(formatPaymentDeadline(bookingData.status.paymentDeadline).time)}
                 </p>
               </div>
             </div>

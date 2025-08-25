@@ -222,10 +222,8 @@ export const PaymentMethod = memo<PaymentMethodProps>(
                 <p className="font-semibold mb-2">دستورات پرداخت</p>
                 {selectedPaymentMethod === 'cash' && (
                   <div className="space-y-2">
-                    <p>• چوکی‌های شما برای ۲ ساعت بدون پرداخت رزرو است</p>
-                    <p>• پول دقیق یا کارت را برای پرداخت در اتوبوس بیاورید</p>
-                    <p>• تأیید رزرو را به کمک نشان دهید</p>
-                    <p>• پرداخت باید قبل از حرکت تکمیل شود</p>
+                    <p>• تکت خود را هنگام سوار شدن نشان دهید</p>
+                    <p>• پرداخت باید حداقل ۲ ساعت قبل از حرکت تکمیل شود</p>
                   </div>
                 )}
                 {selectedPaymentMethod === 'card' && (
@@ -259,10 +257,10 @@ export const PaymentMethod = memo<PaymentMethodProps>(
               />
               <div
                 className={clsx(
-                  "w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-200",
+                  'w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-200',
                   acceptedTerms
-                    ? "bg-gradient-to-r from-orange-500 to-red-500 border-orange-500 shadow-lg"
-                    : "bg-white border-gray-300 group-hover:border-orange-400 shadow-sm"
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 border-orange-500 shadow-lg'
+                    : 'bg-white border-gray-300 group-hover:border-orange-400 shadow-sm',
                 )}
               >
                 {acceptedTerms && (
@@ -299,8 +297,7 @@ export const PaymentMethod = memo<PaymentMethodProps>(
               >
                 سیاست لغو
               </a>{' '}
-              موافقم. می‌دانم که باید حداقل ۱۵ دقیقه قبل از زمان حرکت در
-              محل سواری حضور ڈاشته باشم.
+              موافقم. می‌دانم که باید حداقل ۱۵ دقیقه قبل از زمان حرکت در محل سواری حضور ڈاشته باشم.
             </span>
           </label>
         </div>
@@ -334,12 +331,12 @@ export const PaymentMethod = memo<PaymentMethodProps>(
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span className="hidden sm:inline">در حال تأیید رزرو...</span>
+                <span className="hidden sm:inline">در حال تأیید تکت...</span>
                 <span className="sm:hidden">در حال تأیید...</span>
               </>
             ) : (
               <>
-                <span className="hidden sm:inline">تأیید رزرو</span>
+                <span className="hidden sm:inline">تأیید تکت</span>
                 <span className="sm:hidden">تأیید</span>
                 <ArrowLeft className="w-4 h-4" />
               </>

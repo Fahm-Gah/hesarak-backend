@@ -41,7 +41,7 @@ export const BookingHeader = memo<BookingHeaderProps>(({ status, title, descript
   const IconComponent = config.icon
 
   return (
-    <div className="text-center mb-8">
+    <div className="text-center mb-8" dir="rtl">
       <div
         className={`inline-flex items-center justify-center w-20 h-20 ${config.bgColor} rounded-full mb-6 shadow-lg`}
       >
@@ -54,7 +54,7 @@ export const BookingHeader = memo<BookingHeaderProps>(({ status, title, descript
         {title}
       </h1>
 
-      <p className="text-gray-600 text-lg">{description}</p>
+      <p className="text-gray-600 text-lg leading-relaxed">{description}</p>
     </div>
   )
 })

@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 interface ActionButtonsProps {
   status: 'success' | 'cancelled' | 'error'
@@ -18,8 +18,8 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           borderColor: 'border-green-200/30',
           primaryBg: 'bg-gradient-to-r from-green-500 to-emerald-500',
           primaryHover: 'hover:from-green-600 hover:to-emerald-600',
-          primaryText: 'View My Tickets',
-          primaryTextShort: 'My Tickets',
+          primaryText: 'مشاهده تکت‌های من',
+          primaryTextShort: 'تکت‌های من',
           primaryAction: () => router.push('/my-tickets'),
         }
       case 'cancelled':
@@ -27,8 +27,8 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           borderColor: 'border-red-200/30',
           primaryBg: 'bg-gradient-to-r from-red-600 to-orange-600',
           primaryHover: 'hover:from-red-700 hover:to-orange-700',
-          primaryText: 'Book New Ticket',
-          primaryTextShort: 'Book New',
+          primaryText: 'رزرو تکت جدید',
+          primaryTextShort: 'تکت جدید',
           primaryAction: () => router.push('/'),
         }
       case 'error':
@@ -37,8 +37,8 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           borderColor: 'border-gray-200/30',
           primaryBg: 'bg-gradient-to-r from-gray-600 to-gray-700',
           primaryHover: 'hover:from-gray-700 hover:to-gray-800',
-          primaryText: 'Back to Home',
-          primaryTextShort: 'Home',
+          primaryText: 'برگشت به خانه',
+          primaryTextShort: 'خانه',
           primaryAction: () => router.push('/'),
         }
     }
@@ -48,20 +48,20 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
 
   if (status === 'error') {
     return (
-      <div className="flex justify-center">
+      <div className="flex justify-center" dir="rtl">
         <button
           onClick={config.primaryAction}
           className="flex items-center gap-2 px-6 py-3 bg-white/80 border-2 border-red-600 text-red-600 rounded-2xl transition-all duration-200 font-semibold hover:bg-red-50 hover:border-red-700"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          <ArrowRight className="w-4 h-4" />
+          برگشت به خانه
         </button>
       </div>
     )
   }
 
   return (
-    <div className={`pt-6 sm:pt-8 pb-4 ${config.borderColor}`}>
+    <div className={`pt-6 sm:pt-8 pb-4 ${config.borderColor}`} dir="rtl">
       {/* Mobile Layout - Full width buttons */}
       <div className="flex flex-col gap-3 sm:hidden">
         <button
@@ -75,8 +75,8 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           onClick={() => router.push('/')}
           className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white/80 border-2 border-gray-300 text-gray-700 rounded-2xl transition-all duration-200 font-semibold hover:bg-gray-50 hover:border-gray-400"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          <ArrowRight className="w-4 h-4" />
+          برگشت به خانه
         </button>
       </div>
 
@@ -86,8 +86,8 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           onClick={() => router.push('/')}
           className="flex items-center gap-2 px-6 py-3 bg-white/80 border-2 border-gray-300 text-gray-700 rounded-2xl transition-all duration-200 font-semibold hover:bg-gray-50 hover:border-gray-400"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          <ArrowRight className="w-4 h-4" />
+          برگشت به خانه
         </button>
 
         <button

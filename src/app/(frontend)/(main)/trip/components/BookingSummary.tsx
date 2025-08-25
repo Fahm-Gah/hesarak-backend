@@ -95,17 +95,17 @@ const EmptyState = memo<{
     {isAuthenticated && userBookingInfo && (
       <div className="mt-6 p-4 bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-xl border border-orange-200/50">
         <div className="text-sm text-orange-700">
-          <p className="font-semibold mb-1">محدودیت رزرو:</p>
+          <p className="font-semibold mb-1">محدودیت قید:</p>
           <p>
             شما می‌توانید حداکثر{' '}
             <span className="font-bold">
               {convertToPersianDigits(userBookingInfo.remainingSeatsAllowed)}
             </span>{' '}
-            چوکی دیگر رزرو کنید
+            چوکی دیگر قید کنید
           </p>
           <p className="text-xs mt-1 text-orange-600">
             ({convertToPersianDigits(userBookingInfo.totalBookedSeats)} از{' '}
-            {convertToPersianDigits(userBookingInfo.maxSeatsPerUser)} چوکی قبلاً رزرو شده)
+            {convertToPersianDigits(userBookingInfo.maxSeatsPerUser)} چوکی قبلاً قید شده)
           </p>
         </div>
       </div>
@@ -180,7 +180,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full" />
             <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              خلاصه رزرو
+              خلاصه تکت
             </h3>
           </div>
 
@@ -200,7 +200,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
         <div className="flex items-center gap-3 mb-8">
           <div className="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full" />
           <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            خلاصه رزرو
+            خلاصه تکت
           </h3>
         </div>
 
@@ -290,7 +290,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
         {userBookingInfo && (
           <div className="mb-8 p-4 bg-gradient-to-r from-orange-50/80 via-white/90 to-red-50/80 rounded-2xl border border-orange-200/50">
             <div className="text-sm text-orange-700">
-              <p className="font-semibold mb-1">وضعیت رزرو:</p>
+              <p className="font-semibold mb-1">وضعیت قید:</p>
               <p>
                 شما می‌توانید{' '}
                 <span className="font-bold">
@@ -298,11 +298,11 @@ export const BookingSummary = memo<BookingSummaryProps>(
                     userBookingInfo.remainingSeatsAllowed - selectedSeats.length,
                   )}
                 </span>{' '}
-                چوکی دیگر پس از این رزرو بگیرید
+                چوکی دیگر پس از این قید بگیرید
               </p>
               <p className="text-xs mt-1 text-orange-600">
                 ({convertToPersianDigits(userBookingInfo.totalBookedSeats + selectedSeats.length)}{' '}
-                از {convertToPersianDigits(userBookingInfo.maxSeatsPerUser)} چوکی رزرو خواهد شد)
+                از {convertToPersianDigits(userBookingInfo.maxSeatsPerUser)} چوکی قید خواهد شد)
               </p>
             </div>
           </div>
@@ -328,7 +328,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
             ) : (
               <div className="flex items-center justify-center gap-3">
                 <CreditCard className="w-6 h-6" />
-                <span>رزرو {convertToPersianDigits(selectedSeats.length)} چوکی</span>
+                <span>قید {convertToPersianDigits(selectedSeats.length)} چوکی</span>
               </div>
             )}
           </button>
@@ -349,7 +349,7 @@ export const BookingSummary = memo<BookingSummaryProps>(
           <div className="text-xs text-gray-500 space-y-2 leading-relaxed">
             <p className="flex items-start gap-2">
               <span className="w-1 h-1 bg-orange-400 rounded-full mt-2 flex-shrink-0" />
-              <span>چوکی ها برای ۱۵ دقیقه در حین فرآیند رزرو نگه داشته می‌شوند</span>
+              <span>چوکی ها برای ۱۵ دقیقه در حین فرآیند قید نگه داشته می‌شوند</span>
             </p>
             <p className="flex items-start gap-2">
               <span className="w-1 h-1 bg-orange-400 rounded-full mt-2 flex-shrink-0" />

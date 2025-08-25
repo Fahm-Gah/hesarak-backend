@@ -30,21 +30,21 @@ export const ImportantInfo = memo<ImportantInfoProps>(({ bookingData, status }) 
   const getInfoItems = () => {
     if (status === 'cancelled') {
       return [
-        'Your ticket has been cancelled and your seat(s) have been released',
-        'If you paid for this ticket, a refund will be processed according to our refund policy',
-        'You can book a new ticket for your desired travel date',
-        'Contact customer support if you have any questions about this cancellation',
+        'تکت شما لغو شده و چوکی(ها)ی شما آزاد شده است',
+        'اگر برای این تکت پرداخت کرده بودید، بازپرداخت طبق قوانین بازپرداخت ما پردازش خواهد شد',
+        'می‌توانید برای تاریخ سفر مورد نظر خود تکت جدیدی قید کنید',
+        'اگر سوالی درباره این لغو دارید، با پشتیبانی مشتریان تماس بگیرید',
       ]
     }
 
     const baseItems = [
-      'Please arrive at the departure terminal at least 30 minutes before departure time',
-      'Bring a valid ID document for verification during boarding',
-      'Keep your ticket information safe until your journey is complete',
+      'لطفاً حداقل ۳۰ دقیقه قبل از زمان حرکت در ترمینال حضور یابید',
+      'برای تأیید هویت هنگام سواری، مدرک شناسایی معتبر به همراه داشته باشید',
+      'اطلاعات تکت خود را تا پایان سفر به طور ایمن نگه دارید',
     ]
 
     if (!bookingData.status.isPaid) {
-      baseItems.push('Complete your payment before the deadline to secure your booking')
+      baseItems.push('برای تضمین قید خود، پرداخت را قبل از مهلت تکمیل کنید')
     }
 
     return baseItems
@@ -52,22 +52,22 @@ export const ImportantInfo = memo<ImportantInfoProps>(({ bookingData, status }) 
 
   const getTitle = () => {
     if (status === 'cancelled') {
-      return 'What This Means'
+      return 'این به چه معناست'
     }
-    return 'Important Information'
+    return 'اطلاعات مهم'
   }
 
   const infoItems = getInfoItems()
 
   return (
-    <div className={`${theme.bgGradient} rounded-3xl shadow-xl ${theme.border} p-8 mb-8`}>
+    <div className={`${theme.bgGradient} rounded-3xl shadow-xl ${theme.border} p-8 mb-8`} dir="rtl">
       <h3 className="text-xl font-bold text-gray-800 mb-4">{getTitle()}</h3>
       <div className="space-y-3 text-sm text-gray-700">
         {infoItems.map((item, index) => (
           <p key={index} className="flex items-start gap-2">
             <span
               className={`w-1.5 h-1.5 ${
-                item.includes('Complete your payment') ? theme.pendingDotColor : theme.dotColor
+                item.includes('برای تضمین') ? theme.pendingDotColor : theme.dotColor
               } rounded-full flex-shrink-0 mt-2`}
             />
             {item}

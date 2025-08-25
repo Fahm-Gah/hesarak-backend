@@ -34,11 +34,12 @@ export const PassengerInfo = memo<PassengerInfoProps>(({ bookingData, status }) 
   return (
     <div
       className={`${theme.bgGradient} rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 ${theme.border} backdrop-blur-sm`}
+      dir="rtl"
     >
       <div className="flex items-center gap-3 mb-4 sm:mb-6">
         <div className={`w-2 h-8 ${theme.accentBar} rounded-full`} />
         <h3 className={`text-xl font-bold ${theme.textGradient} bg-clip-text text-transparent`}>
-          Passenger Information
+          اطلاعات مسافر
         </h3>
       </div>
 
@@ -47,26 +48,32 @@ export const PassengerInfo = memo<PassengerInfoProps>(({ bookingData, status }) 
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-gray-600 mb-1">Full Name</p>
+            <p className="text-sm text-gray-600 mb-1">نام کامل</p>
             <p className="font-semibold text-gray-800">{bookingData.passenger.fullName}</p>
           </div>
           {bookingData.passenger.fatherName && (
             <div>
-              <p className="text-sm text-gray-600 mb-1">Father's Name</p>
+              <p className="text-sm text-gray-600 mb-1">نام پدر</p>
               <p className="font-semibold text-gray-800">{bookingData.passenger.fatherName}</p>
             </div>
           )}
           {bookingData.passenger.phoneNumber && (
             <div>
-              <p className="text-sm text-gray-600 mb-1">Phone Number</p>
-              <p className="font-semibold text-gray-800">{bookingData.passenger.phoneNumber}</p>
+              <p className="text-sm text-gray-600 mb-1">شماره تلفن</p>
+              <p className="font-semibold text-gray-800 text-right" dir="ltr">
+                {bookingData.passenger.phoneNumber}
+              </p>
             </div>
           )}
           {bookingData.passenger.gender && (
             <div>
-              <p className="text-sm text-gray-600 mb-1">Gender</p>
-              <p className="font-semibold text-gray-800 capitalize">
-                {bookingData.passenger.gender}
+              <p className="text-sm text-gray-600 mb-1">جنسیت</p>
+              <p className="font-semibold text-gray-800">
+                {bookingData.passenger.gender === 'male'
+                  ? 'مرد'
+                  : bookingData.passenger.gender === 'female'
+                    ? 'زن'
+                    : bookingData.passenger.gender}
               </p>
             </div>
           )}
