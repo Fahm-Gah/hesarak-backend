@@ -96,7 +96,7 @@ export const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold text-white mb-4">خدمات</h4>
             <ul className="space-y-2 text-gray-300">
-              <li>تکت اتوبوس</li>
+              <li>تکت بس</li>
               <li>انتخاب چوکی</li>
               <li>خدمات ۲۴ ساعته</li>
               <li>گزینه‌های متعدد پرداخت</li>

@@ -138,12 +138,12 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   if (!from || !to) {
     return {
       title: 'جستجوی سفرها | حصارک',
-      description: 'جستجوی سفرهای اتوبوسرانی بین شهرها',
+      description: 'جستجوی سفرهای بسرانی بین شهرها',
     }
   }
 
   return {
     title: `${from} تا ${to} - نتایج جستجو | حصارک`,
-    description: `سفرهای اتوبوسرانی از ${from} تا ${to} در تاریخ ${date || 'تاریخ انتخابی شما'} را پیدا کنید`,
+    description: `سفرهای بسرانی از ${from} تا ${to} در تاریخ ${date || 'تاریخ انتخابی شما'} را پیدا کنید`,
   }
 }

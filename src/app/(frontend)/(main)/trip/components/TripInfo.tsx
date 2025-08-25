@@ -185,7 +185,7 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
                   >
                     <Image
                       src={image.url}
-                      alt={image.alt || `اتوبوس ${tripDetails.bus.number} - تصویر ${index + 1}`}
+                      alt={image.alt || `بس ${tripDetails.bus.number} - تصویر ${index + 1}`}
                       width={image.width}
                       height={image.height}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

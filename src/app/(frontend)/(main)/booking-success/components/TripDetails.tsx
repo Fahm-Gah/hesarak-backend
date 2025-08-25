@@ -98,7 +98,9 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
             </div>
             <div className="flex-1">
               <p className="text-sm text-gray-600">تاریخ سفر</p>
-              <p className="font-bold text-gray-800">{convertToPersianDigits(getTravelDate(bookingData))}</p>
+              <p className="font-bold text-gray-800">
+                {convertToPersianDigits(getTravelDate(bookingData))}
+              </p>
               {formatToPersian12Hour(bookingData.booking.date) && (
                 <p className="text-sm text-gray-600 flex items-center gap-1">
                   <Clock className="w-3 h-3" />
@@ -122,9 +124,9 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-600">جزئیات اتوبوس</p>
+                <p className="text-sm text-gray-600">جزئیات بس</p>
                 <p className="font-bold text-gray-800">
-                  اتوبوس #{bookingData.trip.bus.number}
+                  بس #{bookingData.trip.bus.number}
                   {bookingData.trip.bus.type && (
                     <span className="text-sm font-normal text-gray-600 mr-2">
                       - {bookingData.trip.bus.type.name}

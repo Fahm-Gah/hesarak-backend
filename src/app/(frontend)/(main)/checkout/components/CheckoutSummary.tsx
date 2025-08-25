@@ -182,14 +182,14 @@ export const CheckoutSummary = memo<CheckoutSummaryProps>(
                 </svg>
                 <div>
                   <div className="font-semibold text-gray-800 text-sm sm:text-base">
-                    اتوبوس #{tripDetails.bus.number}
+                    بس #{tripDetails.bus.number}
                     {tripDetails.bus.type && (
                       <span className="text-xs sm:text-sm text-gray-600 mr-2">
                         - {tripDetails.bus.type.name}
                       </span>
                     )}
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-600">جزئیات اتوبوس</div>
+                  <div className="text-xs sm:text-sm text-gray-600">جزئیات بس</div>
                 </div>
               </div>
             )}

@@ -10,12 +10,11 @@ const vazirmatn = Vazirmatn({
 
 export const metadata: Metadata = {
   title: {
-    default: 'حصارک پنجشیر - سیستم تکت آنلاین اتوبوس افغانستان',
+    default: 'حصارک پنجشیر - سیستم تکت آنلاین بس افغانستان',
     template: '%s | حصارک پنجشیر',
   },
-  description:
-    'سیستم آنلاین تکت اتوبوس. جستجو و خرید آسان تکت اتوبوس با انتخاب چوکی و پرداخت آنلاین.',
-  keywords: ['اتوبوس', 'تکت', 'رزرو', 'سفر', 'حمل و نقل'],
+  description: 'سیستم آنلاین تکت بس. جستجو و خرید آسان تکت بس با انتخاب چوکی و پرداخت آنلاین.',
+  keywords: ['بس', 'تکت', 'رزرو', 'سفر', 'حمل و نقل'],
   authors: [{ name: 'Fahm Gah Team' }],
   creator: 'Fahm Gah',
   publisher: 'fahmgah',
@@ -52,14 +51,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'fa_IR',
     url: 'https://hesarakbus.com',
-    title: 'حصارک پنجشیر - تکت آنلاین اتوبوس',
-    description: 'سیستم آنلاین خرید تکت اتوبوس - سفری راحت و امن با حصارک پنجشیر',
+    title: 'حصارک پنجشیر - تکت آنلاین بس',
+    description: 'سیستم آنلاین خرید تکت بس - سفری راحت و امن با حصارک پنجشیر',
     siteName: 'حصارک پنجشیر',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'حصارک پنجشیر - تکت آنلاین اتوبوس',
-    description: 'سیستم آنلاین خرید تکت اتوبوس - سفری راحت و امن با حصارک پنجشیر',
+    title: 'حصارک پنجشیر - تکت آنلاین بس',
+    description: 'سیستم آنلاین خرید تکت بس - سفری راحت و امن با حصارک پنجشیر',
   },
   alternates: {
     canonical: '/',

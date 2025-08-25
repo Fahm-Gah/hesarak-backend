@@ -441,8 +441,8 @@ export const TripDetailsClient = ({
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
-                    <span className="font-semibold text-orange-700">سیگار و الکل</span> در اتوبوس
-                    ممنوع است
+                    <span className="font-semibold text-orange-700">سیگار و الکل</span> در بس ممنوع
+                    است
                   </span>
                 </div>
                 <div className="flex items-start gap-3">

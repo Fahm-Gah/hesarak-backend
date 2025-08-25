@@ -479,7 +479,7 @@ export const SeatLayout = memo<SeatLayoutProps>(
               gridTemplateColumns: `repeat(${maxCol}, minmax(48px, auto))`,
             }}
             role="grid"
-            aria-label="طرح بندی چوکی های اتوبوس"
+            aria-label="طرح بندی چوکی های بس"
           >
             {emptyGridCells}
             {renderedElements}

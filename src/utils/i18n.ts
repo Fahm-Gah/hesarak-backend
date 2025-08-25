@@ -55,7 +55,7 @@ export const errorMessages = {
 
   // Bus and seat errors
   BUS_CONFIG_NOT_FOUND: {
-    fa: 'پیکربندی اتوبوس یافت نشد',
+    fa: 'پیکربندی بس یافت نشد',
     en: 'Bus configuration not found',
   },
   INVALID_SEAT_IDS: {

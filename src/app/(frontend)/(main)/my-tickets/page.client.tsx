@@ -172,7 +172,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-800 mb-2">تکت های من</h1>
-              <p className="text-gray-600">تکت های اتوبوس و تاریخچه سفرهای خود را مدیریت کنید</p>
+              <p className="text-gray-600">تکت های بس و تاریخچه سفرهای خود را مدیریت کنید</p>
             </div>
 
             {/* Search Bar */}
@@ -180,7 +180,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 transition-colors duration-200" />
               <input
                 type="text"
-                placeholder="جستجو بر اساس شماره تکت، مسیر، یا اتوبوس..."
+                placeholder="جستجو بر اساس شماره تکت، مسیر، یا بس..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition-all duration-200 hover:border-orange-300"

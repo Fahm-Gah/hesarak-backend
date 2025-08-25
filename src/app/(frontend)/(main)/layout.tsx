@@ -9,10 +9,9 @@ import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'حصارک پنجشیر - سیستم تکت آنلاین اتوبوس افغانستان',
-  description:
-    'سیستم آنلاین تکت اتوبوس. جستجو و خرید آسان تکت اتوبوس با انتخاب چوکی و پرداخت آنلاین.',
-  keywords: 'اتوبوس,, تکت, پنجشیر, افغانستان, سفر, حمل و نقل',
+  title: 'حصارک پنجشیر - سیستم تکت آنلاین بس افغانستان',
+  description: 'سیستم آنلاین تکت بس. جستجو و خرید آسان تکت بس با انتخاب چوکی و پرداخت آنلاین.',
+  keywords: 'بس,, تکت, پنجشیر, افغانستان, سفر, حمل و نقل',
 }
 
 export default async function MainLayout(props: { children: React.ReactNode }) {

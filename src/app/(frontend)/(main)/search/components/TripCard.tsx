@@ -266,7 +266,7 @@ export const TripCard = ({ trip, isExpanded, onToggleExpand, searchParams }: Tri
               <Bus className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
             </div>
             <span className="text-sm font-medium text-gray-700">{trip.bus.type.name}</span>
-            <span className="text-xs text-gray-500">• اتوبوس {trip.bus.number}</span>
+            <span className="text-xs text-gray-500">• بس {trip.bus.number}</span>
           </div>
         </div>
 

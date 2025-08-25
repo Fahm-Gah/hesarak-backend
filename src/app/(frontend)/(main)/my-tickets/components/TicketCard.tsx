@@ -380,9 +380,7 @@ export const TicketCard = ({
 
             {/* Bus */}
             <div className="bg-white/70 rounded-xl p-2 sm:p-3 text-center border-0 backdrop-blur-sm shadow-sm">
-              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
-                اتوبوس
-              </p>
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">بس</p>
               <p className="text-xs sm:text-sm font-bold text-gray-900">{ticket.trip.bus.number}</p>
             </div>
 
