@@ -195,7 +195,10 @@ export const BookingSuccessClient = ({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center" dir="rtl">
+      <div
+        className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center"
+        dir="rtl"
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">در حال بارگیری جزئیات قید شما...</p>
@@ -206,7 +209,10 @@ export const BookingSuccessClient = ({
 
   if (error || !bookingData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center" dir="rtl">
+      <div
+        className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center"
+        dir="rtl"
+      >
         <div className="max-w-lg mx-auto p-6 sm:p-8">
           <BookingHeader
             status="error"
@@ -252,7 +258,7 @@ export const BookingSuccessClient = ({
       <div className="max-w-4xl mx-auto px-4 py-8">
         <BookingHeader
           status="success"
-          title="قید تأیید شد!"
+          title="تکت تأیید شد!"
           description="تکت شما با موفقیت قید شد. جزئیات قید شما در ادامه آمده است:"
         />
 

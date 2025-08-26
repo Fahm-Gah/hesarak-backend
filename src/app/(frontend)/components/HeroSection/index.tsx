@@ -80,13 +80,6 @@ export const HeroSection = () => {
             </div>
           </div>
         </div>
-
-        {/* Bottom decorative element */}
-        <div className="relative h-8 sm:h-10 lg:h-12">
-          <div className="absolute inset-0 bg-gradient-to-t from-orange-600/10 via-orange-500/5 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500/20 via-orange-400/30 to-red-500/20"></div>
-          <div className="absolute bottom-0 left-1/4 w-1/2 h-0.5 bg-gradient-to-r from-transparent via-orange-300/50 to-transparent"></div>
-        </div>
       </div>
     </section>
   )
