@@ -1,6 +1,7 @@
 import React from 'react'
 import { Vazirmatn } from 'next/font/google'
 import type { Metadata, Viewport } from 'next'
+import { getServerSideURL } from '@/utils/getURL'
 
 import './globals.css'
 
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fa_IR',
-    url: 'https://hesarakbus.com',
+    url: getServerSideURL(),
     title: 'حصارک پنجشیر - تکت آنلاین بس',
     description: 'سیستم آنلاین خرید تکت بس - سفری راحت و امن با حصارک پنجشیر',
     siteName: 'حصارک پنجشیر',

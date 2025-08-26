@@ -181,7 +181,6 @@ PayloadCMS hooks are extensively used for business logic:
 
 ### Important Notes
 
-- Always run `pnpm generate:types` after modifying PayloadCMS collections
 - Use proper phone number validation for Afghan numbers
 - Follow Persian/English dual language patterns in new features
 - Respect role-based access control when adding new functionality

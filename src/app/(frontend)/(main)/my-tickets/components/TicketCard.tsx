@@ -1,11 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Copy, Clock, Check, XCircle } from 'lucide-react'
+import { Copy, Clock, Check, XCircle, Download, Loader2 } from 'lucide-react'
 import { UserTicket } from '../types'
 import { convertGregorianToPersianDisplay } from '@/utils/dateUtils'
 import { convertToPersianDigits } from '@/utils/persianDigits'
+import { generateTicketPDF } from '@/utils/generateTicketPDF'
 
 // Using imported convertToPersianDigits function
 
@@ -164,6 +165,9 @@ interface TicketCardProps {
   setCopiedTickets: React.Dispatch<React.SetStateAction<Set<string>>>
   pulseTickets: Set<string>
   setPulseTickets: React.Dispatch<React.SetStateAction<Set<string>>>
+  passengerName?: string // Optional prop for passenger name
+  passengerPhone?: string // Optional prop for passenger phone
+  passengerFatherName?: string // Optional prop for passenger father name
 }
 
 export const TicketCard = ({
@@ -172,8 +176,12 @@ export const TicketCard = ({
   setCopiedTickets,
   pulseTickets,
   setPulseTickets,
+  passengerName,
+  passengerPhone,
+  passengerFatherName,
 }: TicketCardProps) => {
   const router = useRouter()
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const jalaaliDate = formatJalaaliDate(ticket.booking.date)
 
@@ -183,13 +191,37 @@ export const TicketCard = ({
     router.push(`/trip/${ticket.trip.id}?date=${urlDate}`)
   }
 
+  const handleDownloadClick = async (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent card click
+    setIsDownloading(true)
+
+    try {
+      // Generate and download the PDF with passenger info
+      await generateTicketPDF(ticket, passengerName, {
+        fullName: passengerName,
+        fatherName: passengerFatherName,
+        phoneNumber: passengerPhone,
+      })
+
+      // Optional: Show success feedback
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 30, 50]) // Double vibra tion for download
+      }
+    } catch (error) {
+      console.error('Failed to generate PDF:', error)
+      alert('خطا در ایجاد PDF. لطفا دوباره تلاش کنید.')
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
   const getCardTheme = () => {
     // Check expired status first (highest priority)
     if (ticket.status.isExpired) {
       return {
         cardBg: 'bg-gradient-to-br from-white via-orange-50/30 to-gray-50/30',
         cardBorder: 'border-orange-200/50',
-        headerBg: 'bg-gradient-to-r from-orange-500 to-gray-600',
+        headerBg: 'bg-gradient-to-r from-gray-500 to-gray-600',
       }
     }
 
@@ -282,6 +314,27 @@ export const TicketCard = ({
     </button>
   )
 
+  const DownloadButton = () => (
+    <button
+      onClick={handleDownloadClick}
+      disabled={isDownloading}
+      className="group relative flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-white text-gray-700 hover:text-gray-900 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+      title="دانلود تکت PDF"
+    >
+      {isDownloading ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span className="text-sm font-medium">در حال دانلود...</span>
+        </>
+      ) : (
+        <>
+          <Download className="w-4 h-4 group-hover:animate-bounce" />
+          <span className="text-sm font-medium">دانلود تکت</span>
+        </>
+      )}
+    </button>
+  )
+
   return (
     <div
       onClick={handleCardClick}
@@ -297,9 +350,14 @@ export const TicketCard = ({
             {getStatusBadge(ticket)}
           </div>
 
-          {/* Bottom row: Copy button */}
+          {/* Middle row: Copy button */}
           <div className="flex justify-center">
             <CopyButton isMobile={true} />
+          </div>
+
+          {/* Bottom row: Download button */}
+          <div className="flex justify-center">
+            <DownloadButton />
           </div>
         </div>
 
@@ -311,12 +369,15 @@ export const TicketCard = ({
             <CopyButton />
           </div>
 
-          {/* Right side: Status */}
-          <div className="flex-shrink-0">{getStatusBadge(ticket)}</div>
+          {/* Right side: Download and Status */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <DownloadButton />
+            {getStatusBadge(ticket)}
+          </div>
         </div>
       </div>
 
-      {/* Card Content */}
+      {/* Card Content - Rest remains the same */}
       <div className="p-6">
         <div className="space-y-6">
           {/* Route Info - Compact for mobile */}

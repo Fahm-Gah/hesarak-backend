@@ -374,6 +374,21 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                     setCopiedTickets={setCopiedTickets}
                     pulseTickets={pulseTickets}
                     setPulseTickets={setPulseTickets}
+                    passengerName={
+                      typeof user?.profile === 'object' && user.profile
+                        ? user.profile.fullName || undefined
+                        : undefined
+                    }
+                    passengerPhone={
+                      typeof user?.profile === 'object' && user.profile
+                        ? user.profile.phoneNumber || undefined
+                        : undefined
+                    }
+                    passengerFatherName={
+                      typeof user?.profile === 'object' && user.profile
+                        ? user.profile.fatherName || undefined
+                        : undefined
+                    }
                   />
                 ))}
               </div>
