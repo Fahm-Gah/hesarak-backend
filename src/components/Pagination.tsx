@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useMemo } from 'react'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import React, { useMemo, useState, useEffect } from 'react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ChevronDown, Check } from 'lucide-react'
 
 interface PaginationProps {
   currentPage: number
@@ -30,6 +30,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   itemLabel = 'items',
   compactMode = false,
 }) => {
+  const [showLimitDropdown, setShowLimitDropdown] = useState(false)
   // Memoized calculations for performance
   const paginationInfo = useMemo(() => {
     const startItem = totalCount === 0 ? 0 : (currentPage - 1) * limit + 1
@@ -93,23 +94,54 @@ export const Pagination: React.FC<PaginationProps> = ({
   // Limit options
   const limitOptions = [5, 10, 20, 50]
 
-  // Helper function to format numbers with commas
+  // Helper function to format numbers with Persian digits and commas
   const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US').format(num)
+    const formatted = new Intl.NumberFormat('en-US').format(num)
+    // Convert to Persian digits
+    return formatted.replace(/[0-9]/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(digit)])
   }
 
-  // PayloadCMS style summary
+  // Persian summary text
   const getSummaryText = () => {
     if (!paginationInfo.hasResults) {
-      return `No ${itemLabel} found`
+      const itemLabelPersian = itemLabel === 'tickets' ? 'تکت' : itemLabel === 'trips' ? 'سفر' : 'آیتم'
+      return `هیچ ${itemLabelPersian}ی یافت نشد`
     }
 
     if (compactMode) {
-      return `${formatNumber(paginationInfo.startItem)}-${formatNumber(paginationInfo.endItem)} of ${formatNumber(totalCount)}`
+      return `${formatNumber(paginationInfo.startItem)}-${formatNumber(paginationInfo.endItem)} از ${formatNumber(totalCount)}`
     }
 
-    return `Showing ${formatNumber(paginationInfo.startItem)} to ${formatNumber(paginationInfo.endItem)} of ${formatNumber(totalCount)} ${itemLabel}`
+    const itemLabelPersian = itemLabel === 'tickets' ? 'تکت' : itemLabel === 'trips' ? 'سفر' : 'آیتم'
+    return `نمایش ${formatNumber(paginationInfo.startItem)} تا ${formatNumber(paginationInfo.endItem)} از ${formatNumber(totalCount)} ${itemLabelPersian}`
   }
+
+  // Close dropdown when clicking outside or pressing ESC
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      const dropdown = document.querySelector('.limit-dropdown')
+      if (dropdown && !dropdown.contains(target)) {
+        setShowLimitDropdown(false)
+      }
+    }
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowLimitDropdown(false)
+      }
+    }
+
+    if (showLimitDropdown) {
+      document.addEventListener('click', handleClickOutside)
+      document.addEventListener('keydown', handleEscapeKey)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+      document.removeEventListener('keydown', handleEscapeKey)
+    }
+  }, [showLimitDropdown])
 
   // Don't render if no pagination needed
   if (totalPages <= 1 && !showLimitSelector) {
@@ -129,9 +161,9 @@ export const Pagination: React.FC<PaginationProps> = ({
                 onClick={() => onPageChange(1)}
                 disabled={currentPage === 1 || isLoading}
                 className="p-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                aria-label="First page"
+                aria-label="صفحه اول"
               >
-                <ChevronsLeft className="w-4 h-4" />
+                <ChevronsRight className="w-4 h-4" />
               </button>
 
               {/* Previous page */}
@@ -139,9 +171,9 @@ export const Pagination: React.FC<PaginationProps> = ({
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1 || isLoading}
                 className="p-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                aria-label="Previous page"
+                aria-label="صفحه قبل"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4" />
               </button>
 
               {/* Page numbers */}
@@ -158,10 +190,10 @@ export const Pagination: React.FC<PaginationProps> = ({
                           ? 'bg-orange-500 text-white border-orange-500'
                           : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
-                      aria-label={`Go to page ${page}`}
+                      aria-label={`رفتن به صفحه ${formatNumber(page)}`}
                       aria-current={currentPage === page ? 'page' : undefined}
                     >
-                      {page}
+                      {formatNumber(page)}
                     </button>
                   )}
                 </React.Fragment>
@@ -172,9 +204,9 @@ export const Pagination: React.FC<PaginationProps> = ({
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages || isLoading}
                 className="p-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                aria-label="Next page"
+                aria-label="صفحه بعد"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4" />
               </button>
 
               {/* Last page */}
@@ -182,9 +214,9 @@ export const Pagination: React.FC<PaginationProps> = ({
                 onClick={() => onPageChange(totalPages)}
                 disabled={currentPage === totalPages || isLoading}
                 className="p-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                aria-label="Last page"
+                aria-label="صفحه آخر"
               >
-                <ChevronsRight className="w-4 h-4" />
+                <ChevronsLeft className="w-4 h-4" />
               </button>
             </>
           )}
@@ -197,30 +229,53 @@ export const Pagination: React.FC<PaginationProps> = ({
             {getSummaryText()}
             {totalPages > 1 && (
               <div className="text-xs text-gray-500 mt-0.5">
-                Page {currentPage} of {totalPages}
+                صفحه {formatNumber(currentPage)} از {formatNumber(totalPages)}
               </div>
             )}
           </div>
 
-          {/* Limit Selector (PayloadCMS style) */}
+          {/* Custom Limit Selector */}
           {showLimitSelector && (
             <div className="flex items-center gap-2">
-              <label htmlFor="limit-select" className="text-sm text-gray-600 whitespace-nowrap">
-                Per Page:
+              <label className="text-sm text-gray-600 whitespace-nowrap">
+                در هر صفحه:
               </label>
-              <select
-                id="limit-select"
-                value={limit}
-                onChange={(e) => onLimitChange(Number(e.target.value))}
-                disabled={isLoading}
-                className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50 disabled:cursor-not-allowed bg-white"
-              >
-                {limitOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              <div className="relative limit-dropdown">
+                <button
+                  onClick={() => !isLoading && setShowLimitDropdown(!showLimitDropdown)}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-gray-50 transition-colors min-w-[60px] justify-between"
+                  aria-label="تغییر تعداد آیتم در هر صفحه"
+                >
+                  <span>{formatNumber(limit)}</span>
+                  <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${showLimitDropdown ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* Custom Dropdown Menu */}
+                {showLimitDropdown && (
+                  <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50 animate-in fade-in-0 zoom-in-95 duration-200">
+                    <div className="py-1">
+                      {limitOptions.map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => {
+                            onLimitChange(option)
+                            setShowLimitDropdown(false)
+                          }}
+                          className={`w-full text-right px-3 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
+                            limit === option ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
+                          }`}
+                        >
+                          <span>{formatNumber(option)}</span>
+                          {limit === option && (
+                            <Check className="w-3 h-3" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -231,7 +286,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         <div className="absolute inset-0 bg-white/75 rounded-lg flex items-center justify-center">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-            <span>Loading...</span>
+            <span>در حال بارگیری...</span>
           </div>
         </div>
       )}

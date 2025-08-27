@@ -37,8 +37,8 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           borderColor: 'border-gray-200/30',
           primaryBg: 'bg-gradient-to-r from-gray-600 to-gray-700',
           primaryHover: 'hover:from-gray-700 hover:to-gray-800',
-          primaryText: 'برگشت به خانه',
-          primaryTextShort: 'خانه',
+          primaryText: 'برگشت به صفحه اصلی',
+          primaryTextShort: 'صفحه اصلی',
           primaryAction: () => router.push('/'),
         }
     }
@@ -54,7 +54,7 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           className="flex items-center gap-2 px-6 py-3 bg-white/80 border-2 border-red-600 text-red-600 rounded-2xl transition-all duration-200 font-semibold hover:bg-red-50 hover:border-red-700"
         >
           <ArrowRight className="w-4 h-4" />
-          برگشت به خانه
+          برگشت به صفحه اصلی
         </button>
       </div>
     )
@@ -76,7 +76,7 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white/80 border-2 border-gray-300 text-gray-700 rounded-2xl transition-all duration-200 font-semibold hover:bg-gray-50 hover:border-gray-400"
         >
           <ArrowRight className="w-4 h-4" />
-          برگشت به خانه
+          برگشت به صفحه اصلی
         </button>
       </div>
 
@@ -87,7 +87,7 @@ export const ActionButtons = memo<ActionButtonsProps>(({ status }) => {
           className="flex items-center gap-2 px-6 py-3 bg-white/80 border-2 border-gray-300 text-gray-700 rounded-2xl transition-all duration-200 font-semibold hover:bg-gray-50 hover:border-gray-400"
         >
           <ArrowRight className="w-4 h-4" />
-          برگشت به خانه
+          برگشت به صفحه اصلی
         </button>
 
         <button

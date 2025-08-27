@@ -96,7 +96,7 @@ export const LogoutClient = () => {
                   onClick={() => router.push('/')}
                   className="w-full px-6 py-3 text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
                 >
-                  برو به خانه
+                  برو به صفحه اصلی
                 </button>
               </div>
             </>

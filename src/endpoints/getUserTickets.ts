@@ -104,7 +104,9 @@ export const getUserTickets: Endpoint = {
       }
 
       // Build query options
-      const limit = 10 // Fixed limit of 10 tickets per page
+      // If no page is specified, return all tickets (for client-side pagination)
+      // Otherwise use server-side pagination with larger limit
+      const limit = page === 1 && !searchParams.get('page') ? 1000 : 50
       const queryOptions: any = {
         collection: 'tickets',
         where: whereClause,

@@ -1,73 +1,173 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Filter, X, Search, ArrowUpDown, SortAsc, SortDesc } from 'lucide-react'
 import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
 import { Pagination } from '@/components/Pagination'
 import type { User } from '@/payload-types'
-import { UserTicket } from './types'
-import { TicketFilters } from './components/TicketFilters'
+import { getMeUser } from '@/utils/getMeUser.client'
+import { UserTicket, TicketsResponse } from './types'
+import { SimpleTicketFilters } from './components/SimpleTicketFilters'
 import { TicketCard } from './components/TicketCard'
 import { EmptyTicketsState } from './components/EmptyTicketsState'
-import { useServerFilters } from './hooks/useServerFilters'
+import { useClientFilters } from './hooks/useClientFilters'
 import { convertToPersianDigits } from '@/utils/persianDigits'
 
-interface TicketsPageClientProps {
-  tickets: UserTicket[]
-  user: User
-  pagination?: {
-    currentPage: number
-    totalCount: number
-    totalPages: number
-    hasMore: boolean
+// Client-side data fetching function - fetch all tickets
+async function fetchAllUserTickets(): Promise<UserTicket[]> {
+  try {
+    const response = await fetch('/api/user/tickets', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tickets: ${response.status}`)
+    }
+
+    const result: TicketsResponse = await response.json()
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to fetch tickets')
+    }
+
+    return result.data?.tickets || []
+  } catch (error) {
+    console.error('Error fetching user tickets:', error)
+    return []
   }
 }
 
-// Using imported convertToPersianDigits function
-
-export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClientProps) => {
+export const TicketsPageClient = () => {
+  const [user, setUser] = useState<User | null>(null)
+  const [allTickets, setAllTickets] = useState<UserTicket[]>([])
+  const [loading, setLoading] = useState(true)
+  const [authLoading, setAuthLoading] = useState(true)
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10))
+  const [itemsPerPage, setItemsPerPage] = useState(parseInt(searchParams.get('limit') || '10', 10))
   const [copiedTickets, setCopiedTickets] = useState<Set<string>>(new Set())
   const [pulseTickets, setPulseTickets] = useState<Set<string>>(new Set())
 
-  // Sort state
-  const [sortBy, setSortBy] = useState<'date' | 'price' | 'route' | 'status'>('date')
+  // Sort state - initialize from URL params (sortOrder not stored in URL)
+  const [sortBy, setSortBy] = useState<'date' | 'price' | 'route' | 'status'>(
+    (searchParams.get('sortBy') as 'date' | 'price' | 'route' | 'status') || 'date',
+  )
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [showSortDropdown, setShowSortDropdown] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
 
-  // Use the server-side filter hook
+  // Initialize after first render
+  useEffect(() => {
+    setIsInitialized(true)
+  }, [])
+
+  // Sync state with URL parameters when they change (e.g., browser back/forward)
+  useEffect(() => {
+    const page = parseInt(searchParams.get('page') || '1', 10)
+    const limit = parseInt(searchParams.get('limit') || '10', 10)
+    const sortByParam =
+      (searchParams.get('sortBy') as 'date' | 'price' | 'route' | 'status') || 'date'
+
+    if (page !== currentPage) setCurrentPage(page)
+    if (limit !== itemsPerPage) setItemsPerPage(limit)
+    if (sortByParam !== sortBy) {
+      setSortBy(sortByParam)
+      // Reset to desc when changing sort field
+      setSortOrder('desc')
+    }
+  }, [searchParams, currentPage, itemsPerPage, sortBy])
+
+  // Check authentication
+  useEffect(() => {
+    let isMounted = true
+
+    const checkAuth = async () => {
+      try {
+        const result = await getMeUser()
+        if (isMounted) {
+          if (!result.user) {
+            router.push('/auth/login?redirect=' + encodeURIComponent('/my-tickets'))
+            return
+          }
+          setUser(result.user)
+          setAuthLoading(false)
+        }
+      } catch (error) {
+        if (isMounted) {
+          router.push('/auth/login?redirect=' + encodeURIComponent('/my-tickets'))
+        }
+      }
+    }
+
+    checkAuth()
+
+    return () => {
+      isMounted = false
+    }
+  }, [router])
+
+  // Load all tickets after auth is confirmed
+  useEffect(() => {
+    let isMounted = true
+
+    const loadTickets = async () => {
+      if (!user || authLoading) return
+
+      setLoading(true)
+      try {
+        const tickets = await fetchAllUserTickets()
+        if (isMounted) {
+          setAllTickets(tickets)
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Error loading tickets:', error)
+        if (isMounted) {
+          setAllTickets([])
+          setLoading(false)
+        }
+      }
+    }
+
+    loadTickets()
+
+    return () => {
+      isMounted = false
+    }
+  }, [user, authLoading])
+
+  // Use client-side filtering
   const {
     showFilters,
     setShowFilters,
-    statusFilters,
-    setStatusFilters,
     searchTerm,
     setSearchTerm,
-    dateRange,
-    setDateRange,
+    timePeriod,
+    setTimePeriod,
     routeFilters,
     setRouteFilters,
-    showStatusDropdown,
-    setShowStatusDropdown,
     showRouteFromDropdown,
     setShowRouteFromDropdown,
     showRouteToDropdown,
     setShowRouteToDropdown,
+    filteredTickets,
     uniqueRoutes,
     hasActiveFilters,
     clearAllFilters,
-    singleDateFilter,
-  } = useServerFilters(tickets || [])
+  } = useClientFilters(allTickets)
 
-  const breadcrumbItems = [{ label: 'خانه', href: '/' }, { label: 'تکت های من' }]
+  const breadcrumbItems = [{ label: 'صفحه اصلی', href: '/' }, { label: 'تکت های من' }]
 
-  // Sort tickets
-  const sortedTickets = React.useMemo(() => {
-    if (!tickets) return []
+  // Sort filtered tickets
+  const sortedTickets = useMemo(() => {
+    if (!filteredTickets) return []
 
-    const sorted = [...tickets].sort((a, b) => {
+    const sorted = [...filteredTickets].sort((a, b) => {
       let comparison = 0
 
       switch (sortBy) {
@@ -100,10 +200,23 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
     })
 
     return sorted
-  }, [tickets, sortBy, sortOrder])
+  }, [filteredTickets, sortBy, sortOrder])
+
+  // Client-side pagination
+  const totalItems = sortedTickets.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentPageTickets = sortedTickets.slice(startIndex, endIndex)
+
+  // Update URL when sortBy changes (sortOrder not stored in URL)
+  useEffect(() => {
+    if (!isInitialized) return
+    updateURLParams({ sortBy })
+  }, [sortBy, isInitialized])
 
   // Close filters and sort dropdown when clicking outside or pressing ESC
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
 
@@ -140,23 +253,72 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
     }
   }, [showFilters, showSortDropdown])
 
-  // Add loading/error state check
-  if (!tickets) {
+  // URL update helper
+  const updateURLParams = (updates: Record<string, string | number | null>) => {
+    const params = new URLSearchParams(window.location.search)
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (
+        value === null ||
+        value === '' ||
+        value === 'all' ||
+        (key === 'page' && value === 1) ||
+        (key === 'limit' && value === 10) ||
+        (key === 'sortBy' && value === 'date')
+      ) {
+        params.delete(key)
+      } else {
+        params.set(key, value.toString())
+      }
+    })
+
+    const newURL = `${window.location.pathname}?${params.toString()}`
+    router.push(newURL, { scroll: false })
+  }
+
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    updateURLParams({ page })
+  }
+
+  const handleLimitChange = (limit: number) => {
+    setItemsPerPage(limit)
+    // Reset to first page when changing items per page
+    setCurrentPage(1)
+    updateURLParams({ limit, page: 1 })
+  }
+
+  // Show loading while checking auth
+  if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">در حال بارگیری تکت ها...</p>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4" dir="rtl">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">در حال بررسی احراز هویت...</p>
+            </div>
+          </div>
         </div>
       </div>
     )
   }
 
-  // Pagination handlers
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', page.toString())
-    router.push(`/my-tickets?${params.toString()}`)
+  // Show loading while fetching tickets
+  if (loading && !allTickets.length) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4" dir="rtl">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">در حال بارگذاری تکت ها...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -180,7 +342,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 transition-colors duration-200" />
               <input
                 type="text"
-                placeholder="جستجو بر اساس شماره تکت، مسیر، یا بس..."
+                placeholder="جستجو بر اساس شماره تکت..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition-all duration-200 hover:border-orange-300"
@@ -210,12 +372,10 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                     <span className="bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {
                         [
-                          statusFilters.length > 0,
-                          !!dateRange.from,
-                          !!dateRange.to,
+                          !!searchTerm.trim(),
+                          timePeriod !== 'all',
                           !!routeFilters.from,
                           !!routeFilters.to,
-                          singleDateFilter.isDateSelected,
                         ].filter(Boolean).length
                       }
                     </span>
@@ -231,17 +391,13 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                 )}
               </div>
               <div className="p-4">
-                <TicketFilters
+                <SimpleTicketFilters
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                   showFilters={true}
                   setShowFilters={setShowFilters}
-                  statusFilters={statusFilters}
-                  setStatusFilters={setStatusFilters}
-                  showStatusDropdown={showStatusDropdown}
-                  setShowStatusDropdown={setShowStatusDropdown}
-                  dateRange={dateRange}
-                  setDateRange={setDateRange}
+                  timePeriod={timePeriod}
+                  setTimePeriod={setTimePeriod}
                   routeFilters={routeFilters}
                   setRouteFilters={setRouteFilters}
                   showRouteFromDropdown={showRouteFromDropdown}
@@ -251,10 +407,6 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                   uniqueRoutes={uniqueRoutes}
                   hasActiveFilters={hasActiveFilters}
                   clearAllFilters={clearAllFilters}
-                  filteredCount={sortedTickets.length}
-                  totalCount={tickets.length}
-                  isSidebar={true}
-                  singleDateFilter={singleDateFilter}
                 />
               </div>
             </div>
@@ -344,12 +496,10 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                   <span className="bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                     {
                       [
-                        statusFilters.length > 0,
-                        !!dateRange.from,
-                        !!dateRange.to,
+                        !!searchTerm.trim(),
+                        timePeriod !== 'all',
                         !!routeFilters.from,
                         !!routeFilters.to,
-                        singleDateFilter.isDateSelected,
                       ].filter(Boolean).length
                     }
                   </span>
@@ -366,7 +516,7 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
               />
             ) : (
               <div className="space-y-4">
-                {sortedTickets.map((ticket) => (
+                {currentPageTickets.map((ticket) => (
                   <TicketCard
                     key={ticket.id}
                     ticket={ticket}
@@ -394,39 +544,39 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
               </div>
             )}
 
-            {/* Footer - Always show for consistent alignment */}
-            <div className="mt-8">
-              {pagination && pagination.totalPages > 1 && sortedTickets.length > 0 ? (
-                <Pagination
-                  currentPage={pagination.currentPage}
-                  totalPages={pagination.totalPages}
-                  totalCount={pagination.totalCount}
-                  limit={10}
-                  onPageChange={handlePageChange}
-                  onLimitChange={() => {}}
-                  showLimitSelector={false}
-                  itemLabel="tickets"
-                  isLoading={false}
-                />
-              ) : (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4">
-                  <div className="flex items-center justify-center">
-                    <p className="text-sm text-gray-600">
-                      {sortedTickets.length === 0
-                        ? 'هیچ تکتی پیدا نشد'
-                        : sortedTickets.length === 1
+            {/* Footer - Show pagination or ticket count */}
+            {sortedTickets.length > 0 && (
+              <div className="mt-8">
+                {totalPages > 1 ? (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={totalItems}
+                    limit={itemsPerPage}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                    showLimitSelector={true}
+                    itemLabel="tickets"
+                    isLoading={false}
+                  />
+                ) : (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4">
+                    <div className="flex items-center justify-center">
+                      <p className="text-sm text-gray-600">
+                        {sortedTickets.length === 1
                           ? 'نمایش ۱ تکت'
                           : `نمایش ${convertToPersianDigits(sortedTickets.length)} تکت`}
-                      {hasActiveFilters && tickets.length > sortedTickets.length && (
-                        <span className="mr-1 text-gray-500">
-                          (فیلتر شده از {convertToPersianDigits(tickets.length)} تکت کل)
-                        </span>
-                      )}
-                    </p>
+                        {hasActiveFilters && allTickets.length > sortedTickets.length && (
+                          <span className="mr-1 text-gray-500">
+                            (فیلتر شده از {convertToPersianDigits(allTickets.length)} تکت کل)
+                          </span>
+                        )}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -451,12 +601,10 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                     <span className="bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {
                         [
-                          statusFilters.length > 0,
-                          !!dateRange.from,
-                          !!dateRange.to,
+                          !!searchTerm.trim(),
+                          timePeriod !== 'all',
                           !!routeFilters.from,
                           !!routeFilters.to,
-                          singleDateFilter.isDateSelected,
                         ].filter(Boolean).length
                       }
                     </span>
@@ -472,17 +620,13 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
 
               {/* Filter Content */}
               <div className="p-4">
-                <TicketFilters
+                <SimpleTicketFilters
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                   showFilters={true}
                   setShowFilters={setShowFilters}
-                  statusFilters={statusFilters}
-                  setStatusFilters={setStatusFilters}
-                  showStatusDropdown={showStatusDropdown}
-                  setShowStatusDropdown={setShowStatusDropdown}
-                  dateRange={dateRange}
-                  setDateRange={setDateRange}
+                  timePeriod={timePeriod}
+                  setTimePeriod={setTimePeriod}
                   routeFilters={routeFilters}
                   setRouteFilters={setRouteFilters}
                   showRouteFromDropdown={showRouteFromDropdown}
@@ -492,11 +636,6 @@ export const TicketsPageClient = ({ tickets, user, pagination }: TicketsPageClie
                   uniqueRoutes={uniqueRoutes}
                   hasActiveFilters={hasActiveFilters}
                   clearAllFilters={clearAllFilters}
-                  filteredCount={tickets.length}
-                  totalCount={tickets.length}
-                  isSidebar={true}
-                  onApplyFilters={() => setShowFilters(false)}
-                  singleDateFilter={singleDateFilter}
                 />
               </div>
             </div>

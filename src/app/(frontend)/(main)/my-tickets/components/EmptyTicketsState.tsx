@@ -20,7 +20,8 @@ export const EmptyTicketsState = ({
     if (hasActiveFilters) {
       return {
         title: 'هیچ تکتی با فیلترهای شما مطابقت ندارد',
-        description: 'فیلترهای جستجوی خود را تنظیم کنید یا آنها را پاک کنید تا نتایج بیشتری ببینید.',
+        description:
+          'فیلترهای جستجوی خود را تنظیم کنید یا آنها را پاک کنید تا نتایج بیشتری ببینید.',
         icon: <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />,
         showClearButton: true,
       }

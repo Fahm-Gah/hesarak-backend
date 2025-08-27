@@ -316,7 +316,7 @@ export const TripDetailsClient = ({
   const searchUrl = `/search?from=${encodeURIComponent(searchFromProvince)}&to=${encodeURIComponent(searchToProvince)}&date=${encodeURIComponent(searchDate)}`
 
   const breadcrumbItems = [
-    { label: 'خانه', href: '/' },
+    { label: 'صفحه اصلی', href: '/' },
     { label: 'نتایج جستجو', href: searchUrl },
     { label: 'جزئیات سفر' },
   ]

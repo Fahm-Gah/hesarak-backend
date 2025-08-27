@@ -31,11 +31,14 @@ import { getPopularRoutes } from './endpoints/getPopularRoutes'
 import { TripRecords } from './collections/TripRecords'
 import { Drivers } from './collections/Drivers'
 
-const allowedOrigins = [
-  'https://hesarak-backend.vercel.app',
-  'https://www.hesarakbus.com',
-  'https://hesarakbus.com',
-]
+const allowedOrigins =
+  process.env.NODE_ENV === 'development'
+    ? ['http://localhost:3000']
+    : process.env.ALLOWED_ORIGINS?.split(',') || [
+        'https://hesarak-backend.vercel.app',
+        'https://www.hesarakbus.com',
+        'https://hesarakbus.com',
+      ]
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

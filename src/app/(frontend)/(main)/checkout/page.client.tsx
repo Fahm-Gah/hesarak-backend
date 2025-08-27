@@ -228,7 +228,7 @@ export const CheckoutClient = ({
     const tripUrl = `/trip/${tripDetails.id}?${tripParams.toString()}`
 
     return [
-      { label: 'خانه', href: '/' },
+      { label: 'صفحه اصلی', href: '/' },
       { label: 'نتایج جستجو', href: searchUrl },
       { label: 'جزئیات سفر', href: tripUrl },
       { label: 'پرداخت' },

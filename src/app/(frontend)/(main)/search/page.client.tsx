@@ -177,7 +177,7 @@ export const SearchPageClient = ({
     }
   }, [showFilters])
 
-  const breadcrumbItems = [{ label: 'خانه', href: '/' }, { label: 'جستجوی سفرها' }]
+  const breadcrumbItems = [{ label: 'صفحه اصلی', href: '/' }, { label: 'جستجوی سفرها' }]
 
   // Pagination handlers
   const handlePageChange = (newPage: number) => {
@@ -239,7 +239,7 @@ export const SearchPageClient = ({
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumbs */}
         <div className="mb-4">
-          <Breadcrumbs items={[{ label: 'خانه', href: '/' }, { label: 'نتایج جستجو' }]} />
+          <Breadcrumbs items={[{ label: 'صفحه اصلی', href: '/' }, { label: 'نتایج جستجو' }]} />
         </div>
 
         {/* Search Bar */}
