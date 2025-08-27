@@ -4,13 +4,12 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { User } from '@/payload-types'
+import { getMeUser } from '@/utils/getMeUser.client'
 import { Logo } from '@/app/(frontend)/components/Logo'
 
-interface NavBarClientProps {
-  user?: User | null
-}
-
-export const NavBarClient = ({ user }: NavBarClientProps) => {
+export const NavBarClient = () => {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -24,6 +23,26 @@ export const NavBarClient = ({ user }: NavBarClientProps) => {
     setIsMobileMenuOpen(false)
   }, [])
 
+  // Load user auth state
+  useEffect(() => {
+    let isMounted = true
+
+    const loadUser = async () => {
+      const result = await getMeUser()
+      if (isMounted) {
+        setUser(result.user)
+        setLoading(false)
+      }
+    }
+
+    loadUser()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  // Handle dropdown/menu closing
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

@@ -5,16 +5,13 @@ import { Toast } from '@/app/(frontend)/components/Toast'
 import { Footer } from '@/app/(frontend)/components/Footer'
 import type { Metadata } from 'next'
 
-// Force dynamic rendering since we use authentication
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'حصارک پنجشیر - سیستم تکت آنلاین بس افغانستان',
   description: 'سیستم آنلاین تکت بس. جستجو و خرید آسان تکت بس با انتخاب چوکی و پرداخت آنلاین.',
   keywords: 'بس,, تکت, پنجشیر, افغانستان, سفر, حمل و نقل',
 }
 
-export default async function MainLayout(props: { children: React.ReactNode }) {
+export default function MainLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
