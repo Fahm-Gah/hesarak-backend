@@ -1,10 +1,12 @@
 import React from 'react'
+import { cookies } from 'next/headers'
 import { getMeUser } from '@/utils/getMeUser'
 import { NavBarClient } from './index.client'
 
-export const dynamic = 'force-dynamic'
-
 export const NavBar = async () => {
+  // Force this component to be dynamic by accessing cookies
+  await cookies()
+
   let user = null
 
   try {

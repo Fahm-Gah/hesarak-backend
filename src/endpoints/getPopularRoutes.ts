@@ -47,8 +47,6 @@ export const getPopularRoutes: Endpoint = {
         limit: 1000, // Get a good sample size
       })
 
-      console.log(`Found ${recentTickets.docs.length} tickets in the last 7 days`)
-
       // Group tickets by route (from province to province)
       const routeStats = new Map<
         string,
@@ -170,9 +168,6 @@ export const getPopularRoutes: Endpoint = {
         .filter((route) => route.startingPrice > 0) // Only include routes with valid pricing data
         .sort((a, b) => b.tripsPerWeek - a.tripsPerWeek) // Sort by actual trips per week
         .slice(0, 6) // Top 6 routes
-
-      console.log(`Returning ${popularRoutes.length} popular routes`)
-      console.log('Popular routes:', popularRoutes)
 
       // Return only real data, no fallback
       return Response.json({

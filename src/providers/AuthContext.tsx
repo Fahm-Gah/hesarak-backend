@@ -192,7 +192,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             captureLocationSilently()
           }, 100)
 
-          console.log(data.user)
           return { success: true, user: data.user }
         } else {
           const errorMessage =
@@ -249,8 +248,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (response.ok && responseData.user) {
           // Registration successful - now login the user
-          console.log('Registration successful, logging in user...')
-
           try {
             // Login the user but skip automatic location capture for registration
             const response = await fetch(`${getClientSideURL()}/api/users/login`, {
