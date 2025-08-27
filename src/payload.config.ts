@@ -9,7 +9,6 @@ import sharp from 'sharp'
 
 import { en } from '@payloadcms/translations/languages/en'
 import { fa } from '@payloadcms/translations/languages/fa'
-import { getServerSideURL } from './utils/getURL'
 
 import { Users } from './collections/Users'
 import { Profiles } from './collections/Profiles'
@@ -35,7 +34,8 @@ import { Drivers } from './collections/Drivers'
 const allowedOrigins = [
   'http://localhost:3000',
   'https://hesarak-backend.vercel.app',
-  getServerSideURL(),
+  'https://www.hesarakbus.com',
+  'https://hesarakbus.com',
 ]
 
 const filename = fileURLToPath(import.meta.url)
