@@ -30,9 +30,12 @@ import { getTicketDetails } from './endpoints/getTicketDetails'
 import { getPopularRoutes } from './endpoints/getPopularRoutes'
 import { TripRecords } from './collections/TripRecords'
 import { Drivers } from './collections/Drivers'
-import { getServerSideURL } from './utils/getURL'
 
-const allowedOrigins = [getServerSideURL()]
+const allowedOrigins = [
+  'https://hesarak-backend.vercel.app',
+  'https://www.hesarakbus.com',
+  'https://hesarakbus.com',
+]
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
