@@ -1,6 +1,9 @@
 import React from 'react'
 import { Vazirmatn } from 'next/font/google'
 
+// Force dynamic rendering for auth-dependent components
+export const dynamic = 'force-dynamic'
+
 const vazirmatn = Vazirmatn({
   subsets: ['latin'],
 })
