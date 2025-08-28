@@ -49,6 +49,9 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    timezones: {
+      defaultTimezone: 'Asia/Kabul',
+    },
   },
   // i18n configuration with Persian as default
   i18n: {
