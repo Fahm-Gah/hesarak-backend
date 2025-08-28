@@ -397,6 +397,8 @@ export const TripDetailsClient = ({
   }, [])
 
   const handleProceedToBooking = useCallback(async () => {
+    if (!tripDetails) return
+
     if (selectedSeats.length === 0) {
       toast.error('لطفاً حداقل یک چوکی انتخاب کنید')
       return
@@ -423,13 +425,13 @@ export const TripDetailsClient = ({
       if (!isAuthenticated) {
         // Create checkout URL with selected seats and trip details - use originalDate to maintain Persian format
         const checkoutParams = new URLSearchParams()
-        checkoutParams.append('tripId', tripDetails!.id)
-        checkoutParams.append('date', tripDetails!.originalDate)
+        checkoutParams.append('tripId', tripDetails.id)
+        checkoutParams.append('date', tripDetails.originalDate)
         checkoutParams.append('seats', selectedSeats.join(','))
         // Include user's specific from/to terminals
-        checkoutParams.append('from', tripDetails!.from.id)
-        if (tripDetails!.to) {
-          checkoutParams.append('to', tripDetails!.to.id)
+        checkoutParams.append('from', tripDetails.from.id)
+        if (tripDetails.to) {
+          checkoutParams.append('to', tripDetails.to.id)
         }
 
         // Also include original search parameters for breadcrumb navigation
@@ -446,13 +448,13 @@ export const TripDetailsClient = ({
       } else {
         // Navigate directly to checkout for authenticated users - use originalDate to maintain Persian format
         const checkoutParams = new URLSearchParams()
-        checkoutParams.append('tripId', tripDetails!.id)
-        checkoutParams.append('date', tripDetails!.originalDate)
+        checkoutParams.append('tripId', tripDetails.id)
+        checkoutParams.append('date', tripDetails.originalDate)
         checkoutParams.append('seats', selectedSeats.join(','))
         // Include user's specific from/to terminals
-        checkoutParams.append('from', tripDetails!.from.id)
-        if (tripDetails!.to) {
-          checkoutParams.append('to', tripDetails!.to.id)
+        checkoutParams.append('from', tripDetails.from.id)
+        if (tripDetails.to) {
+          checkoutParams.append('to', tripDetails.to.id)
         }
 
         // Also include original search parameters for breadcrumb navigation
@@ -471,14 +473,7 @@ export const TripDetailsClient = ({
       toast.error('ادامه رزرو ناموفق بود. لطفاً دوباره تلاش کنید.')
       setIsBookingLoading(false)
     }
-  }, [
-    isAuthenticated,
-    selectedSeats,
-    router,
-    tripDetails?.id ?? '',
-    tripDetails?.originalDate ?? '',
-    originalSearchParams,
-  ])
+  }, [tripDetails, isAuthenticated, selectedSeats, router, originalSearchParams])
 
   // Build search URL with original search parameters to maintain search context
   // Use original search provinces if available, otherwise fall back to terminal provinces
