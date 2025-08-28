@@ -388,7 +388,7 @@ export const TripDetailsClient = ({
         }
       })
     },
-    [isAuthenticated, tripDetails?.userBookingInfo?.remainingSeatsAllowed],
+    [isAuthenticated, tripDetails?.userBookingInfo?.remainingSeatsAllowed ?? 2],
   )
 
   const handleClearSelection = useCallback(() => {
@@ -475,9 +475,9 @@ export const TripDetailsClient = ({
     isAuthenticated,
     selectedSeats,
     router,
-    tripDetails?.id,
-    tripDetails?.originalDate,
-    tripDetails?.userBookingInfo,
+    tripDetails?.id ?? '',
+    tripDetails?.originalDate ?? '',
+    originalSearchParams,
   ])
 
   // Build search URL with original search parameters to maintain search context
