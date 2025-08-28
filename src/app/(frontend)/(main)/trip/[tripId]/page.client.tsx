@@ -124,10 +124,9 @@ interface User {
 }
 
 interface TripDetailsClientProps {
-  tripId: string
-  date: string
-  from?: string | null
-  to?: string | null
+  tripDetails: TripDetails
+  user: User | null
+  isAuthenticated: boolean
   initialError?: string | null
   originalSearchParams?: {
     fromProvince?: string
@@ -136,124 +135,20 @@ interface TripDetailsClientProps {
   }
 }
 
-async function fetchTripDetails(
-  tripId: string,
-  date: string,
-  from?: string,
-  to?: string,
-  token?: string,
-) {
-  try {
-    const headers: HeadersInit = {}
-    if (token) {
-      headers.Authorization = `JWT ${token}`
-    }
-
-    // Build URL with optional from/to parameters
-    let url = `/api/trips/${tripId}/date/${encodeURIComponent(date)}`
-    const params = new URLSearchParams()
-    if (from) params.append('from', from)
-    if (to) params.append('to', to)
-    if (params.toString()) {
-      url += `?${params.toString()}`
-    }
-
-    const response = await fetch(url, {
-      cache: 'no-store',
-      headers,
-    })
-
-    if (!response.ok) {
-      return null
-    }
-
-    const result = await response.json()
-    return result.success ? result.data : null
-  } catch (error) {
-    console.error('Error fetching trip details:', error)
-    return null
-  }
-}
-
-async function fetchCurrentUser() {
-  try {
-    const response = await fetch('/api/users/me', {
-      credentials: 'include',
-    })
-
-    if (!response.ok) {
-      return { user: null, token: null }
-    }
-
-    const result = await response.json()
-    return {
-      user: result.user || null,
-      token: result.token || null,
-    }
-  } catch (error) {
-    console.error('Error fetching user:', error)
-    return { user: null, token: null }
-  }
-}
-
 export const TripDetailsClient = ({
-  tripId,
-  date,
-  from,
-  to,
+  tripDetails,
+  user,
+  isAuthenticated,
   initialError,
   originalSearchParams,
 }: TripDetailsClientProps) => {
   const router = useRouter()
-  const [tripDetails, setTripDetails] = useState<TripDetails | null>(null)
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
   const [isBookingLoading, setIsBookingLoading] = useState(false)
 
-  const isAuthenticated = !!user
-
-  // Load trip details and user data
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true)
-      setError(null)
-
-      try {
-        // Fetch user data first to get token
-        const userResult = await fetchCurrentUser()
-        setUser(userResult.user)
-
-        // Then fetch trip details with token if available
-        const tripResult = await fetchTripDetails(
-          tripId,
-          date,
-          from || undefined,
-          to || undefined,
-          userResult.token || undefined,
-        )
-
-        if (!tripResult) {
-          setError('Trip not found')
-          return
-        }
-
-        setTripDetails(tripResult)
-      } catch (err) {
-        console.error('Error loading data:', err)
-        setError('Failed to load trip details')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadData()
-  }, [tripId, date, from, to])
-
   // Handle initial error from URL parameters
   useEffect(() => {
-    if (initialError && tripDetails) {
+    if (initialError) {
       switch (initialError) {
         case 'booking_limit_exceeded':
           toast.error(
@@ -268,86 +163,19 @@ export const TripDetailsClient = ({
       }
       setSelectedSeats([]) // Clear any selected seats
     }
-  }, [initialError, tripDetails])
+  }, [initialError])
 
   // Only clear selected seats if user can't book more, but don't show error message automatically
   useEffect(() => {
     if (
       isAuthenticated &&
-      tripDetails &&
       tripDetails.userBookingInfo &&
       !tripDetails.userBookingInfo.canBookMoreSeats &&
       !initialError
     ) {
       setSelectedSeats([]) // Clear any selected seats silently
     }
-  }, [isAuthenticated, tripDetails, initialError])
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center"
-        dir="rtl"
-      >
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">در حال بارگذاری جزئیات سفر...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Show error state
-  if (error === 'Trip not found') {
-    return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center"
-        dir="rtl"
-      >
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">سفر یافت نشد</h1>
-          <p className="text-gray-600 mb-6">سفر درخواستی یافت نشد یا دیگر در دسترس نیست.</p>
-          <button
-            onClick={() => router.push('/search')}
-            className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-200"
-          >
-            بازگشت به جستجو
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center"
-        dir="rtl"
-      >
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">خطا در بارگذاری</h1>
-          <p className="text-gray-600 mb-6">خطایی در بارگذاری جزئیات سفر رخ داده است.</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-200 ml-4"
-          >
-            تلاش مجدد
-          </button>
-          <button
-            onClick={() => router.push('/search')}
-            className="bg-gray-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-600 transition-all duration-200"
-          >
-            بازگشت به جستجو
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  if (!tripDetails) {
-    return null
-  }
+  }, [isAuthenticated, tripDetails.userBookingInfo, initialError])
 
   // Calculate if user can select more seats
   // Default to 2 seats if userBookingInfo is not available (for unauthenticated users or when API doesn't return it)
@@ -368,7 +196,6 @@ export const TripDetailsClient = ({
           // Check if user can book more seats at all
           if (
             isAuthenticated &&
-            tripDetails &&
             tripDetails.userBookingInfo &&
             !tripDetails.userBookingInfo.canBookMoreSeats
           ) {
@@ -377,7 +204,7 @@ export const TripDetailsClient = ({
           }
 
           // Check if user can select more seats
-          const maxSeats = tripDetails?.userBookingInfo?.remainingSeatsAllowed ?? 2
+          const maxSeats = tripDetails.userBookingInfo?.remainingSeatsAllowed ?? 2
           if (prev.length >= maxSeats) {
             toast.error(`شما فقط می‌توانید حداکثر ${maxSeats} چوکی انتخاب کنید`)
             return prev
@@ -388,7 +215,7 @@ export const TripDetailsClient = ({
         }
       })
     },
-    [isAuthenticated, tripDetails?.userBookingInfo?.remainingSeatsAllowed ?? 2],
+    [isAuthenticated, tripDetails.userBookingInfo?.remainingSeatsAllowed],
   )
 
   const handleClearSelection = useCallback(() => {
@@ -397,8 +224,6 @@ export const TripDetailsClient = ({
   }, [])
 
   const handleProceedToBooking = useCallback(async () => {
-    if (!tripDetails) return
-
     if (selectedSeats.length === 0) {
       toast.error('لطفاً حداقل یک چوکی انتخاب کنید')
       return
@@ -473,13 +298,20 @@ export const TripDetailsClient = ({
       toast.error('ادامه رزرو ناموفق بود. لطفاً دوباره تلاش کنید.')
       setIsBookingLoading(false)
     }
-  }, [tripDetails, isAuthenticated, selectedSeats, router, originalSearchParams])
+  }, [
+    isAuthenticated,
+    selectedSeats,
+    router,
+    tripDetails.id,
+    tripDetails.originalDate,
+    tripDetails.userBookingInfo,
+  ])
 
   // Build search URL with original search parameters to maintain search context
   // Use original search provinces if available, otherwise fall back to terminal provinces
-  const searchFromProvince = originalSearchParams?.fromProvince || tripDetails?.from.province || ''
-  const searchToProvince = originalSearchParams?.toProvince || tripDetails?.to?.province || ''
-  const searchDate = originalSearchParams?.date || tripDetails?.originalDate || date
+  const searchFromProvince = originalSearchParams?.fromProvince || tripDetails.from.province
+  const searchToProvince = originalSearchParams?.toProvince || tripDetails.to?.province || ''
+  const searchDate = originalSearchParams?.date || tripDetails.originalDate
 
   const searchUrl = `/search?from=${encodeURIComponent(searchFromProvince)}&to=${encodeURIComponent(searchToProvince)}&date=${encodeURIComponent(searchDate)}`
 
