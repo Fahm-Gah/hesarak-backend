@@ -32,7 +32,13 @@ export const bookTicket: Endpoint = {
     // Validate business constraints
     const constraintValidation = validateBookingConstraints(bookingData)
     if (!constraintValidation.isValid) {
-      return createErrorResponse('BOOKING_CONSTRAINTS_VIOLATED', 400, locale, undefined, constraintValidation.errors)
+      return createErrorResponse(
+        'BOOKING_CONSTRAINTS_VIOLATED',
+        400,
+        locale,
+        undefined,
+        constraintValidation.errors,
+      )
     }
 
     const {
@@ -89,16 +95,15 @@ export const bookTicket: Endpoint = {
         if (departureTimeToCheck) {
           // Extract time string from ISO date or time string using dateUtils
           const timeString = formatTime(departureTimeToCheck)
-          
+
           if (timeString && timeString.includes(':')) {
             const [hours, minutes] = timeString.split(':').map(Number)
-            
+
             // Create departure datetime using the normalized date
             const departureDateTime = new Date(normalizedDate)
             departureDateTime.setHours(hours, minutes, 0, 0)
 
             const timeDiffInHours = (departureDateTime.getTime() - now.getTime()) / (1000 * 60 * 60)
-
 
             // Prevent booking if trip has already departed
             if (timeDiffInHours <= 0) {
@@ -133,7 +138,9 @@ export const bookTicket: Endpoint = {
         const invalidIds = uniqueSeatIds.filter(
           (id) => !validSeats.some((seat: any) => seat.id === id),
         )
-        return createErrorResponse('INVALID_SEAT_IDS', 400, locale, { seatIds: invalidIds.join(', ') })
+        return createErrorResponse('INVALID_SEAT_IDS', 400, locale, {
+          seatIds: invalidIds.join(', '),
+        })
       }
 
       // Check for existing bookings with proper date range filtering
@@ -215,7 +222,9 @@ export const bookTicket: Endpoint = {
           .filter((seat: any) => conflictingIds.includes(seat.id))
           .map((seat: any) => seat.seatNumber)
 
-        return createErrorResponse('SEATS_ALREADY_BOOKED', 409, locale, { seats: conflictedSeats.join(', ') })
+        return createErrorResponse('SEATS_ALREADY_BOOKED', 409, locale, {
+          seats: conflictedSeats.join(', '),
+        })
       }
 
       // Check user booking limits - IMPROVED VALIDATION
@@ -223,7 +232,9 @@ export const bookTicket: Endpoint = {
       const totalSeatsAfterBooking = userExistingSeats + uniqueSeatIds.length
 
       if (totalSeatsAfterBooking > maxSeatsPerUser) {
-        return createErrorResponse('BOOKING_LIMIT_EXCEEDED', 400, locale, { maxSeats: maxSeatsPerUser })
+        return createErrorResponse('BOOKING_LIMIT_EXCEEDED', 400, locale, {
+          maxSeats: maxSeatsPerUser,
+        })
       }
 
       // Additional safety check - prevent booking if user already has max seats
@@ -260,7 +271,9 @@ export const bookTicket: Endpoint = {
       })
 
       if (finalUserSeatCount + uniqueSeatIds.length > maxSeatsPerUser) {
-        return createErrorResponse('BOOKING_LIMIT_EXCEEDED', 400, locale, { maxSeats: maxSeatsPerUser })
+        return createErrorResponse('BOOKING_LIMIT_EXCEEDED', 400, locale, {
+          maxSeats: maxSeatsPerUser,
+        })
       }
 
       // Calculate pricing
@@ -297,12 +310,10 @@ export const bookTicket: Endpoint = {
         ticketData.to = toTerminalId
       }
 
-
       const ticket = (await payload.create({
         collection: 'tickets',
         data: ticketData,
       })) as any
-
 
       return createSuccessResponse(
         'BOOKING_SUCCESS',
@@ -356,7 +367,7 @@ export const bookTicket: Endpoint = {
             paymentDeadline: ticket.paymentDeadline || null,
           },
         },
-        locale
+        locale,
       )
     } catch (error: unknown) {
       console.error('Booking error:', error)

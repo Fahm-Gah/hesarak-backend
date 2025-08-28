@@ -75,7 +75,7 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
 
       // Calculate departure datetime by combining trip date with departure time
       const tripDate = new Date(data.date)
-      
+
       // Use formatTime utility to handle both ISO strings and time-only strings
       const timeString = formatTime(trip.departureTime)
       const [hours, minutes] = timeString.split(':').map(Number)

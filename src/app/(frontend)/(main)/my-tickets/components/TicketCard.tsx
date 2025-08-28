@@ -389,9 +389,9 @@ export const TicketCard = ({
                   {formatTo12Hour(ticket.trip.departureTime)}
                 </p>
                 <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                  {ticket.trip.from.name}
+                  {ticket.trip.from.province}
                 </p>
-                <p className="text-xs text-gray-500 hidden sm:block">{ticket.trip.from.province}</p>
+                <p className="text-xs text-gray-500 hidden sm:block">{ticket.trip.from.address}</p>
               </div>
               <div className="flex-1 flex items-center px-1 sm:px-2">
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-green-300 via-blue-300 to-red-300 rounded-full relative">
@@ -410,10 +410,10 @@ export const TicketCard = ({
                   {ticket.trip.arrivalTime ? formatTo12Hour(ticket.trip.arrivalTime) : 'نامشخص'}
                 </p>
                 <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                  {ticket.trip.to?.name || 'مقصد'}
+                  {ticket.trip.to?.province || 'مقصد'}
                 </p>
                 <p className="text-xs text-gray-500 hidden sm:block">
-                  {ticket.trip.to?.province || ''}
+                  {ticket.trip.to?.address || ''}
                 </p>
               </div>
             </div>
