@@ -13,31 +13,42 @@ export const getDayOfWeek = (date: string): string => {
 
 /**
  * Format time string to HH:mm format (24-hour)
- * @param timeInput - Time string or Date object from database
- * @returns Formatted time in 24-hour format
+ * @param timeInput - Time string or Date object from database (stored in Afghanistan timezone)
+ * @returns Formatted time in 24-hour format (preserving Afghanistan timezone)
  */
 export const formatTime = (timeInput: string | Date): string => {
   try {
-    let date: Date
-
     if (timeInput instanceof Date) {
-      date = timeInput
+      // For Date objects, format directly
+      return timeInput.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
     } else if (typeof timeInput === 'string') {
       // Handle both ISO strings and time-only strings
       if (timeInput.includes('T') || timeInput.includes('Z')) {
-        date = new Date(timeInput)
+        // Full ISO string - parse as normal
+        const date = new Date(timeInput)
+        return date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        })
       } else {
-        date = new Date(`1970-01-01T${timeInput}:00`)
+        // Time-only string like "22:00" - these are stored in Afghanistan time
+        // Just return them as-is since they're already in the correct timezone
+        const timeParts = timeInput.split(':')
+        if (timeParts.length >= 2) {
+          const hours = timeParts[0].padStart(2, '0')
+          const minutes = timeParts[1].padStart(2, '0')
+          return `${hours}:${minutes}`
+        }
+        return timeInput
       }
     } else {
       return String(timeInput)
     }
-
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    })
   } catch {
     return String(timeInput)
   }
@@ -46,38 +57,42 @@ export const formatTime = (timeInput: string | Date): string => {
 /**
  * Format a time to a readable 12-hour format with AM/PM.
  * This function can handle Date objects, ISO strings, and "HH:MM" strings.
- * @param timeInput - Time input (Date object, ISO string, or "HH:MM" string)
+ * @param timeInput - Time input (Date object, ISO string, or "HH:MM" string stored in Afghanistan timezone)
  * @returns Formatted time (e.g., "9:00 AM", "2:30 PM", or "7:30 PM")
  */
 export const formatDepartureTime = (timeInput: string | Date): string => {
   try {
-    let date: Date
-
     if (timeInput instanceof Date) {
       // Direct Date object
-      date = timeInput
+      return timeInput.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
     } else if (typeof timeInput === 'string') {
       // Handle both ISO strings and time-only strings
       if (timeInput.includes('T') || timeInput.includes('Z')) {
         // ISO string
-        date = new Date(timeInput)
+        const date = new Date(timeInput)
+        if (isNaN(date.getTime())) {
+          throw new Error('Invalid date/time')
+        }
+        return date.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        })
       } else {
-        // Time-only string like "14:30"
-        date = new Date(`1970-01-01T${timeInput}:00`)
+        // Time-only string like "14:30" - stored in Afghanistan time
+        // Parse directly without timezone conversion
+        const [hours, minutes] = timeInput.split(':').map(Number)
+        const period = hours >= 12 ? 'PM' : 'AM'
+        const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
+        return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`
       }
     } else {
       return String(timeInput)
     }
-
-    if (isNaN(date.getTime())) {
-      throw new Error('Invalid date/time')
-    }
-
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
   } catch (e) {
     console.error('Error formatting departure time:', e, 'Input:', timeInput)
     return String(timeInput) // Fallback to original string on error
@@ -357,4 +372,25 @@ export const getCurrentPersianDate = (): string => {
  */
 export const isPersianLeapYear = (persianYear: number): boolean => {
   return moment.jIsLeapYear(persianYear)
+}
+
+/**
+ * Get current time in Kabul timezone (Afghanistan Time - UTC+4:30)
+ * @returns Date object representing current time in Kabul
+ */
+export const getKabulTime = (): Date => {
+  const now = new Date()
+  // Afghanistan Time is UTC+4:30
+  const kabulOffset = 4.5 * 60 // 4.5 hours in minutes
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000)
+  const kabulTime = new Date(utc + (kabulOffset * 60000))
+  return kabulTime
+}
+
+/**
+ * Get current timestamp in Kabul timezone
+ * @returns Timestamp in milliseconds for current Kabul time
+ */
+export const getKabulTimeStamp = (): number => {
+  return getKabulTime().getTime()
 }
