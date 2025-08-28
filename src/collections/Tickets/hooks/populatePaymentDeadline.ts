@@ -99,10 +99,10 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
 
       if (daysToDeparture > 7) {
         // More than 7 days: 48 hours to pay
-        paymentDeadline = new Date(now.getTime() + 48 * 60 * 60 * 1000)
+        paymentDeadline = new Date(Date.now() + 48 * 60 * 60 * 1000)
       } else if (daysToDeparture > 1) {
         // 1-7 days: 24 hours to pay
-        paymentDeadline = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+        paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000)
       } else {
         // Less than 24 hours: 2 hours before departure
         paymentDeadline = new Date(departureDateTime.getTime() - 2 * 60 * 60 * 1000)
