@@ -173,13 +173,13 @@ export const BookingSuccessClient = ({
             sessionStorage.removeItem('bookingResult')
           }, 100)
         } else if (mounted) {
-          setError('هیچ اطلاعات قیدی یافت نشد. لطفاً دوباره قید کنید.')
+          setError('اطلاعات تکت یافت نشد. لطفاً دوباره تکت قید کنید.')
           setIsLoading(false)
         }
       } catch (err) {
         console.error('Error reading booking data:', err)
         if (mounted) {
-          setError('بارگیری اطلاعات قید کردن ناموفق بود.')
+          setError('بارگیری اطلاعات تکت کردن ناموفق بود.')
           setIsLoading(false)
         }
       }
@@ -201,7 +201,7 @@ export const BookingSuccessClient = ({
       >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">در حال بارگیری جزئیات قید شما...</p>
+          <p className="text-gray-600">در حال بارگیری جزئیات تکت شما...</p>
         </div>
       </div>
     )
@@ -216,8 +216,8 @@ export const BookingSuccessClient = ({
         <div className="max-w-lg mx-auto p-6 sm:p-8">
           <BookingHeader
             status="error"
-            title="اطلاعات قید یافت نشد"
-            description={error || 'قادر به بارگیری جزئیات قید نیستیم.'}
+            title="اطلاعات تکت یافت نشد"
+            description={error || 'قادر به بارگیری جزئیات تکت نیستیم.'}
           />
           <ActionButtons status="error" />
         </div>
@@ -233,7 +233,7 @@ export const BookingSuccessClient = ({
           <BookingHeader
             status="cancelled"
             title="تکت لغو شد"
-            description="این تکت توسط مدیریت لغو شده است. قید شما دیگر معتبر نیست."
+            description="این تکت توسط مدیریت لغو شده است. تکت شما دیگر معتبر نیست."
           />
 
           <TicketCard bookingData={bookingData} status="cancelled" getTravelDate={getTravelDate}>
@@ -259,7 +259,7 @@ export const BookingSuccessClient = ({
         <BookingHeader
           status="success"
           title="تکت تأیید شد!"
-          description="تکت شما با موفقیت قید شد. جزئیات قید شما در ادامه آمده است:"
+          description="تکت شما با موفقیت قید شد. جزئیات تکت شما در ادامه آمده است:"
         />
 
         <TicketCard bookingData={bookingData} status="success" getTravelDate={getTravelDate}>

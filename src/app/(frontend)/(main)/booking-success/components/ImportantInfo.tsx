@@ -33,7 +33,7 @@ export const ImportantInfo = memo<ImportantInfoProps>(({ bookingData, status }) 
         'تکت شما لغو شده و چوکی(ها)ی شما آزاد شده است',
         'اگر برای این تکت پرداخت کرده بودید، بازپرداخت طبق قوانین بازپرداخت ما پردازش خواهد شد',
         'می‌توانید برای تاریخ سفر مورد نظر خود تکت جدیدی قید کنید',
-        'اگر سوالی درباره این لغو دارید، با پشتیبانی مشتریان تماس بگیرید',
+        'اگر سوالی درباره این لغو دارید، با خدمات مشتریان تماس بگیرید',
       ]
     }
 
@@ -44,7 +44,7 @@ export const ImportantInfo = memo<ImportantInfoProps>(({ bookingData, status }) 
     ]
 
     if (!bookingData.status.isPaid) {
-      baseItems.push('برای تضمین قید خود، پرداخت را قبل از مهلت تکمیل کنید')
+      baseItems.push('برای تضمین تکت خود، پرداخت را قبل از مهلت تکمیل کنید')
     }
 
     return baseItems
