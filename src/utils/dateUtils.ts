@@ -378,24 +378,3 @@ export const getCurrentPersianDate = (): string => {
 export const isPersianLeapYear = (persianYear: number): boolean => {
   return moment.jIsLeapYear(persianYear)
 }
-
-/**
- * Get current time in Kabul timezone (Afghanistan Time - UTC+4:30)
- * @returns Date object representing current time in Kabul
- */
-export const getKabulTime = (): Date => {
-  const now = new Date()
-  // Afghanistan Time is UTC+4:30
-  const kabulOffset = 4.5 * 60 // 4.5 hours in minutes
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000
-  const kabulTime = new Date(utc + kabulOffset * 60000)
-  return kabulTime
-}
-
-/**
- * Get current timestamp in Kabul timezone
- * @returns Timestamp in milliseconds for current Kabul time
- */
-export const getKabulTimeStamp = (): number => {
-  return getKabulTime().getTime()
-}

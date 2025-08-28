@@ -1,5 +1,5 @@
 import type { CollectionBeforeChangeHook } from 'payload'
-import { formatTime, getKabulTime, getKabulTimeStamp } from '@/utils/dateUtils'
+import { formatTime } from '@/utils/dateUtils'
 
 /**
  * Hook to populate payment deadline dynamically based on business requirements
@@ -33,9 +33,9 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
     if (isNaN(deadline.getTime())) {
       console.warn('Invalid payment deadline date provided, using fallback:', {
         originalDeadline: data.paymentDeadline,
-        newDeadline: new Date(getKabulTimeStamp() + 24 * 60 * 60 * 1000).toISOString(),
+        newDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       })
-      data.paymentDeadline = new Date(getKabulTimeStamp() + 24 * 60 * 60 * 1000).toISOString()
+      data.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     }
 
     return data
@@ -69,7 +69,7 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
 
       if (!trip || !trip.departureTime) {
         // Fallback: 24 hours from booking for trips without departure time
-        data.paymentDeadline = new Date(getKabulTimeStamp() + 24 * 60 * 60 * 1000).toISOString()
+        data.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
         return data
       }
 
@@ -90,7 +90,7 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
       )
 
       // Calculate time until departure for payment deadline logic
-      const now = getKabulTime()
+      const now = new Date()
       const timeToDeparture = departureDateTime.getTime() - now.getTime()
 
       const daysToDeparture = timeToDeparture / (1000 * 60 * 60 * 24)
@@ -99,10 +99,10 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
 
       if (daysToDeparture > 7) {
         // More than 7 days: 48 hours to pay
-        paymentDeadline = new Date(getKabulTimeStamp() + 48 * 60 * 60 * 1000)
+        paymentDeadline = new Date(Date.now() + 48 * 60 * 60 * 1000)
       } else if (daysToDeparture > 1) {
         // 1-7 days: 24 hours to pay
-        paymentDeadline = new Date(getKabulTimeStamp() + 24 * 60 * 60 * 1000)
+        paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000)
       } else {
         // Less than 24 hours: 2 hours before departure
         paymentDeadline = new Date(departureDateTime.getTime() - 2 * 60 * 60 * 1000)
@@ -110,10 +110,10 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
         // If that puts deadline in the past, give 30 minutes
         if (paymentDeadline <= now) {
           if (timeToDeparture > 30 * 60 * 1000) {
-            paymentDeadline = new Date(getKabulTimeStamp() + 30 * 60 * 1000)
+            paymentDeadline = new Date(Date.now() + 30 * 60 * 1000)
           } else {
             // Last resort: 15 minutes grace period
-            paymentDeadline = new Date(getKabulTimeStamp() + 15 * 60 * 1000)
+            paymentDeadline = new Date(Date.now() + 15 * 60 * 1000)
           }
         }
       }
@@ -128,7 +128,7 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
     } catch (error) {
       console.error('Error populating payment deadline:', error)
       // Fallback: 4 hours from booking time
-      data.paymentDeadline = new Date(getKabulTimeStamp() + 4 * 60 * 60 * 1000).toISOString()
+      data.paymentDeadline = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString()
     }
   }
 
