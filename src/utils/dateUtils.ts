@@ -19,11 +19,13 @@ export const getDayOfWeek = (date: string): string => {
 export const formatTime = (timeInput: string | Date): string => {
   try {
     if (timeInput instanceof Date) {
-      // For Date objects, format directly
+      // For Date objects from PayloadCMS timeOnly fields
+      // Format in Asia/Kabul timezone to preserve the correct time
       return timeInput.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
+        timeZone: 'Asia/Kabul',
       })
     } else if (typeof timeInput === 'string') {
       // Handle both ISO strings and time-only strings
@@ -34,6 +36,7 @@ export const formatTime = (timeInput: string | Date): string => {
           hour: '2-digit',
           minute: '2-digit',
           hour12: false,
+          timeZone: 'Asia/Kabul',
         })
       } else {
         // Time-only string like "22:00" - these are stored in Afghanistan time
@@ -63,11 +66,12 @@ export const formatTime = (timeInput: string | Date): string => {
 export const formatDepartureTime = (timeInput: string | Date): string => {
   try {
     if (timeInput instanceof Date) {
-      // Direct Date object
+      // Direct Date object - format in Asia/Kabul timezone
       return timeInput.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true,
+        timeZone: 'Asia/Kabul',
       })
     } else if (typeof timeInput === 'string') {
       // Handle both ISO strings and time-only strings
@@ -81,6 +85,7 @@ export const formatDepartureTime = (timeInput: string | Date): string => {
           hour: 'numeric',
           minute: '2-digit',
           hour12: true,
+          timeZone: 'Asia/Kabul',
         })
       } else {
         // Time-only string like "14:30" - stored in Afghanistan time
@@ -317,7 +322,7 @@ export const convertGregorianToPersianDisplay = (gregorianDate: string): string 
     if (!m.isValid()) {
       m = moment(gregorianDate) // Try automatic parsing
     }
-    
+
     if (m.isValid()) {
       const formatted = m.format('jYYYY/jMM/jDD')
       // Double check the year isn't malformed
@@ -382,8 +387,8 @@ export const getKabulTime = (): Date => {
   const now = new Date()
   // Afghanistan Time is UTC+4:30
   const kabulOffset = 4.5 * 60 // 4.5 hours in minutes
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000)
-  const kabulTime = new Date(utc + (kabulOffset * 60000))
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000
+  const kabulTime = new Date(utc + kabulOffset * 60000)
   return kabulTime
 }
 
