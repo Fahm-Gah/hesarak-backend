@@ -431,7 +431,7 @@ export const SeatLayout = memo<SeatLayoutProps>(
                 className="w-3 h-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg shadow-sm border border-orange-300/50"
                 aria-hidden="true"
               />
-              <span className="text-xs font-medium text-gray-700">انتخابی</span>
+              <span className="text-xs font-medium text-gray-700">انتخاب شده</span>
             </div>
             <div className="flex items-center gap-2">
               <div

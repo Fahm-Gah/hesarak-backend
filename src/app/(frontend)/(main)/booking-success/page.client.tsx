@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import type { User as PayloadUser, Profile } from '@/payload-types'
 import { convertGregorianToPersianDisplay } from '@/utils/dateUtils'
 import { convertToPersianDigits } from '@/utils/persianDigits'
@@ -15,6 +16,9 @@ import {
   ActionButtons,
   type BookingData,
 } from './components'
+
+// Dynamically import Confetti to avoid SSR issues
+const Confetti = dynamic(() => import('react-confetti'), { ssr: false })
 
 interface User extends PayloadUser {
   profile?: Profile | null
@@ -35,6 +39,8 @@ export const BookingSuccessClient = ({
   const [bookingData, setBookingData] = useState<BookingData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
 
   // Helper function to get properly formatted travel date
   const getTravelDate = (bookingData: BookingData): string => {
@@ -193,6 +199,36 @@ export const BookingSuccessClient = ({
     }
   }, [ticketId, initialBookingData]) // Include initialBookingData to react to server data
 
+  // Handle confetti display for successful bookings
+  useEffect(() => {
+    if (bookingData && !bookingData.status.isCancelled) {
+      // Show confetti when booking data loads successfully
+      setShowConfetti(true)
+      
+      // Stop confetti after 5 seconds
+      const timer = setTimeout(() => {
+        setShowConfetti(false)
+      }, 5000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [bookingData])
+
+  // Handle window resize for confetti
+  useEffect(() => {
+    const updateWindowSize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight })
+    }
+    
+    // Set initial size
+    updateWindowSize()
+    
+    // Add event listener
+    window.addEventListener('resize', updateWindowSize)
+    
+    return () => window.removeEventListener('resize', updateWindowSize)
+  }, [])
+
   if (isLoading) {
     return (
       <div
@@ -255,6 +291,21 @@ export const BookingSuccessClient = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50" dir="rtl">
+      {/* Confetti Animation */}
+      {showConfetti && windowSize.width > 0 && (
+        <Confetti
+          width={windowSize.width}
+          height={windowSize.height}
+          numberOfPieces={200}
+          recycle={false}
+          colors={['#22c55e', '#16a34a', '#15803d', '#f97316', '#ea580c', '#dc2626', '#fbbf24', '#f59e0b']}
+          gravity={0.3}
+          wind={0.05}
+          initialVelocityX={5}
+          initialVelocityY={-10}
+        />
+      )}
+      
       <div className="max-w-4xl mx-auto px-4 py-8">
         <BookingHeader
           status="success"
