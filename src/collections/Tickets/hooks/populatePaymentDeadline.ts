@@ -80,6 +80,8 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
       const timeString = formatTime(trip.departureTime)
       const [hours, minutes] = timeString.split(':').map(Number)
 
+      // Create departure datetime in Afghanistan timezone (UTC+4:30)
+      // Since times are stored in Afghanistan time, we need to construct the date properly
       const departureDateTime = new Date(
         tripDate.getFullYear(),
         tripDate.getMonth(),
@@ -88,6 +90,12 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
         minutes,
         0, // seconds
       )
+
+      // Convert from local time to Afghanistan time
+      // Afghanistan is UTC+4:30, so we need to adjust for timezone difference
+      const afghanistanOffset = 4.5 * 60 * 60 * 1000 // 4.5 hours in milliseconds
+      const localOffset = departureDateTime.getTimezoneOffset() * 60 * 1000 // local offset in milliseconds
+      departureDateTime.setTime(departureDateTime.getTime() - localOffset + afghanistanOffset)
 
       // Calculate time until departure for payment deadline logic
       const now = new Date()
