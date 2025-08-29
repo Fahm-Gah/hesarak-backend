@@ -21,16 +21,11 @@ export const getMeUser = async (args?: {
     },
   })
 
-  let user: User | null = null
-
-  if (meUserReq.ok) {
-    try {
-      const response = await meUserReq.json()
-      user = response.user || null
-    } catch (error) {
-      console.error('Error parsing user response:', error)
-    }
-  }
+  const {
+    user,
+  }: {
+    user: User
+  } = await meUserReq.json()
 
   if (validUserRedirect && meUserReq.ok && user) {
     redirect(validUserRedirect)
@@ -40,13 +35,9 @@ export const getMeUser = async (args?: {
     redirect(nullUserRedirect)
   }
 
-  // Only return if we have both token and user
-  if (!token || !user) {
-    throw new Error('User not authenticated')
-  }
-
+  // Token will exist here because if it doesn't the user will be redirected
   return {
-    token,
+    token: token!,
     user,
   }
 }

@@ -294,10 +294,33 @@ export const TicketsPageClient = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4" dir="rtl">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">در حال بررسی احراز هویت...</p>
+          {/* Breadcrumb skeleton */}
+          <div className="mb-4">
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+          </div>
+
+          {/* Header skeleton */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+              <div className="flex-1">
+                <div className="h-8 bg-gray-200 rounded animate-pulse w-32 mb-2"></div>
+                <div className="h-4 bg-gray-100 rounded animate-pulse w-64"></div>
+              </div>
+              <div className="w-full lg:w-80">
+                <div className="h-12 bg-gray-100 rounded-lg animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Auth loading content */}
+          <div className="flex items-center justify-center min-h-[300px]">
+            <div className="text-center bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
+              <div className="relative mb-6">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-100 border-t-orange-600 mx-auto"></div>
+                <div className="absolute inset-0 rounded-full bg-orange-50 opacity-20 animate-ping"></div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">در حال بررسی احراز هویت</h3>
+              <p className="text-gray-600 text-sm">لطفاً صبر کنید...</p>
             </div>
           </div>
         </div>
@@ -310,10 +333,118 @@ export const TicketsPageClient = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4" dir="rtl">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">در حال بارگذاری تکت ها...</p>
+          {/* Breadcrumbs */}
+          <div className="mb-4">
+            <Breadcrumbs items={breadcrumbItems} />
+          </div>
+
+          {/* Header with Title and Search */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+              <div className="flex-1">
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">تکت های من</h1>
+                <p className="text-gray-600">تکت های بس و تاریخچه سفرهای خود را مدیریت کنید</p>
+              </div>
+              <div className="relative w-full lg:w-80 lg:flex-shrink-0">
+                <div className="h-12 bg-gray-100 rounded-lg animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Layout with skeleton */}
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Filters Sidebar skeleton - Desktop */}
+            <div className="hidden lg:block lg:w-1/4">
+              <div className="bg-white rounded-lg shadow-md sticky top-4">
+                <div className="p-4 border-b border-gray-200">
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-20 mb-2"></div>
+                </div>
+                <div className="p-4 space-y-4">
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-100 rounded animate-pulse w-16"></div>
+                    <div className="h-10 bg-gray-50 rounded animate-pulse"></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-100 rounded animate-pulse w-20"></div>
+                    <div className="h-10 bg-gray-50 rounded animate-pulse"></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-100 rounded animate-pulse w-16"></div>
+                    <div className="h-10 bg-gray-50 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tickets List skeleton */}
+            <div className="flex-1">
+              {/* Mobile controls skeleton */}
+              <div className="lg:hidden mb-4 flex justify-between gap-3">
+                <div className="h-10 bg-white rounded-lg shadow-md animate-pulse w-24"></div>
+                <div className="h-10 bg-white rounded-lg shadow-md animate-pulse w-20"></div>
+              </div>
+
+              {/* Loading content with ticket skeletons */}
+              <div className="space-y-4">
+                {/* Loading indicator */}
+                <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                  <div className="relative mb-6">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-100 border-t-orange-600 mx-auto"></div>
+                    <div className="absolute inset-0 rounded-full bg-orange-50 opacity-20 animate-ping"></div>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    در حال بارگذاری تکت ها
+                  </h3>
+                  <p className="text-gray-600 text-sm">لطفاً صبر کنید...</p>
+                </div>
+
+                {/* Ticket card skeletons */}
+                {[1, 2, 3].map((index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-xl shadow-md border border-gray-100 p-6 animate-pulse"
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                      {/* Left section */}
+                      <div className="flex-1 space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2">
+                            <div className="h-5 bg-gray-200 rounded w-32"></div>
+                            <div className="h-4 bg-gray-100 rounded w-24"></div>
+                          </div>
+                          <div className="h-6 bg-gray-100 rounded-full w-16"></div>
+                        </div>
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div className="space-y-1">
+                            <div className="h-3 bg-gray-100 rounded w-12"></div>
+                            <div className="h-4 bg-gray-200 rounded w-20"></div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="h-3 bg-gray-100 rounded w-12"></div>
+                            <div className="h-4 bg-gray-200 rounded w-16"></div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="h-3 bg-gray-100 rounded w-16"></div>
+                            <div className="h-4 bg-gray-200 rounded w-24"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right section */}
+                      <div className="lg:w-48 space-y-3">
+                        <div className="space-y-2">
+                          <div className="h-4 bg-gray-100 rounded w-16"></div>
+                          <div className="h-6 bg-gray-200 rounded w-full"></div>
+                        </div>
+                        <div className="flex gap-2">
+                          <div className="h-8 bg-gray-100 rounded flex-1"></div>
+                          <div className="h-8 bg-gray-100 rounded w-8"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
