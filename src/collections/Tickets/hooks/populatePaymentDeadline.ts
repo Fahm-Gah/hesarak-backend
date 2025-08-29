@@ -80,22 +80,18 @@ export const populatePaymentDeadline: CollectionBeforeChangeHook = async ({
       const timeString = formatTime(trip.departureTime)
       const [hours, minutes] = timeString.split(':').map(Number)
 
-      // Create departure datetime in Afghanistan timezone (UTC+4:30)
-      // Since times are stored in Afghanistan time, we need to construct the date properly
-      const departureDateTime = new Date(
-        tripDate.getFullYear(),
-        tripDate.getMonth(),
-        tripDate.getDate(),
-        hours,
-        minutes,
-        0, // seconds
-      )
+      // Create departure datetime in Afghanistan timezone
+      // Build an ISO string that represents the Afghanistan time
+      const year = tripDate.getFullYear()
+      const month = String(tripDate.getMonth() + 1).padStart(2, '0')
+      const day = String(tripDate.getDate()).padStart(2, '0')
+      const hour = String(hours).padStart(2, '0')
+      const minute = String(minutes).padStart(2, '0')
 
-      // Convert from local time to Afghanistan time
-      // Afghanistan is UTC+4:30, so we need to adjust for timezone difference
-      const afghanistanOffset = 4.5 * 60 * 60 * 1000 // 4.5 hours in milliseconds
-      const localOffset = departureDateTime.getTimezoneOffset() * 60 * 1000 // local offset in milliseconds
-      departureDateTime.setTime(departureDateTime.getTime() - localOffset + afghanistanOffset)
+      // Create ISO string for Afghanistan time and parse it
+      // This represents the exact moment in Afghanistan when the bus departs
+      const afghanistanISOString = `${year}-${month}-${day}T${hour}:${minute}:00+04:30`
+      const departureDateTime = new Date(afghanistanISOString)
 
       // Calculate time until departure for payment deadline logic
       const now = new Date()
