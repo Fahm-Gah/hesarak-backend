@@ -74,11 +74,14 @@ export const BookingSuccessClient = ({
     try {
       const date = new Date(deadline)
       const persianDate = convertGregorianToPersianDisplay(deadline.split('T')[0])
-      const time = date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      })
+
+      // Format time with Persian AM/PM
+      const hour = date.getHours()
+      const minute = date.getMinutes()
+      const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
+      const period = hour >= 12 ? 'ب.ظ' : 'ق.ظ'
+      const time = `${hour12}:${minute.toString().padStart(2, '0')} ${period}`
+
       return { date: persianDate, time }
     } catch (error) {
       console.error('Error formatting payment deadline:', error)
@@ -204,12 +207,12 @@ export const BookingSuccessClient = ({
     if (bookingData && !bookingData.status.isCancelled) {
       // Show confetti when booking data loads successfully
       setShowConfetti(true)
-      
+
       // Stop confetti after 5 seconds
       const timer = setTimeout(() => {
         setShowConfetti(false)
       }, 5000)
-      
+
       return () => clearTimeout(timer)
     }
   }, [bookingData])
@@ -219,13 +222,13 @@ export const BookingSuccessClient = ({
     const updateWindowSize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight })
     }
-    
+
     // Set initial size
     updateWindowSize()
-    
+
     // Add event listener
     window.addEventListener('resize', updateWindowSize)
-    
+
     return () => window.removeEventListener('resize', updateWindowSize)
   }, [])
 
@@ -298,14 +301,23 @@ export const BookingSuccessClient = ({
           height={windowSize.height}
           numberOfPieces={200}
           recycle={false}
-          colors={['#22c55e', '#16a34a', '#15803d', '#f97316', '#ea580c', '#dc2626', '#fbbf24', '#f59e0b']}
+          colors={[
+            '#22c55e',
+            '#16a34a',
+            '#15803d',
+            '#f97316',
+            '#ea580c',
+            '#dc2626',
+            '#fbbf24',
+            '#f59e0b',
+          ]}
           gravity={0.3}
           wind={0.05}
           initialVelocityX={5}
           initialVelocityY={-10}
         />
       )}
-      
+
       <div className="max-w-4xl mx-auto px-4 py-8">
         <BookingHeader
           status="success"

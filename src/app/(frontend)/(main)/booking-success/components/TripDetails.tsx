@@ -13,11 +13,27 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
   const seatNumbers = bookingData.booking.seats.map((seat) => seat.seatNumber).sort()
 
   // Function to convert 24-hour time to 12-hour format with Persian AM/PM
-  const formatToPersian12Hour = (dateStr: string): string => {
+  const formatToPersian12Hour = (timeStr: string): string => {
     try {
-      const date = new Date(dateStr)
-      const hours = date.getHours()
-      const minutes = date.getMinutes()
+      if (!timeStr) return ''
+
+      // Handle both full datetime and time-only formats
+      let hours: number, minutes: number
+
+      if (timeStr.includes('T') || timeStr.includes('Z')) {
+        // Full datetime format
+        const date = new Date(timeStr)
+        hours = date.getHours()
+        minutes = date.getMinutes()
+      } else if (timeStr.includes(':')) {
+        // Time-only format like "14:30"
+        const [hoursStr, minutesStr] = timeStr.split(':')
+        hours = parseInt(hoursStr, 10)
+        minutes = parseInt(minutesStr, 10)
+      } else {
+        return ''
+      }
+
       const period = hours >= 12 ? 'ب.ظ' : 'ق.ظ'
       const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
 
@@ -101,12 +117,13 @@ export const TripDetails = memo<TripDetailsProps>(({ bookingData, getTravelDate,
               <p className="font-bold text-gray-800">
                 {convertToPersianDigits(getTravelDate(bookingData))}
               </p>
-              {formatToPersian12Hour(bookingData.booking.date) && (
-                <p className="text-sm text-gray-600 flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {formatToPersian12Hour(bookingData.booking.date)}
-                </p>
-              )}
+              {bookingData.trip.departureTime &&
+                formatToPersian12Hour(bookingData.trip.departureTime) && (
+                  <p className="text-sm text-gray-600 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {formatToPersian12Hour(bookingData.trip.departureTime)}
+                  </p>
+                )}
             </div>
           </div>
 

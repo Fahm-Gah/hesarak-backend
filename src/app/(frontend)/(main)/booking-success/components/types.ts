@@ -12,6 +12,8 @@ export interface BookingData {
     id: string
     tripName: string
     price: number
+    departureTime?: string
+    arrivalTime?: string
     from?: {
       id: string
       name: string
