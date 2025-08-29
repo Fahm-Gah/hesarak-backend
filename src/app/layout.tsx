@@ -1,13 +1,8 @@
 import React from 'react'
-import { Vazirmatn } from 'next/font/google'
 import type { Metadata, Viewport } from 'next'
 import { getServerSideURL } from '@/utils/getURL'
 
 import './globals.css'
-
-const vazirmatn = Vazirmatn({
-  subsets: ['latin'],
-})
 
 export const metadata: Metadata = {
   title: {

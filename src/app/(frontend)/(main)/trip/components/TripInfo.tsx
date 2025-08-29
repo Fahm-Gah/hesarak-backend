@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
-import Image from 'next/image'
+import React, { useState, useEffect } from 'react'
 import { Bus, MapPin, Clock, Users } from 'lucide-react'
 import { ImageViewer } from './ImageViewer'
+import { OptimizedBusImage } from './OptimizedBusImage'
 import { convertToPersianDigits } from '@/utils/persianDigits'
+import { useImageCache } from '@/utils/imageCache'
 
 interface Terminal {
   id: string
@@ -78,6 +79,7 @@ interface TripInfoProps {
 export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const { preloadImages } = useImageCache()
 
   // Function to convert 24-hour time to 12-hour format with Persian AM/PM
   const formatToPersian12Hour = (time24: string): string => {
@@ -133,6 +135,16 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
     setIsImageViewerOpen(false)
   }
 
+  // Preload images when component mounts
+  useEffect(() => {
+    if (tripDetails.bus.images && tripDetails.bus.images.length > 0) {
+      const imageUrls = tripDetails.bus.images.map((img) => img.url)
+      preloadImages(imageUrls).catch((error) => {
+        console.warn('Failed to preload bus images:', error)
+      })
+    }
+  }, [tripDetails.bus.images, preloadImages])
+
   return (
     <div className={`space-y-6 pb-4 ${className}`} dir="rtl">
       {/* Trip Details */}
@@ -175,34 +187,22 @@ export const TripInfo = ({ tripDetails, className = '' }: TripInfoProps) => {
         {/* Bus Gallery */}
         {tripDetails.bus.images && tripDetails.bus.images.length > 0 && (
           <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
+              تصاویر بس
+            </h3>
             <div className="relative">
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-orange-100">
                 {tripDetails.bus.images.map((image, index) => (
-                  <div
+                  <OptimizedBusImage
                     key={image.id}
-                    className="relative flex-none w-64 md:w-72 aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 group cursor-pointer"
+                    image={image}
+                    index={index}
+                    totalImages={tripDetails.bus.images.length}
+                    busNumber={tripDetails.bus.number}
                     onClick={() => openImageViewer(index)}
-                  >
-                    <Image
-                      src={image.url}
-                      alt={image.alt || `بس ${tripDetails.bus.number} - تصویر ${index + 1}`}
-                      width={image.width}
-                      height={image.height}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      sizes="(max-width: 768px) 80vw, (max-width: 1200px) 50vw, 33vw"
-                      priority={index === 0}
-                      loading={index === 0 ? 'eager' : 'lazy'}
-                      placeholder="blur"
-                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium">
-                      {index + 1} / {tripDetails.bus.images.length}
-                    </div>
-                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-orange-600 text-xs px-2 py-1 rounded-full font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      کلیک کنید برای مشاهده اندازه کامل
-                    </div>
-                  </div>
+                    priority={index === 0}
+                  />
                 ))}
               </div>
             </div>

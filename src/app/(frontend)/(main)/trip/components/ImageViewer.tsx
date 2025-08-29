@@ -1,7 +1,7 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Zoom, Keyboard, A11y } from 'swiper/modules'
-import { X } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
@@ -36,6 +36,7 @@ export const ImageViewer = ({
   busNumber,
 }: ImageViewerProps) => {
   const router = useRouter()
+  const [loadingStates, setLoadingStates] = useState<Record<number, boolean>>({})
 
   // Handle browser back button to close image viewer
   const handleClose = useCallback(() => {
@@ -166,6 +167,16 @@ export const ImageViewer = ({
           {images.map((image, index) => (
             <SwiperSlide key={image.id} className="flex items-center justify-center">
               <div className="swiper-zoom-container relative max-w-full max-h-full">
+                {/* Loading indicator */}
+                {loadingStates[index] && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
+                    <div className="flex flex-col items-center text-white">
+                      <Loader2 className="w-8 h-8 animate-spin mb-2" />
+                      <span className="text-sm">در حال بارگذاری...</span>
+                    </div>
+                  </div>
+                )}
+
                 <Image
                   src={image.url}
                   alt={image.alt || `Bus ${busNumber} - Image ${index + 1}`}
@@ -175,6 +186,10 @@ export const ImageViewer = ({
                   priority={index === initialIndex}
                   loading={index === initialIndex ? 'eager' : 'lazy'}
                   sizes="100vw"
+                  quality={95}
+                  onLoadStart={() => setLoadingStates((prev) => ({ ...prev, [index]: true }))}
+                  onLoad={() => setLoadingStates((prev) => ({ ...prev, [index]: false }))}
+                  onError={() => setLoadingStates((prev) => ({ ...prev, [index]: false }))}
                 />
               </div>
             </SwiperSlide>
