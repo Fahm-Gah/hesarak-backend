@@ -1,4 +1,4 @@
-import type { Endpoint } from 'payload'
+import type { Endpoint, PayloadRequest } from 'payload'
 import { formatTime, calculateDuration } from '../utils/dateUtils'
 
 interface UserTicket {
@@ -49,7 +49,7 @@ interface UserTicket {
 export const getUserTickets: Endpoint = {
   path: '/user/tickets',
   method: 'get',
-  handler: async (req) => {
+  handler: async (req: PayloadRequest) => {
     const { payload, user } = req
 
     // Authentication required
