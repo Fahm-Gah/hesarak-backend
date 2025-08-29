@@ -27,6 +27,8 @@ export const getSeatSelectorTranslations = (lang: 'en' | 'fa' = 'en') => {
           ? 'برای انتخاب، روی صندلی‌های موجود کلیک کنید.'
           : 'Click on available seats to select them for booking.',
       yourExistingBooking: lang === 'fa' ? 'تکت فعلی شما' : 'Your existing booking',
+      bookedBy: lang === 'fa' ? 'بوک شده توسط' : 'Booked by',
+      reservedBy: lang === 'fa' ? 'قید شده توسط' : 'Reserved by',
     },
     labels: {
       selectedSeats: lang === 'fa' ? 'صندلی‌های انتخاب شده' : 'Selected Seats',
@@ -40,6 +42,15 @@ export const getSeatSelectorTranslations = (lang: 'en' | 'fa' = 'en') => {
       specificDays: lang === 'fa' ? 'روزهای خاص' : 'Specific days',
       removeSeat: lang === 'fa' ? 'حذف صندلی' : 'Remove seat',
       seatStatusLegend: lang === 'fa' ? 'راهنمای وضعیت صندلی' : 'Seat status legend',
+    },
+    roles: {
+      customer: lang === 'fa' ? 'مشتری' : 'customer',
+      editor: lang === 'fa' ? 'ویرایشگر' : 'editor',
+      agent: lang === 'fa' ? 'نماینده' : 'agent',
+      driver: lang === 'fa' ? 'راننده' : 'driver',
+      admin: lang === 'fa' ? 'مدیر' : 'admin',
+      superadmin: lang === 'fa' ? 'مدیر ارشد' : 'superadmin',
+      dev: lang === 'fa' ? 'مدیر وب سایت' : 'dev',
     },
     days: {
       sat: lang === 'fa' ? 'شنبه' : 'Saturday',

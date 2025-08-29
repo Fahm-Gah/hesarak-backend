@@ -87,14 +87,44 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
           return null
         })()
 
+        // Get the highest role of the bookedBy user
+        const getHighestRole = (roles: string[] | undefined) => {
+          if (!Array.isArray(roles) || roles.length === 0) return 'customer'
+          const roleHierarchy = [
+            'customer',
+            'editor',
+            'agent',
+            'driver',
+            'admin',
+            'superadmin',
+            'dev',
+          ]
+          return roles.reduce((highest, role) => {
+            const currentIndex = roleHierarchy.indexOf(role)
+            const highestIndex = roleHierarchy.indexOf(highest)
+            return currentIndex > highestIndex ? role : highest
+          }, 'customer')
+        }
+
+        const bookedByRole = (() => {
+          if (typeof booking.bookedBy === 'object' && booking.bookedBy?.roles) {
+            const highestRole = getHighestRole(booking.bookedBy.roles)
+            return t.roles[highestRole as keyof typeof t.roles] || highestRole
+          }
+          return null
+        })()
+
         const statusText = status === 'booked' ? t.messages.seatBookedBy : t.messages.seatReservedBy
+        const bookedByText = status === 'booked' ? t.messages.bookedBy : t.messages.reservedBy
         const msg = (
           <div>
             {t.seatTypes.seat} {statusText} <strong>{passengerName}</strong>
+            {bookedByRole && <span> ({bookedByRole})</span>}
             {bookedByName && bookedByName !== passengerName && (
               <>
                 <br />
-                Booked by: <strong>{bookedByName}</strong>
+                {bookedByText}: <strong>{bookedByName}</strong>
+                {bookedByRole && <span> ({bookedByRole})</span>}
               </>
             )}
             <br />
