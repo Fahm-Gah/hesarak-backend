@@ -1,99 +1,116 @@
-import React from 'react'
-import { redirect, notFound } from 'next/navigation'
-import { getMeUser } from '@/utils/getMeUser'
-import { getServerSideURL } from '@/utils/getURL'
-import { TripDetailsClient } from './page.client'
+import React, { Suspense } from 'react'
+import { Metadata } from 'next'
+import { TripDetailsPageClient } from './page.client'
 
-export const dynamic = 'force-dynamic'
-
-interface TripDetailsPageProps {
-  params: Promise<{ tripId: string }>
-  searchParams: Promise<{
-    date?: string
-    error?: string
-    from?: string // User's boarding terminal ID
-    to?: string // User's destination terminal ID
-    fromProvince?: string // User's original search province
-    toProvince?: string // User's original search province
-  }>
+export const metadata: Metadata = {
+  title: 'Trip Details | Hesarakbus',
+  description: 'View trip details and book your bus tickets',
 }
 
-async function fetchTripDetails(
-  tripId: string,
-  date: string,
-  from?: string,
-  to?: string,
-  token?: string,
-) {
-  try {
-    const headers: HeadersInit = {}
-    if (token) {
-      headers.Authorization = `JWT ${token}`
-    }
-
-    // Build URL with optional from/to parameters
-    let url = `${getServerSideURL()}/api/trips/${tripId}/date/${encodeURIComponent(date)}`
-    const params = new URLSearchParams()
-    if (from) params.append('from', from)
-    if (to) params.append('to', to)
-    if (params.toString()) {
-      url += `?${params.toString()}`
-    }
-
-    const response = await fetch(url, {
-      cache: 'no-store',
-      headers,
-    })
-
-    if (!response.ok) {
-      return null
-    }
-
-    const result = await response.json()
-    return result.success ? result.data : null
-  } catch (error) {
-    console.error('Error fetching trip details:', error)
-    return null
-  }
-}
-
-export default async function TripDetailsPage({ params, searchParams }: TripDetailsPageProps) {
-  const { tripId } = await params
-  const { date, error, from, to, fromProvince, toProvince } = await searchParams
-
-  if (!date) {
-    redirect('/search')
-  }
-
-  // Get user authentication status and token
-  let user = null
-  let token = null
-  try {
-    const result = await getMeUser()
-    user = result?.user || null
-    token = result?.token || null
-  } catch (error) {
-    // User is not authenticated, continue without user data
-  }
-
-  // Fetch trip details with user-specific from/to if provided
-  const tripDetails = await fetchTripDetails(tripId, date, from, to, token || undefined)
-
-  if (!tripDetails) {
-    notFound()
-  }
-
+function TripDetailsLoading() {
   return (
-    <TripDetailsClient
-      tripDetails={tripDetails}
-      user={user}
-      isAuthenticated={!!user}
-      initialError={error}
-      originalSearchParams={{
-        fromProvince,
-        toProvince,
-        date,
-      }}
-    />
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50" dir="rtl">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Breadcrumb skeleton */}
+        <div className="mb-6">
+          <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* Left Column - Trip Info skeleton */}
+          <div className="xl:col-span-2 space-y-6">
+            {/* Trip header skeleton */}
+            <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+              <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-6">
+                <div className="space-y-3">
+                  <div className="h-7 bg-gray-200 rounded w-48"></div>
+                  <div className="h-4 bg-gray-100 rounded w-32"></div>
+                </div>
+                <div className="h-8 bg-gray-100 rounded-full w-24 mt-4 lg:mt-0"></div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-100 rounded w-16"></div>
+                  <div className="h-6 bg-gray-200 rounded w-40"></div>
+                </div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-100 rounded w-20"></div>
+                  <div className="h-6 bg-gray-200 rounded w-32"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bus info skeleton */}
+            <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="h-32 bg-gray-100 rounded-lg"></div>
+                </div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-100 rounded w-24"></div>
+                  <div className="h-5 bg-gray-200 rounded w-36"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-100 rounded w-20"></div>
+                    <div className="flex flex-wrap gap-2">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-6 bg-gray-100 rounded-full w-16"></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column skeleton */}
+          <div className="xl:col-span-1 space-y-6">
+            {/* Seat layout skeleton */}
+            <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-28 mb-4"></div>
+              <div className="h-64 bg-gray-100 rounded-lg mb-4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-100 rounded w-32"></div>
+                <div className="h-4 bg-gray-100 rounded w-24"></div>
+              </div>
+            </div>
+
+            {/* Booking summary skeleton */}
+            <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-28 mb-4"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-100 rounded w-full"></div>
+                <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                <div className="border-t pt-3 mt-4">
+                  <div className="h-6 bg-gray-200 rounded w-20 mb-3"></div>
+                  <div className="h-12 bg-gray-100 rounded-lg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading indicator */}
+        <div className="flex items-center justify-center min-h-[200px] mt-8">
+          <div className="text-center">
+            <div className="relative mb-6">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-100 border-t-orange-600 mx-auto"></div>
+              <div className="absolute inset-0 rounded-full bg-orange-50 opacity-20 animate-ping"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">در حال بارگذاری جزئیات سفر</h3>
+            <p className="text-gray-600 text-sm">لطفاً صبر کنید...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function TripDetailsPage() {
+  return (
+    <Suspense fallback={<TripDetailsLoading />}>
+      <TripDetailsPageClient />
+    </Suspense>
   )
 }

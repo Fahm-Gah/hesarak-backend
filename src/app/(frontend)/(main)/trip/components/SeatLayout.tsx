@@ -454,7 +454,7 @@ export const SeatLayout = memo<SeatLayoutProps>(
                     className="w-3 h-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg shadow-sm border border-amber-400/50 ring-1 ring-amber-300/40"
                     aria-hidden="true"
                   />
-                  <span className="text-xs font-medium text-gray-700">شما (در انتظار)</span>
+                  <span className="text-xs font-medium text-gray-700">شما (قید شده)</span>
                 </div>
               </>
             )}

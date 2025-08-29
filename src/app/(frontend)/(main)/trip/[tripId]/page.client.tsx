@@ -1,13 +1,50 @@
 'use client'
 
 import React, { useState, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { Breadcrumbs } from '@/app/(frontend)/components/Breadcrumbs'
 import { SeatLayout } from '../components/SeatLayout'
 import { TripInfo } from '../components/TripInfo'
 import { BookingSummary } from '../components/BookingSummary'
 import { Phone } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { getMeUser } from '@/utils/getMeUser.client'
+
+// Client-side data fetching function
+async function fetchTripDetails(
+  tripId: string,
+  date: string,
+  from?: string,
+  to?: string,
+): Promise<TripDetails | null> {
+  try {
+    // Build URL with optional from/to parameters
+    let url = `/api/trips/${tripId}/date/${encodeURIComponent(date)}`
+    const params = new URLSearchParams()
+    if (from) params.append('from', from)
+    if (to) params.append('to', to)
+    if (params.toString()) {
+      url += `?${params.toString()}`
+    }
+
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch trip details: ${response.status}`)
+    }
+
+    const result = await response.json()
+    return result.success ? result.data : null
+  } catch (error) {
+    console.error('Error fetching trip details:', error)
+    return null
+  }
+}
 
 interface BusLayoutElement {
   id: string
@@ -123,28 +160,102 @@ interface User {
   profile?: any
 }
 
-interface TripDetailsClientProps {
-  tripDetails: TripDetails
-  user: User | null
-  isAuthenticated: boolean
-  initialError?: string | null
-  originalSearchParams?: {
-    fromProvince?: string
-    toProvince?: string
-    date?: string
-  }
-}
-
-export const TripDetailsClient = ({
-  tripDetails,
-  user,
-  isAuthenticated,
-  initialError,
-  originalSearchParams,
-}: TripDetailsClientProps) => {
+export const TripDetailsPageClient = () => {
   const router = useRouter()
+  const params = useParams()
+  const searchParams = useSearchParams()
+
+  // State
+  const [tripDetails, setTripDetails] = useState<TripDetails | null>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
   const [isBookingLoading, setIsBookingLoading] = useState(false)
+
+  // Get URL parameters
+  const tripId = params.tripId as string
+  const date = searchParams.get('date')
+  const initialError = searchParams.get('error')
+  const from = searchParams.get('from')
+  const to = searchParams.get('to')
+  const fromProvince = searchParams.get('fromProvince')
+  const toProvince = searchParams.get('toProvince')
+
+  const originalSearchParams = {
+    fromProvince,
+    toProvince,
+    date,
+  }
+
+  // Check if date is provided, redirect to search if not
+  useEffect(() => {
+    if (!date) {
+      router.push('/search')
+      return
+    }
+  }, [date, router])
+
+  // Load user authentication status
+  useEffect(() => {
+    let isMounted = true
+
+    const checkAuth = async () => {
+      try {
+        const result = await getMeUser()
+        if (isMounted) {
+          setUser(result.user)
+          setIsAuthenticated(!!result.user)
+        }
+      } catch (error) {
+        if (isMounted) {
+          setUser(null)
+          setIsAuthenticated(false)
+        }
+      }
+    }
+
+    checkAuth()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  // Load trip details after we have the parameters
+  useEffect(() => {
+    let isMounted = true
+
+    const loadTripDetails = async () => {
+      if (!date || !tripId) return
+
+      setLoading(true)
+      try {
+        const details = await fetchTripDetails(tripId, date, from || undefined, to || undefined)
+        if (isMounted) {
+          if (!details) {
+            setError('Trip not found')
+          } else {
+            setTripDetails(details)
+          }
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Error loading trip details:', error)
+        if (isMounted) {
+          setError('Failed to load trip details')
+          setLoading(false)
+        }
+      }
+    }
+
+    loadTripDetails()
+
+    return () => {
+      isMounted = false
+    }
+  }, [tripId, date, from, to])
 
   // Handle initial error from URL parameters
   useEffect(() => {
@@ -169,21 +280,20 @@ export const TripDetailsClient = ({
   useEffect(() => {
     if (
       isAuthenticated &&
-      tripDetails.userBookingInfo &&
+      tripDetails?.userBookingInfo &&
       !tripDetails.userBookingInfo.canBookMoreSeats &&
       !initialError
     ) {
       setSelectedSeats([]) // Clear any selected seats silently
     }
-  }, [isAuthenticated, tripDetails.userBookingInfo, initialError])
+  }, [isAuthenticated, tripDetails?.userBookingInfo, initialError])
 
   // Calculate if user can select more seats
-  // Default to 2 seats if userBookingInfo is not available (for unauthenticated users or when API doesn't return it)
-  const maxAllowedSeats = tripDetails.userBookingInfo?.remainingSeatsAllowed ?? 2
-  const canBookMoreSeats = tripDetails.userBookingInfo?.canBookMoreSeats ?? true
-  // Allow seat selection for both authenticated and unauthenticated users
+  const maxAllowedSeats = tripDetails?.userBookingInfo?.remainingSeatsAllowed ?? 2
+  const canBookMoreSeats = tripDetails?.userBookingInfo?.canBookMoreSeats ?? true
   const canSelectMoreSeats = canBookMoreSeats && selectedSeats.length < maxAllowedSeats
 
+  // Seat selection handler
   const handleSeatSelect = useCallback(
     (seatId: string) => {
       setSelectedSeats((prev) => {
@@ -196,7 +306,7 @@ export const TripDetailsClient = ({
           // Check if user can book more seats at all
           if (
             isAuthenticated &&
-            tripDetails.userBookingInfo &&
+            tripDetails?.userBookingInfo &&
             !tripDetails.userBookingInfo.canBookMoreSeats
           ) {
             toast.error('شما قبلاً حداکثر تعداد چوکی مجاز برای این سفر را رزرو کرده‌اید.')
@@ -204,7 +314,7 @@ export const TripDetailsClient = ({
           }
 
           // Check if user can select more seats
-          const maxSeats = tripDetails.userBookingInfo?.remainingSeatsAllowed ?? 2
+          const maxSeats = tripDetails?.userBookingInfo?.remainingSeatsAllowed ?? 2
           if (prev.length >= maxSeats) {
             toast.error(`شما فقط می‌توانید حداکثر ${maxSeats} چوکی انتخاب کنید`)
             return prev
@@ -215,14 +325,20 @@ export const TripDetailsClient = ({
         }
       })
     },
-    [isAuthenticated, tripDetails.userBookingInfo?.remainingSeatsAllowed],
+    [
+      isAuthenticated,
+      tripDetails?.userBookingInfo?.remainingSeatsAllowed,
+      tripDetails?.userBookingInfo?.canBookMoreSeats,
+    ],
   )
 
+  // Clear selection handler
   const handleClearSelection = useCallback(() => {
     setSelectedSeats([])
     toast.success('انتخاب پاک شد')
   }, [])
 
+  // Proceed to booking handler
   const handleProceedToBooking = useCallback(async () => {
     if (selectedSeats.length === 0) {
       toast.error('لطفاً حداقل یک چوکی انتخاب کنید')
@@ -230,7 +346,7 @@ export const TripDetailsClient = ({
     }
 
     // Check if authenticated user can book the selected number of seats
-    if (isAuthenticated && tripDetails.userBookingInfo) {
+    if (isAuthenticated && tripDetails?.userBookingInfo) {
       const { canBookMoreSeats, remainingSeatsAllowed } = tripDetails.userBookingInfo
 
       if (!canBookMoreSeats) {
@@ -247,50 +363,33 @@ export const TripDetailsClient = ({
     setIsBookingLoading(true)
 
     try {
-      if (!isAuthenticated) {
-        // Create checkout URL with selected seats and trip details - use originalDate to maintain Persian format
-        const checkoutParams = new URLSearchParams()
-        checkoutParams.append('tripId', tripDetails.id)
-        checkoutParams.append('date', tripDetails.originalDate)
-        checkoutParams.append('seats', selectedSeats.join(','))
-        // Include user's specific from/to terminals
+      const checkoutParams = new URLSearchParams()
+      checkoutParams.append('tripId', tripDetails?.id || '')
+      checkoutParams.append('date', tripDetails?.originalDate || '')
+      checkoutParams.append('seats', selectedSeats.join(','))
+
+      // Include user's specific from/to terminals
+      if (tripDetails?.from?.id) {
         checkoutParams.append('from', tripDetails.from.id)
-        if (tripDetails.to) {
-          checkoutParams.append('to', tripDetails.to.id)
-        }
+      }
+      if (tripDetails?.to?.id) {
+        checkoutParams.append('to', tripDetails.to.id)
+      }
 
-        // Also include original search parameters for breadcrumb navigation
-        if (originalSearchParams?.fromProvince) {
-          checkoutParams.append('fromProvince', originalSearchParams.fromProvince)
-        }
-        if (originalSearchParams?.toProvince) {
-          checkoutParams.append('toProvince', originalSearchParams.toProvince)
-        }
+      // Also include original search parameters for breadcrumb navigation
+      if (originalSearchParams?.fromProvince) {
+        checkoutParams.append('fromProvince', originalSearchParams.fromProvince)
+      }
+      if (originalSearchParams?.toProvince) {
+        checkoutParams.append('toProvince', originalSearchParams.toProvince)
+      }
 
-        const checkoutUrl = `/checkout?${checkoutParams.toString()}`
+      const checkoutUrl = `/checkout?${checkoutParams.toString()}`
+
+      if (!isAuthenticated) {
         const loginUrl = '/auth/login?redirect=' + encodeURIComponent(checkoutUrl)
         router.push(loginUrl)
       } else {
-        // Navigate directly to checkout for authenticated users - use originalDate to maintain Persian format
-        const checkoutParams = new URLSearchParams()
-        checkoutParams.append('tripId', tripDetails.id)
-        checkoutParams.append('date', tripDetails.originalDate)
-        checkoutParams.append('seats', selectedSeats.join(','))
-        // Include user's specific from/to terminals
-        checkoutParams.append('from', tripDetails.from.id)
-        if (tripDetails.to) {
-          checkoutParams.append('to', tripDetails.to.id)
-        }
-
-        // Also include original search parameters for breadcrumb navigation
-        if (originalSearchParams?.fromProvince) {
-          checkoutParams.append('fromProvince', originalSearchParams.fromProvince)
-        }
-        if (originalSearchParams?.toProvince) {
-          checkoutParams.append('toProvince', originalSearchParams.toProvince)
-        }
-
-        const checkoutUrl = `/checkout?${checkoutParams.toString()}`
         router.push(checkoutUrl)
       }
     } catch (err) {
@@ -302,18 +401,21 @@ export const TripDetailsClient = ({
     isAuthenticated,
     selectedSeats,
     router,
-    tripDetails.id,
-    tripDetails.originalDate,
-    tripDetails.userBookingInfo,
+    tripDetails?.id,
+    tripDetails?.originalDate,
+    tripDetails?.userBookingInfo,
+    tripDetails?.from?.id,
+    tripDetails?.to?.id,
+    originalSearchParams?.fromProvince,
+    originalSearchParams?.toProvince,
   ])
 
-  // Build search URL with original search parameters to maintain search context
-  // Use original search provinces if available, otherwise fall back to terminal provinces
-  const searchFromProvince = originalSearchParams?.fromProvince || tripDetails.from.province
-  const searchToProvince = originalSearchParams?.toProvince || tripDetails.to?.province || ''
-  const searchDate = originalSearchParams?.date || tripDetails.originalDate
+  // Build breadcrumbs
+  const searchFromProvince = originalSearchParams?.fromProvince || tripDetails?.from?.province
+  const searchToProvince = originalSearchParams?.toProvince || tripDetails?.to?.province || ''
+  const searchDate = originalSearchParams?.date || tripDetails?.originalDate
 
-  const searchUrl = `/search?from=${encodeURIComponent(searchFromProvince)}&to=${encodeURIComponent(searchToProvince)}&date=${encodeURIComponent(searchDate)}`
+  const searchUrl = `/search?from=${encodeURIComponent(searchFromProvince || '')}&to=${encodeURIComponent(searchToProvince)}&date=${encodeURIComponent(searchDate || '')}`
 
   const breadcrumbItems = [
     { label: 'صفحه اصلی', href: '/' },
@@ -321,6 +423,117 @@ export const TripDetailsClient = ({
     { label: 'جزئیات سفر' },
   ]
 
+  // Show loading while fetching trip details
+  if (loading || !tripDetails) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50" dir="rtl">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          {/* Breadcrumb skeleton */}
+          <div className="mb-6">
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Left Column - Trip Info skeleton */}
+            <div className="xl:col-span-2 space-y-6">
+              {/* Trip header skeleton */}
+              <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-6">
+                  <div className="space-y-3">
+                    <div className="h-7 bg-gray-200 rounded w-48"></div>
+                    <div className="h-4 bg-gray-100 rounded w-32"></div>
+                  </div>
+                  <div className="h-8 bg-gray-100 rounded-full w-24 mt-4 lg:mt-0"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <div className="h-4 bg-gray-100 rounded w-16"></div>
+                    <div className="h-6 bg-gray-200 rounded w-40"></div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="h-4 bg-gray-100 rounded w-20"></div>
+                    <div className="h-6 bg-gray-200 rounded w-32"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bus info skeleton */}
+              <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+                <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="h-32 bg-gray-100 rounded-lg"></div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="h-4 bg-gray-100 rounded w-24"></div>
+                    <div className="h-5 bg-gray-200 rounded w-36"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-100 rounded w-20"></div>
+                      <div className="flex flex-wrap gap-2">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="h-6 bg-gray-100 rounded-full w-16"></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column skeleton */}
+            <div className="xl:col-span-1 space-y-6">
+              {/* Seat layout skeleton */}
+              <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+                <div className="h-6 bg-gray-200 rounded w-28 mb-4"></div>
+                <div className="h-64 bg-gray-100 rounded-lg mb-4"></div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-100 rounded w-32"></div>
+                  <div className="h-4 bg-gray-100 rounded w-24"></div>
+                </div>
+              </div>
+
+              {/* Booking summary skeleton */}
+              <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+                <div className="h-6 bg-gray-200 rounded w-28 mb-4"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-100 rounded w-full"></div>
+                  <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                  <div className="pt-3 mt-4">
+                    <div className="h-6 bg-gray-200 rounded w-20 mb-3"></div>
+                    <div className="h-12 bg-gray-100 rounded-lg"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div
+        className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center"
+        dir="rtl"
+      >
+        <div className="text-center bg-white rounded-xl shadow-lg p-8 max-w-md">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">خطا در بارگذاری</h3>
+          <p className="text-gray-600 mb-4">امکان بارگذاری جزئیات سفر وجود ندارد</p>
+          <button
+            onClick={() => router.push('/search')}
+            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+          >
+            بازگشت به جستجو
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Main content
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -387,7 +600,7 @@ export const TripDetailsClient = ({
                   <span>
                     حداکثر{' '}
                     <span className="font-semibold text-orange-700">
-                      {tripDetails.userBookingInfo?.maxSeatsPerUser || 2}
+                      {tripDetails?.userBookingInfo?.maxSeatsPerUser || 2}
                     </span>{' '}
                     چوکی برای هر کاربر. برای قید کردن بیش از دو چوکی به شماره تلفن ما به تماس شوید
                   </span>
