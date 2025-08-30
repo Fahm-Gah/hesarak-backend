@@ -1,153 +1,98 @@
-@import '~@payloadcms/ui/scss';
+// ProfileSelectorField styles - matching PayloadCMS design system
+.profile-selector-field {
+  // Remove any custom field-type styling - use PayloadCMS defaults
 
-@layer payload-default {
-  // RTL support for Persian language
-  [dir='rtl'] {
-    .profile-selector {
-      &__search {
-        &-wrapper {
-          direction: rtl;
-        }
+  // Search section styling within the dropdown menu
+  .rs__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background-color: var(--theme-bg);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 3px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
 
-        &-icon {
-          left: auto;
-          right: base(0.5);
-        }
-
-        &-input {
-          padding-left: base(0.75);
-          padding-right: base(0.75);
-          text-align: right;
-          font-size: base(0.8); // Better Persian text readability
-          margin: 0;
-        }
-      }
-
-      &__option {
-        &-content {
-          direction: rtl;
-          text-align: right;
-        }
-
-        &-name {
-          font-size: base(0.8); // Better Persian text readability
-        }
-
-        &-phone {
-          direction: ltr; // Keep phone numbers LTR
-          text-align: left;
-        }
-      }
-
-      &__selected-display {
-        direction: rtl;
-        text-align: right;
-
-        &-phone {
-          direction: ltr; // Keep phone numbers LTR
-          text-align: left;
-        }
-      }
-
-      &__selected-value {
-        direction: rtl;
-        text-align: right;
-        font-size: base(0.65); // Match default input field size
-      }
-    }
-
-    .relationship-input-wrapper {
-      &__input {
-        text-align: right;
-
-        &--placeholder {
-          text-align: right;
-        }
-      }
-
-      &__actions {
-        left: base(0.5);
-        right: auto;
-      }
-    }
-  }
-  .profile-selector {
-    position: relative;
-    margin-bottom: 20px;
-
-    &__dropdown {
-      @include shadow-lg;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      z-index: 10;
-      background: var(--theme-input-bg);
-      border: 1px solid var(--theme-elevation-150);
-      border-top: none;
-      max-height: 320px;
-      overflow: hidden;
-    }
-
-    &__search {
+    .profile-search-section {
+      padding: 8px;
       border-bottom: 1px solid var(--theme-elevation-150);
-      padding: base(0.75);
+      position: sticky;
+      top: 0;
+      background-color: var(--theme-bg);
+      z-index: 2;
 
-      &-wrapper {
+      .profile-search-wrapper {
         position: relative;
         display: flex;
         align-items: center;
-      }
 
-      &-icon {
-        position: absolute;
-        left: base(0.5);
-        color: var(--theme-elevation-400);
-        pointer-events: none;
-        width: base(1);
-        height: base(1);
-      }
+        svg {
+          position: absolute;
+          left: 10px;
+          width: 14px;
+          height: 14px;
+          color: var(--theme-elevation-400);
+          pointer-events: none;
+        }
 
-      &-input {
-        @include formInput;
-        padding-left: base(2);
-        border: none;
-        background: var(--theme-input-bg);
-        font-size: base(0.75);
-        margin: 0;
-
-        &:focus {
+        .profile-search-input {
+          width: 100%;
+          padding: 6px 10px 6px 32px;
+          border: 1px solid var(--theme-elevation-150);
+          border-radius: 3px;
+          background-color: var(--theme-input-bg);
+          color: var(--theme-text);
+          font-size: var(--font-body-size);
+          font-family: var(--font-body);
           outline: none;
-          box-shadow: none;
+          transition: all 0.2s ease;
+
+          &:focus {
+            border-color: var(--theme-success-500);
+            box-shadow: 0 0 0 1px var(--theme-success-500);
+          }
+
+          &::placeholder {
+            color: var(--theme-elevation-400);
+          }
         }
       }
     }
 
-    &__options {
-      max-height: 240px;
+    // Scrollable options container
+    .profile-options-container {
+      max-height: 250px;
       overflow-y: auto;
+      overflow-x: hidden;
     }
 
-    &__option {
-      padding: base(0.75);
+    // Individual profile options
+    .profile-option {
+      padding: 10px 12px;
       cursor: pointer;
-      border-bottom: 1px solid var(--theme-elevation-50);
-      transition: background-color 0.15s ease;
+      transition: background-color 0.1s ease;
+      border: none;
 
-      &:hover {
+      &:hover:not(.profile-option--loading):not(.profile-option--no-results) {
         background-color: var(--theme-elevation-50);
       }
 
       &--selected {
         background-color: var(--theme-elevation-100);
-        color: var(--theme-elevation-800);
+
+        &:hover {
+          background-color: var(--theme-elevation-150);
+        }
       }
 
       &--loading,
       &--no-results {
+        padding: 16px 12px;
         text-align: center;
         color: var(--theme-elevation-400);
-        font-style: italic;
+        font-size: var(--font-body-size);
         cursor: default;
 
         &:hover {
@@ -155,184 +100,309 @@
         }
       }
 
-      &-content {
+      .profile-option-content {
         display: flex;
         align-items: center;
-        gap: base(0.75);
-      }
+        gap: 10px;
 
-      &-icon {
-        flex-shrink: 0;
-        width: base(1);
-        height: base(1);
+        .profile-icon {
+          &--male,
+          &--female {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+          }
 
-        &--male {
-          color: var(--theme-success);
+          &--male {
+            color: var(--theme-success-400);
+          }
+
+          &--female {
+            color: var(--theme-warning-400);
+          }
         }
 
-        &--female {
-          color: var(--theme-warning);
-        }
-      }
+        .profile-details {
+          flex: 1;
+          min-width: 0;
 
-      &-details {
-        flex: 1;
-        min-width: 0;
-      }
+          .profile-name {
+            font-size: var(--font-body-size);
+            font-weight: 500;
+            color: var(--theme-text);
+            line-height: 1.4;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
 
-      &-name {
-        font-weight: 500;
-        font-size: base(0.75);
-        color: var(--theme-elevation-800);
-        margin-bottom: base(0.25);
-      }
+          .profile-phone {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: calc(var(--font-body-size) - 1px);
+            color: var(--theme-elevation-500);
+            line-height: 1.3;
 
-      &-phone {
-        display: flex;
-        align-items: center;
-        gap: base(0.5);
-        font-size: base(0.625);
-        color: var(--theme-elevation-500);
-
-        &-icon {
-          width: base(0.75);
-          height: base(0.75);
-        }
-      }
-    }
-
-    &__selected-value {
-      font-size: base(0.65);
-      color: var(--theme-elevation-800);
-      line-height: 1.4;
-    }
-
-    &__selected-display {
-      display: flex;
-      align-items: center;
-      gap: base(0.75);
-      padding: base(0.5);
-
-      &-icon {
-        flex-shrink: 0;
-        width: base(1);
-        height: base(1);
-
-        &--male {
-          color: var(--theme-success);
-        }
-
-        &--female {
-          color: var(--theme-warning);
-        }
-      }
-
-      &-details {
-        flex: 1;
-        min-width: 0;
-      }
-
-      &-name {
-        font-weight: 500;
-        font-size: base(0.75);
-        color: var(--theme-elevation-800);
-        margin-bottom: base(0.25);
-      }
-
-      &-phone {
-        display: flex;
-        align-items: center;
-        gap: base(0.5);
-        font-size: base(0.625);
-        color: var(--theme-elevation-500);
-
-        &-icon {
-          width: base(0.75);
-          height: base(0.75);
+            .phone-icon {
+              width: 12px;
+              height: 12px;
+              flex-shrink: 0;
+            }
+          }
         }
       }
     }
   }
 
-  .relationship-input-wrapper {
-    position: relative;
+  // Fix single value display to match PayloadCMS
+  .relationship--single-value {
+    display: flex;
+    align-items: center;
+    width: 100%;
 
-    &__input {
-      @include formInput;
-      cursor: pointer;
-      padding-right: base(0.65);
-      margin: 0;
-
-      &--placeholder {
-        color: var(--theme-text);
-        font-style: normal;
-      }
-
-      &--has-value {
-        padding: base(0.75) base(0.65) base(0.75) base(0.65);
-        display: flex;
-        align-items: center;
-      }
-
-      &--read-only {
-        background-color: var(--theme-elevation-50);
-        cursor: default;
-      }
-
-      &--error {
-        background-color: var(--theme-error-200);
-        border-color: var(--theme-error-500);
-      }
-
-      &--open {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-bottom-color: transparent;
-      }
-    }
-
-    &__actions {
-      position: absolute;
-      right: base(0.5);
-      top: 50%;
-      transform: translateY(-50%);
+    .relationship--single-value__label {
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: base(0.25);
-    }
 
-    &__clear-button {
-      appearance: none;
-      background: none;
-      border: none;
-      padding: base(0.25);
-      cursor: pointer;
+      .relationship--single-value__label-text {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+
+        .relationship--single-value__text {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: var(--font-body-size);
+          color: var(--theme-text);
+        }
+
+        .relationship--single-value__drawer-toggler {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px;
+          margin: -4px 0;
+          border-radius: 3px;
+          transition: background-color 0.2s ease;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+
+          &:hover {
+            background-color: var(--theme-elevation-100);
+          }
+
+          .icon--edit {
+            width: 14px;
+            height: 14px;
+            color: var(--theme-elevation-500);
+          }
+        }
+      }
+    }
+  }
+
+  // Fix indicators alignment
+  .rs__indicators {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 8px;
+
+    .clear-indicator {
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      transition: background-color 0.15s ease;
+      padding: 4px;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
 
       &:hover {
-        background-color: var(--theme-elevation-100);
+        opacity: 0.7;
       }
 
-      &-icon {
-        width: base(0.75);
-        height: base(0.75);
+      .clear-indicator__icon {
+        width: 14px;
+        height: 14px;
         color: var(--theme-elevation-500);
       }
     }
 
-    &__chevron {
-      width: base(1);
-      height: base(1);
-      color: var(--theme-elevation-400);
-      transition: transform 0.15s ease;
+    .rs__indicator-separator {
+      width: 1px;
+      height: 20px;
+      background-color: var(--theme-elevation-200);
+    }
 
-      &--flipped {
-        transform: rotate(180deg);
+    .dropdown-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+
+      .dropdown-indicator__icon {
+        width: 14px;
+        height: 14px;
+        color: var(--theme-elevation-500);
+        transition: transform 0.2s ease;
+
+        &--flipped {
+          transform: rotate(180deg);
+        }
       }
+    }
+  }
+
+  // Add new button styling - inline with field
+  .relationship-add-new {
+    .relationship-add-new__add-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      min-height: 40px;
+      padding: 0;
+      background-color: var(--theme-input-bg);
+      border: none;
+      border-left: 1px solid var(--theme-elevation-150);
+      border-radius: 0;
+      color: var(--theme-text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        color: var(--theme-elevation-500);
+        transition: color 0.2s ease;
+      }
+
+      &:hover {
+        background-color: var(--theme-elevation-50);
+
+        svg {
+          color: var(--theme-text);
+        }
+      }
+
+      &:focus {
+        outline: none;
+        background-color: var(--theme-elevation-100);
+      }
+    }
+  }
+
+  // Adjust relationship wrap for inline add button
+  .relationship__wrap {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+
+    .rs__control {
+      flex: 1;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      background-color: var(--theme-input-bg);
+      border: 1px solid var(--theme-elevation-150);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+
+      &:hover {
+        border-color: var(--theme-elevation-200);
+      }
+
+      &--is-focused,
+      &--menu-is-open {
+        border-color: var(--theme-success-500);
+        box-shadow: 0 0 0 1px var(--theme-success-500);
+      }
+
+      .rs__value-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        min-height: 38px;
+        overflow: hidden;
+
+        .rs__placeholder {
+          color: var(--theme-elevation-400);
+          font-size: var(--font-body-size);
+        }
+      }
+    }
+  }
+
+  // When allow-create is enabled
+  &.relationship--allow-create {
+    .rs__control {
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+
+      &--is-focused,
+      &--menu-is-open {
+        box-shadow: none;
+      }
+    }
+
+    .relationship-add-new__add-button {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+      border: 1px solid var(--theme-elevation-150);
+      border-left: 1px solid var(--theme-elevation-150);
+
+      &:hover {
+        border-color: var(--theme-elevation-200);
+      }
+    }
+
+    .rs__control--is-focused + .relationship-add-new .relationship-add-new__add-button,
+    .rs__control--menu-is-open + .relationship-add-new .relationship-add-new__add-button {
+      border-color: var(--theme-success-500);
+      border-left-color: var(--theme-elevation-150);
+    }
+  }
+}
+
+// RTL support
+[dir='rtl'] {
+  .profile-selector-field {
+    .profile-search-wrapper svg {
+      left: auto;
+      right: 10px;
+    }
+
+    .profile-search-input {
+      padding: 6px 32px 6px 10px;
+    }
+
+    .profile-option-content {
+      flex-direction: row-reverse;
+    }
+
+    .profile-phone {
+      flex-direction: row-reverse;
+    }
+
+    .relationship--single-value__label-text {
+      flex-direction: row-reverse;
+    }
+
+    .rs__indicators {
+      flex-direction: row-reverse;
     }
   }
 }

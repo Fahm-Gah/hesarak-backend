@@ -1,45 +1,18 @@
-import type { StaticLabel } from 'payload'
-import type { Profile } from '@/payload-types'
+import type { RelationshipField } from 'payload'
 
-export type ProfileOption = {
+export interface Profile {
   id: string
   fullName: string
-  fatherName?: string | null
-  phoneNumber?: string | null
-  gender?: 'male' | 'female' | null
+  fatherName?: string
+  phoneNumber?: string
+  gender?: 'male' | 'female'
 }
 
-export type FieldComponentProps = {
-  path: string
-  field: {
-    name: string
-    type: 'relationship'
+export interface Props {
+  field: RelationshipField & {
     relationTo: 'profiles'
-    label?: string | StaticLabel
-    required?: boolean
-    admin?: {
-      allowCreate?: boolean
-      allowEdit?: boolean
-      [key: string]: any
-    }
-    [key: string]: any
   }
-  value?: string | Profile | null
-  onChange?: (value: string | null) => void
+  path: string
   readOnly?: boolean
-  validate?: (value: any, options: any) => string | boolean | Promise<string | boolean>
-  permissions?: {
-    create?: {
-      permission: boolean
-    }
-    read?: {
-      permission: boolean
-    }
-    update?: {
-      permission: boolean
-    }
-  }
-  [key: string]: any
+  validate?: (value: any, siblingData: any) => string | Promise<string> | true
 }
-
-export type Props = FieldComponentProps

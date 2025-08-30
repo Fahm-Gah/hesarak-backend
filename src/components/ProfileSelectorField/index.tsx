@@ -1,14 +1,18 @@
 'use client'
+
 import React, { lazy, Suspense } from 'react'
-import { ShimmerEffect } from '@payloadcms/ui'
+import { ShimmerEffect, FieldLabel } from '@payloadcms/ui'
 import type { Props } from './types'
 
 import './index.scss'
 
-const ProfileSelector = lazy(() => import('./ProfileSelector.js'))
+// Lazy load the actual component
+const ProfileSelectorComponent = lazy(() => import('./Component'))
 
 export const ProfileSelectorField: React.FC<Props> = (props) => {
-  // Simple language detection for fallback
+  const { field, path } = props
+
+  // Simple language detection for fallback shimmer
   const isRTL =
     typeof window !== 'undefined' &&
     (localStorage.getItem('payload-language') === 'fa' ||
@@ -17,23 +21,28 @@ export const ProfileSelectorField: React.FC<Props> = (props) => {
   return (
     <Suspense
       fallback={
-        <div className="field-type-relationship" dir={isRTL ? 'rtl' : 'ltr'}>
-          <div className="field-type-relationship__label">
-            <label className="field-label">
-              {typeof props.field.label === 'string'
-                ? props.field.label
-                : props.field.label?.fa || props.field.label?.en || 'Profile'}
-              {props.field.required && <span className="required">*</span>}
-            </label>
+        <div
+          className={`field-type relationship ${field.admin?.allowCreate ? 'relationship--allow-create' : ''}`}
+          dir={isRTL ? 'rtl' : 'ltr'}
+        >
+          <FieldLabel
+            htmlFor={path}
+            label={typeof field.label === 'function' ? undefined : field.label || undefined}
+            required={field.required}
+          />
+          <div className="field-type__wrap">
+            <div className="relationship__wrap">
+              <div className="rs__control">
+                <ShimmerEffect height="auto" />
+              </div>
+            </div>
           </div>
-          <ShimmerEffect height={40} />
         </div>
       }
     >
-      <ProfileSelector {...props} />
+      <ProfileSelectorComponent {...props} />
     </Suspense>
   )
 }
 
-export { ProfileSelector }
 export default ProfileSelectorField
