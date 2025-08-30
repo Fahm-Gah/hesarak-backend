@@ -240,10 +240,10 @@ export default function PrivacyPage() {
                   <p>
                     برای اعمال این حقوق، لطفاً با ما تماس بگیرید{' '}
                     <a
-                      href="mailto:privacy@hesarakbus.com"
+                      href="mailto:hesarak.trans600@gmail.com"
                       className="text-orange-600 hover:text-orange-700 font-medium"
                     >
-                      privacy@hesarakbus.com
+                      hesarak.trans600@gmail.com
                     </a>
                   </p>
                 </div>
@@ -313,10 +313,10 @@ export default function PrivacyPage() {
                       <li>
                         <strong>ایمیل:</strong>{' '}
                         <a
-                          href="mailto:privacy@hesarakbus.com"
+                          href="mailto:hesarak.trans600@gmail.com"
                           className="text-orange-600 hover:text-orange-700"
                         >
-                          privacy@hesarakbus.com
+                          hesarak.trans600@gmail.com
                         </a>
                       </li>
                       <li>

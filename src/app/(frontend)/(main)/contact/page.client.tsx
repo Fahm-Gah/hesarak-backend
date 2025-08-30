@@ -11,9 +11,26 @@ import {
   Users,
   Shield,
   ChevronDown,
+  Send,
+  Check,
 } from 'lucide-react'
 
 export default function ContactPageClient() {
+  // Form state
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: '',
+  })
+
+  // UI state
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+
   // Custom dropdown state
   const [selectedSubject, setSelectedSubject] = useState('')
   const [showSubjectDropdown, setShowSubjectDropdown] = useState(false)
@@ -52,7 +69,52 @@ export default function ContactPageClient() {
 
   const handleSubjectSelect = (option: string) => {
     setSelectedSubject(option)
+    setFormData((prev) => ({ ...prev, subject: option }))
     setShowSubjectDropdown(false)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitError('')
+
+    try {
+      const response = await fetch('/api/contact-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        setIsSubmitted(true)
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: '',
+        })
+        setSelectedSubject('')
+      } else {
+        setSubmitError(result.message || 'خطا در ارسال پیام. لطفاً دوباره امتحان کنید.')
+      }
+    } catch (error) {
+      console.error('Contact form submission error:', error)
+      setSubmitError('خطا در ارسال پیام. لطفاً دوباره امتحان کنید.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactMethods = [
@@ -67,7 +129,7 @@ export default function ContactPageClient() {
       icon: Mail,
       title: 'پشتیبانی ایمیل',
       subtitle: 'پیام خود را ارسال کنید',
-      info: 'support@hesarakbus.com',
+      info: 'hesarak.trans600@gmail.com',
       description: 'ما به تمام ایمیل‌ها در عرض 2 ساعت پاسخ می‌دهیم',
     },
     {
@@ -167,100 +229,162 @@ export default function ContactPageClient() {
             {/* Contact Form */}
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">برای ما پیام بفرستید</h3>
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">نام</label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                      placeholder="نام خود را وارد کنید"
-                    />
+
+              {isSubmitted ? (
+                <div className="text-center py-8">
+                  <div className="bg-green-100 border border-green-400 rounded-lg p-6 mb-4">
+                    <Check className="w-12 h-12 text-green-600 mx-auto mb-4" />
+                    <h4 className="text-lg font-semibold text-green-800 mb-2">
+                      پیام شما ارسال شد!
+                    </h4>
+                    <p className="text-green-700">
+                      ما به زودی با شما تماس خواهیم گرفت. از صبر شما متشکریم.
+                    </p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">تخلص</label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                      placeholder="تخلص خود را وارد کنید"
-                    />
-                  </div>
+                  <button
+                    onClick={() => setIsSubmitted(false)}
+                    className="text-orange-600 hover:text-orange-700 font-medium"
+                  >
+                    ارسال پیام جدید
+                  </button>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">آدرس ایمیل</label>
-                  <input
-                    type="email"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-
-                <div dir="rtl">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">شماره تلفن</label>
-                  <input
-                    type="tel"
-                    className="w-full text-right px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                    placeholder="+93 79 900 4567"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">موضوع</label>
-                  <div className="relative">
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setShowSubjectDropdown(!showSubjectDropdown)
-                      }}
-                      className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 cursor-pointer hover:bg-gray-50/80 hover:border-gray-400 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
-                    >
-                      <span className={selectedSubject ? 'text-gray-900' : 'text-gray-500'}>
-                        {selectedSubject || 'موضوع را انتخاب کنید'}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showSubjectDropdown ? 'rotate-180' : ''}`}
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">نام</label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                        placeholder="نام خود را وارد کنید"
+                        required
                       />
                     </div>
-
-                    {showSubjectDropdown && (
-                      <div
-                        ref={subjectDropdownRef}
-                        className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto"
-                      >
-                        {subjectOptions.map((option, index) => (
-                          <div
-                            key={`subject-${option}-${index}`}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleSubjectSelect(option)
-                            }}
-                            className="px-4 py-3 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg border-b border-gray-100 last:border-b-0"
-                          >
-                            {option}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">تخلص</label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                        placeholder="تخلص خود را وارد کنید"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">پیام</label>
-                  <textarea
-                    rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
-                    placeholder="لطفاً سوال یا نگرانی خود را به تفصیل توضیح دهید..."
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      آدرس ایمیل
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      placeholder="your.email@example.com"
+                      required
+                    />
+                  </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-4 px-6 rounded-lg font-semibold hover:from-orange-700 hover:to-red-700 transition-all duration-300 transform hover:scale-105"
-                >
-                  ارسال پیام
-                </button>
-              </form>
+                  <div dir="rtl">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      شماره تلفن
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full text-right px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      placeholder="+93 79 900 4567"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">موضوع</label>
+                    <div className="relative">
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setShowSubjectDropdown(!showSubjectDropdown)
+                        }}
+                        className="w-full bg-gradient-to-br from-white to-gray-50/80 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 cursor-pointer hover:bg-gray-50/80 hover:border-gray-400 hover:shadow-md transition-all duration-300 shadow-sm flex items-center justify-between"
+                      >
+                        <span className={selectedSubject ? 'text-gray-900' : 'text-gray-500'}>
+                          {selectedSubject || 'موضوع را انتخاب کنید'}
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showSubjectDropdown ? 'rotate-180' : ''}`}
+                        />
+                      </div>
+
+                      {showSubjectDropdown && (
+                        <div
+                          ref={subjectDropdownRef}
+                          className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto"
+                        >
+                          {subjectOptions.map((option, index) => (
+                            <div
+                              key={`subject-${option}-${index}`}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleSubjectSelect(option)
+                              }}
+                              className="px-4 py-3 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg border-b border-gray-100 last:border-b-0"
+                            >
+                              {option}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">پیام</label>
+                    <textarea
+                      rows={6}
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
+                      placeholder="لطفاً سوال یا نگرانی خود را به تفصیل توضیح دهید..."
+                      required
+                    />
+                  </div>
+
+                  {submitError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+                      {submitError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-4 px-6 rounded-lg font-semibold hover:from-orange-700 hover:to-red-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent ml-2"></div>
+                        در حال ارسال...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 ml-2" />
+                        ارسال پیام
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
             </div>
 
             {/* Contact Information & Hours */}
@@ -322,7 +446,7 @@ export default function ContactPageClient() {
                   </div>
                   <div className="flex items-center">
                     <Mail className="w-5 h-5 ml-3" />
-                    <span className="font-semibold">support@hesarakbus.com</span>
+                    <span className="font-semibold">hesarak.trans600@gmail.com</span>
                   </div>
                   <div className="flex items-start">
                     <MapPin className="w-5 h-5 ml-3 mt-0.5" />

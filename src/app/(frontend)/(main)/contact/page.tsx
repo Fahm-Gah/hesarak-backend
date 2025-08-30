@@ -1,6 +1,6 @@
 import React from 'react'
 import { Metadata } from 'next'
-import ContactPageClient from './ContactPage.client'
+import ContactPageClient from './page.client'
 
 export const metadata: Metadata = {
   title: 'تماس با ما | حصارک پنجشیر - برای پشتیبانی در تماس باشید',

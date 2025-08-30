@@ -432,7 +432,7 @@ export default function HelpPage() {
                 برای ما ایمیل بفرستید و ما در عرض ۲ ساعت پاسخ خواهیم داد
               </p>
               <p className="text-right text-lg font-semibold text-gray-900" dir="ltr">
-                support@hesarakbus.com
+                hesarak.trans600@gmail.com
               </p>
               <p className="text-sm text-gray-500 mt-2">پاسخ در عرض ۲ ساعت</p>
             </div>

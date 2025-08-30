@@ -82,6 +82,10 @@ export const errorMessages = {
     fa: 'تکت‌ها با موفقیت قید شدند',
     en: 'Tickets booked successfully',
   },
+  CONTACT_FORM_SUBMITTED: {
+    fa: 'پیام شما با موفقیت ارسال شد',
+    en: 'Your message has been sent successfully',
+  },
 
   // Generic errors
   INTERNAL_ERROR: {

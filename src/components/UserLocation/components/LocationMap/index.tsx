@@ -149,8 +149,8 @@ export const LocationMap: React.FC<LocationMapProps> = ({
         })
         .openPopup()
 
-      // Add accuracy circle for GPS locations
-      if (typeof accuracy === 'number' && accuracy > 0 && source === 'browser') {
+      // Add accuracy circle for locations with accuracy data
+      if (typeof accuracy === 'number' && accuracy > 0) {
         const accuracyCircle = L.circle([latitude, longitude], {
           radius: accuracy,
           color: '#3b82f6',

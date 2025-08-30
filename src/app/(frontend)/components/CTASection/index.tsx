@@ -23,8 +23,8 @@ export const CTASection = () => {
         <div className="text-center text-white">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">آماده شروع سفرتان هستید؟</h2>
           <p className="text-xl md:text-2xl mb-12 opacity-90 max-w-3xl mx-auto">
-            به هزاران مسافر راضی بپیوندید که به حصارک پنجشیر برای سفرهای امن، راحت و مقرون‌به‌صرفه در
-            سراسر افغانستان اعتماد دارند.
+            به هزاران مسافر راضی بپیوندید که به حصارک پنجشیر برای سفرهای امن، راحت و مقرون‌به‌صرفه
+            در سراسر افغانستان اعتماد دارند.
           </p>
 
           {/* CTA Buttons */}
@@ -54,7 +54,8 @@ export const CTASection = () => {
                   <h3 className="text-xl font-bold">اپلیکیشن موبایل ما را دریافت کنید</h3>
                 </div>
                 <p className="text-base opacity-90 mb-3">
-                  اپلیکیشن موبایل حصارک پنجشیر را برای تکت آسان‌تر و مدیریت سفر در هر کجا دانلود کنید.
+                  اپلیکیشن موبایل حصارک پنجشیر را برای تکت آسان‌تر و مدیریت سفر در هر کجا دانلود
+                  کنید.
                 </p>
                 <div className="text-sm opacity-75">
                   • فرآیند تکت سریع‌تر
@@ -92,7 +93,7 @@ export const CTASection = () => {
             <div>
               <div className="text-2xl font-bold mb-2">ایمیل ما</div>
               <div className="opacity-90" dir="ltr">
-                support@hesarakbus.com
+                hesarak.trans600@gmail.com
               </div>
             </div>
             <div>

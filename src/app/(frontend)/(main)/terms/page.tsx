@@ -287,7 +287,7 @@ export default function TermsPage() {
                         <strong>تلفن:</strong> <span dir="ltr">+93 79 900 4567</span>
                       </li>
                       <li>
-                        <strong>ایمیل:</strong> support@hesarakbus.com
+                        <strong>ایمیل:</strong> hesarak.trans600@gmail.com
                       </li>
                       <li>
                         <strong>ساعات:</strong> ۲۴/۷ قابل دسترس

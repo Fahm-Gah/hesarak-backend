@@ -6,6 +6,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { resendAdapter } from '@payloadcms/email-resend'
 
 import { en } from '@payloadcms/translations/languages/en'
 import { fa } from '@payloadcms/translations/languages/fa'
@@ -28,6 +29,7 @@ import { getUserTickets } from './endpoints/getUserTickets'
 import { updateLocation } from './endpoints/updateLocation'
 import { getTicketDetails } from './endpoints/getTicketDetails'
 import { getPopularRoutes } from './endpoints/getPopularRoutes'
+import { contactForm } from './endpoints/contactForm'
 import { TripRecords } from './collections/TripRecords'
 import { Drivers } from './collections/Drivers'
 
@@ -53,6 +55,11 @@ export default buildConfig({
       defaultTimezone: 'Asia/Kabul',
     },
   },
+  email: resendAdapter({
+    defaultFromAddress: 'onboarding@resend.dev',
+    defaultFromName: 'Hesarak Panjshir',
+    apiKey: process.env.RESEND_API_KEY!,
+  }),
   // i18n configuration with Persian as default
   i18n: {
     // Set Persian as the fallback (default) language
@@ -109,5 +116,6 @@ export default buildConfig({
     updateLocation,
     getTicketDetails,
     getPopularRoutes,
+    contactForm,
   ],
 })

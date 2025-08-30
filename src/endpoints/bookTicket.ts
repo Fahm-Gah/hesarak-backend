@@ -2,6 +2,10 @@ import type { Endpoint } from 'payload'
 import { convertPersianDateToGregorian, formatTime } from '../utils/dateUtils'
 import { validateBookingRequest, validateBookingConstraints } from '../validations/booking'
 import { getLocaleFromRequest, createErrorResponse, createSuccessResponse, t } from '../utils/i18n'
+import {
+  generateTicketConfirmationEmail,
+  generateAdminBookingNotification,
+} from '../utils/emailTemplates'
 
 export const bookTicket: Endpoint = {
   path: '/book-ticket',
@@ -314,6 +318,69 @@ export const bookTicket: Endpoint = {
         collection: 'tickets',
         data: ticketData,
       })) as any
+
+      // Send email notifications
+      try {
+        const userProfile = authUser.profile
+        const hasEmail = userProfile.email || authUser.email
+
+        if (hasEmail) {
+          const emailData = {
+            ticketNumber: ticket.ticketNumber,
+            passengerName:
+              userProfile.fullName ||
+              `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() ||
+              'مسافر',
+            tripName: trip.tripName,
+            fromTerminal: ticket.from?.name || trip.from?.name || 'نامشخص',
+            toTerminal: ticket.to?.name || trip.to?.name || 'نامشخص',
+            departureDate: new Date(normalizedDate).toLocaleDateString('fa-IR', {
+              timeZone: 'Asia/Kabul',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            }),
+            departureTime: formatTime(trip.departureTime) || 'نامشخص',
+            seatNumbers: validSeats.map((seat: any) => seat.seatNumber),
+            totalPrice,
+            isPaid: ticket.isPaid,
+            paymentMethod: ticket.paymentMethod || paymentMethod,
+            paymentDeadline: ticket.paymentDeadline
+              ? new Date(ticket.paymentDeadline).toLocaleDateString('fa-IR', {
+                  timeZone: 'Asia/Kabul',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              : undefined,
+          }
+
+          // Send confirmation email to user
+          const userEmail = generateTicketConfirmationEmail(emailData)
+          await payload.sendEmail({
+            to: hasEmail,
+            subject: `تایید رزرو تکت ${ticket.ticketNumber} - حصارک پنجشیر`,
+            html: userEmail.html,
+            text: userEmail.text,
+          })
+
+          // Send notification to admin
+          const adminEmailData = {
+            ...emailData,
+            passengerPhone: userProfile.phoneNumber || authUser.phoneNumber || 'نامشخص',
+          }
+          const adminEmail = generateAdminBookingNotification(adminEmailData)
+          await payload.sendEmail({
+            to: 'hesarak.trans600@gmail.com',
+            subject: `رزرو جدید: ${ticket.ticketNumber} - ${emailData.passengerName}`,
+            html: adminEmail.html,
+            text: adminEmail.text,
+          })
+        }
+      } catch (emailError) {
+        console.error('Email sending failed for booking:', emailError)
+        // Don't fail the booking if email fails - just log it
+      }
 
       return createSuccessResponse(
         'BOOKING_SUCCESS',

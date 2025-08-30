@@ -17,6 +17,9 @@ importers:
       '@payloadcms/db-mongodb':
         specifier: 3.48.0
         version: 3.48.0(@aws-sdk/credential-providers@3.848.0)(payload@3.48.0(graphql@16.11.0)(typescript@5.7.3))
+      '@payloadcms/email-resend':
+        specifier: ^3.54.0
+        version: 3.54.0(payload@3.48.0(graphql@16.11.0)(typescript@5.7.3))
       '@payloadcms/next':
         specifier: 3.48.0
         version: 3.48.0(@types/react@19.1.0)(graphql@16.11.0)(monaco-editor@0.52.2)(next@15.3.2(@babel/core@7.28.0)(@playwright/test@1.50.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4))(payload@3.48.0(graphql@16.11.0)(typescript@5.7.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.7.3)
@@ -98,6 +101,9 @@ importers:
       react-image-gallery:
         specifier: ^1.4.0
         version: 1.4.0(react@19.1.0)
+      resend:
+        specifier: ^6.0.2
+        version: 6.0.2
       sharp:
         specifier: 0.34.2
         version: 0.34.2
@@ -1280,6 +1286,12 @@ packages:
     engines: {node: ^18.20.2 || >=20.9.0}
     peerDependencies:
       payload: 3.48.0
+
+  '@payloadcms/email-resend@3.54.0':
+    resolution: {integrity: sha512-He8Bz2G4RUktKZmmaO1uo45DqFR9RtGw/IV4CTEb20lsYCjTUKHQKqSD9rtzjM/FpCJCucyOZ67K+LmAxpEgoA==}
+    engines: {node: ^18.20.2 || >=20.9.0}
+    peerDependencies:
+      payload: 3.54.0
 
   '@payloadcms/graphql@3.48.0':
     resolution: {integrity: sha512-kwqghSNM4yojfztEBoIzEIs7ahCWPA/BT2pEcK//Pny6cLEAd3ZAE1rJp7RgWLmUAFg/Guvb1Pv8F6WGx7UgVg==}
@@ -4121,6 +4133,15 @@ packages:
   require-main-filename@2.0.0:
     resolution: {integrity: sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==}
 
+  resend@6.0.2:
+    resolution: {integrity: sha512-um08qWpSVvEVqAePEy/bsa7pqtnJK+qTCZ0Et7YE7xuqM46J0C9gnSbIJKR3LIcRVMgO9jUeot8rH0UI84eqMQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@react-email/render': ^1.1.0
+    peerDependenciesMeta:
+      '@react-email/render':
+        optional: true
+
   resolve-dir@1.0.1:
     resolution: {integrity: sha512-R7uiTjECzvOsWSfdM0QKFNBVFcK27aHOUwdvK53BcW8zqnGdYp0Fbj82cy54+2A4P2tFM22J5kRfe1R+lM/1yg==}
     engines: {node: '>=0.10.0'}
@@ -6365,6 +6386,10 @@ snapshots:
   '@payloadcms/email-nodemailer@3.48.0(payload@3.48.0(graphql@16.11.0)(typescript@5.7.3))':
     dependencies:
       nodemailer: 6.9.16
+      payload: 3.48.0(graphql@16.11.0)(typescript@5.7.3)
+
+  '@payloadcms/email-resend@3.54.0(payload@3.48.0(graphql@16.11.0)(typescript@5.7.3))':
+    dependencies:
       payload: 3.48.0(graphql@16.11.0)(typescript@5.7.3)
 
   '@payloadcms/graphql@3.48.0(graphql@16.11.0)(payload@3.48.0(graphql@16.11.0)(typescript@5.7.3))(typescript@5.7.3)':
@@ -9782,6 +9807,8 @@ snapshots:
   require-from-string@2.0.2: {}
 
   require-main-filename@2.0.0: {}
+
+  resend@6.0.2: {}
 
   resolve-dir@1.0.1:
     dependencies:

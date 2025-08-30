@@ -11,10 +11,6 @@ test.describe('Frontend', () => {
   test('can go on homepage', async ({ page }) => {
     await page.goto('http://localhost:3000')
 
-    await expect(page).toHaveTitle(/Payload Blank Template/)
-
-    const headging = page.locator('h1').first()
-
-    await expect(headging).toHaveText('Welcome to hesarak backend.')
+    await expect(page).toHaveTitle(/بزرگترین شرکت/)
   })
 })
