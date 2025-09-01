@@ -37,7 +37,7 @@ export default function TripNotFound() {
 
           <h1 className="text-3xl font-bold text-gray-800 mb-4">Trip Not Found</h1>
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            The trip you're looking for doesn't exist or is no longer available. This could be
+            The trip you&apos;re looking for doesn&apos;t exist or is no longer available. This could be
             because:
           </p>
 

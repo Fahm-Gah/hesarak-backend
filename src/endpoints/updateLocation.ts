@@ -130,7 +130,7 @@ export const updateLocation: Endpoint = {
       const ip =
         cfConnectingIP || trueClientIP || forwardedFor?.split(',')[0].trim() || realIP || 'unknown'
 
-      let locationData: any = {
+      const locationData: any = {
         lastUpdated: new Date().toISOString(),
         ipAddress: ip,
       }

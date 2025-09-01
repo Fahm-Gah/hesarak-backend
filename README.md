@@ -36,7 +36,7 @@ A comprehensive bus ticket booking system built for Afghanistan, featuring Persi
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Fahm-Gah/hesarak-backend.git
 cd hesarak-backend
 ```
 

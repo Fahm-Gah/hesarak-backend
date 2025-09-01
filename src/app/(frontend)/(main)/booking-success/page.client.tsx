@@ -170,7 +170,7 @@ export const BookingSuccessClient = ({
         }
 
         // Fallback to storage if no ticketId
-        let storedData = sessionStorage.getItem('bookingResult')
+        const storedData = sessionStorage.getItem('bookingResult')
 
         if (storedData && mounted) {
           const data = JSON.parse(storedData) as BookingData

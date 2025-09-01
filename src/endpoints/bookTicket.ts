@@ -12,7 +12,9 @@ export const bookTicket: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const { payload, user } = req
-    const locale = getLocaleFromRequest(req)
+    const locale = getLocaleFromRequest({
+      headers: Object.fromEntries(req.headers.entries()),
+    })
 
     if (!user) {
       return createErrorResponse('AUTH_REQUIRED', 401, locale)

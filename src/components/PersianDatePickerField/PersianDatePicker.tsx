@@ -10,7 +10,8 @@ import type { PersianDatePickerComponentProps } from './types'
 const baseClass = 'date-time-picker'
 
 const PersianDatePicker: React.FC<PersianDatePickerComponentProps> = (props) => {
-  const fieldData = props.path ? useField<string | null>({ path: props.path }) : null
+  const fieldData = useField<string | null>({ path: props.path || '_dummy_field_' })
+  const useFieldData = Boolean(props.path)
 
   const dateConfig = props.field?.admin?.date || {}
 
@@ -34,8 +35,8 @@ const PersianDatePicker: React.FC<PersianDatePickerComponentProps> = (props) => 
     required = props.field?.required || false,
     path,
     showLabel = true,
-    showError = fieldData?.showError || false,
-    errorMessage = fieldData?.errorMessage,
+    showError = (useFieldData && fieldData?.showError) || false,
+    errorMessage = useFieldData ? fieldData?.errorMessage : undefined,
     monthsToShow = dateConfig.monthsToShow || 1,
     overrides = dateConfig.overrides || {},
     id,
@@ -46,10 +47,12 @@ const PersianDatePicker: React.FC<PersianDatePickerComponentProps> = (props) => 
 
   const disabled = propDisabled || readOnly
 
-  const value = fieldData ? (fieldData.value ? new Date(fieldData.value) : null) : propValue
-  const onChange = fieldData
-    ? (date: Date | null) => fieldData.setValue(date?.toISOString() || null)
-    : propOnChange
+  const value =
+    useFieldData && fieldData ? (fieldData.value ? new Date(fieldData.value) : null) : propValue
+  const onChange =
+    useFieldData && fieldData
+      ? (date: Date | null) => fieldData.setValue(date?.toISOString() || null)
+      : propOnChange
   const { i18n } = useTranslation()
   const isRtl = i18n.language === 'fa'
   const processing = useFormProcessing()

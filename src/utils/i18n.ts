@@ -125,7 +125,7 @@ export function t(
  * @param req - Request object
  * @returns Detected locale
  */
-export function getLocaleFromRequest(req: any): SupportedLocale {
+export function getLocaleFromRequest(req: { headers?: Record<string, string> }): SupportedLocale {
   // Check Accept-Language header
   const acceptLanguage = req.headers?.['accept-language']
 
@@ -157,11 +157,11 @@ export function createErrorResponse(
   status: number,
   locale: SupportedLocale = 'fa',
   interpolations?: Record<string, string | number>,
-  details?: any,
+  details?: unknown,
 ) {
   const error = t(messageKey, locale, interpolations)
 
-  const responseBody: any = {
+  const responseBody: Record<string, unknown> = {
     success: false,
     error,
     locale,
@@ -184,13 +184,13 @@ export function createErrorResponse(
  */
 export function createSuccessResponse(
   messageKey: keyof typeof errorMessages,
-  data?: any,
+  data?: unknown,
   locale: SupportedLocale = 'fa',
   interpolations?: Record<string, string | number>,
 ) {
   const message = t(messageKey, locale, interpolations)
 
-  const responseBody: any = {
+  const responseBody: Record<string, unknown> = {
     success: true,
     message,
     locale,

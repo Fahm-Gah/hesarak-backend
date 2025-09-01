@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading: false,
     error: null,
   })
-  const router = useRouter()
+  const _router = useRouter()
 
   const clearError = useCallback(() => {
     setAuthState((prev) => ({ ...prev, error: null }))
@@ -223,102 +223,89 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [captureLocationSilently],
   )
 
-  const register = useCallback(
-    async (data: RegisterData) => {
-      setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
+  const register = useCallback(async (data: RegisterData) => {
+    setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
 
-      try {
-        const response = await fetch(`${getClientSideURL()}/api/auth/register`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            email: data.email.trim(),
-            phone: normalizePhoneNumber(data.phone.trim()),
-            password: data.password,
-            fullName: data.fullName.trim(),
-            fatherName: data.fatherName?.trim() || undefined,
-            gender: data.gender,
-          }),
-        })
+    try {
+      const response = await fetch(`${getClientSideURL()}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: data.email.trim(),
+          phone: normalizePhoneNumber(data.phone.trim()),
+          password: data.password,
+          fullName: data.fullName.trim(),
+          fatherName: data.fatherName?.trim() || undefined,
+          gender: data.gender,
+        }),
+      })
 
-        const responseData = await response.json()
+      const responseData = await response.json()
 
-        if (response.ok && responseData.user) {
-          // Registration successful - now login the user
-          try {
-            // Login the user but skip automatic location capture for registration
-            const response = await fetch(`${getClientSideURL()}/api/users/login`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              credentials: 'include',
-              body: JSON.stringify({
-                email: data.email,
-                password: data.password,
-              }),
-            })
+      if (response.ok && responseData.user) {
+        // Registration successful - now login the user
+        try {
+          // Login the user but skip automatic location capture for registration
+          const response = await fetch(`${getClientSideURL()}/api/users/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              email: data.email,
+              password: data.password,
+            }),
+          })
 
-            const loginData = await response.json()
+          const loginData = await response.json()
 
-            if (response.ok && loginData.user) {
-              setAuthState((prev) => ({
-                ...prev,
-                user: loginData.user,
-                isLoading: false,
-                error: null,
-              }))
+          if (response.ok && loginData.user) {
+            setAuthState((prev) => ({
+              ...prev,
+              user: loginData.user,
+              isLoading: false,
+              error: null,
+            }))
 
-              // Don't capture location automatically - registration flow will handle it
-              return { success: true, user: loginData.user }
-            } else {
-              const loginErrorMessage =
-                loginData.errors?.[0]?.message ||
-                loginData.message ||
-                'Registration successful, but auto-login failed. Please login manually.'
+            // Don't capture location automatically - registration flow will handle it
+            return { success: true, user: loginData.user }
+          } else {
+            const loginErrorMessage =
+              loginData.errors?.[0]?.message ||
+              loginData.message ||
+              'Registration successful, but auto-login failed. Please login manually.'
 
-              setAuthState((prev) => ({
-                ...prev,
-                isLoading: false,
-                error: loginErrorMessage,
-              }))
-
-              return {
-                success: false,
-                error: loginErrorMessage,
-              }
-            }
-          } catch (loginError) {
-            console.error('Auto-login after registration failed:', loginError)
             setAuthState((prev) => ({
               ...prev,
               isLoading: false,
-              error: 'Registration successful, but auto-login failed. Please login manually.',
+              error: loginErrorMessage,
             }))
 
             return {
               success: false,
-              error: 'Registration successful, but auto-login failed. Please login manually.',
+              error: loginErrorMessage,
             }
           }
-        } else {
-          const errorMessage =
-            responseData.error || responseData.message || 'Registration failed. Please try again.'
-
+        } catch (loginError) {
+          console.error('Auto-login after registration failed:', loginError)
           setAuthState((prev) => ({
             ...prev,
             isLoading: false,
-            error: errorMessage,
+            error: 'Registration successful, but auto-login failed. Please login manually.',
           }))
 
-          return { success: false, error: errorMessage }
+          return {
+            success: false,
+            error: 'Registration successful, but auto-login failed. Please login manually.',
+          }
         }
-      } catch (error) {
-        console.error('Registration error:', error)
-        const errorMessage = 'Network error. Please try again.'
+      } else {
+        const errorMessage =
+          responseData.error || responseData.message || 'Registration failed. Please try again.'
 
         setAuthState((prev) => ({
           ...prev,
@@ -328,9 +315,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         return { success: false, error: errorMessage }
       }
-    },
-    [login],
-  )
+    } catch (error) {
+      console.error('Registration error:', error)
+      const errorMessage = 'Network error. Please try again.'
+
+      setAuthState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage,
+      }))
+
+      return { success: false, error: errorMessage }
+    }
+  }, [])
 
   const logout = useCallback(async () => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))

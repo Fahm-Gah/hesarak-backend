@@ -73,7 +73,9 @@ export const contactForm: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const { payload } = req
-    const locale = getLocaleFromRequest(req)
+    const locale = getLocaleFromRequest({
+      headers: Object.fromEntries(req.headers.entries())
+    })
 
     let requestBody: unknown
     try {

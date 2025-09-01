@@ -217,7 +217,7 @@ export const BookingConfirmation = memo<BookingConfirmationProps>(
               </div>
               {bookingData.passenger.fatherName && (
                 <div>
-                  <p className="text-sm text-gray-600">Father's Name</p>
+                  <p className="text-sm text-gray-600">Father&apos;s Name</p>
                   <p className="font-semibold text-gray-800">{bookingData.passenger.fatherName}</p>
                 </div>
               )}

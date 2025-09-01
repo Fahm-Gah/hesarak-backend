@@ -1,5 +1,3 @@
-import { formatTime } from './dateUtils'
-
 interface TicketEmailData {
   ticketNumber: string
   passengerName: string

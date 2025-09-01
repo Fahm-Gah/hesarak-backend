@@ -131,7 +131,12 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
             {t.messages.ticket}: {booking.ticketNumber}
           </div>
         )
-        status === 'booked' ? toast.error(msg) : toast.warning(msg)
+
+        if (status === 'booked') {
+          toast.error(msg)
+        } else {
+          toast.warning(msg)
+        }
         return
       }
 

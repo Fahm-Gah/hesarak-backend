@@ -138,9 +138,9 @@ export default function TermsPage() {
                 <div>
                   <h3 className="text-xl font-semibold text-gray-800 mb-3">نحوه لغو</h3>
                   <ul className="list-disc list-inside space-y-2 mr-4">
-                    <li>به حساب خود لاگ ین کنید و به "تکت‌های من" بروید</li>
+                    <li>به حساب خود لاگ ین کنید و به &ldquo;تکت‌های من&rdquo; بروید</li>
                     <li>تکتی که می‌خواهید لغو کنید را انتخاب کنید</li>
-                    <li>روی "لغو تکت" کلیک کنید و دستورالعمل را دنبال کنید</li>
+                    <li>روی &ldquo;لغو تکت&rdquo; کلیک کنید و دستورالعمل را دنبال کنید</li>
                     <li>شما ایمیل تایید لغو دریافت خواهید کرد</li>
                     <li>بازپرداخت‌ها ظرف ۵-۷ روز کاری پردازش خواهد شد</li>
                   </ul>

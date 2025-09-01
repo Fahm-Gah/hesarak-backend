@@ -9,7 +9,7 @@ export interface BookingRequest {
   seatIds: string[]
   paymentMethod?: 'cash' | 'card' | 'mobile'
   fromTerminalId?: string // Optional: user's boarding terminal
-  toTerminalId?: string   // Optional: user's destination terminal
+  toTerminalId?: string // Optional: user's destination terminal
 }
 
 /**
@@ -149,7 +149,7 @@ export const validateBookingRequest = (requestBody: unknown): ValidationResult =
     }
   }
 
-  const body = requestBody as any
+  const body = requestBody as Record<string, unknown>
 
   // Validate trip ID
   const tripIdError = validateTripId(body.tripId)
@@ -202,12 +202,12 @@ export const validateBookingRequest = (requestBody: unknown): ValidationResult =
 
   // Return validated and cleaned data
   const validatedData: BookingRequest = {
-    tripId: body.tripId.trim(),
-    date: body.date.trim(),
-    seatIds: body.seatIds.map((id: string) => id.trim()),
-    paymentMethod: body.paymentMethod || 'cash', // Default to cash
-    fromTerminalId: body.fromTerminalId ? body.fromTerminalId.trim() : undefined,
-    toTerminalId: body.toTerminalId ? body.toTerminalId.trim() : undefined,
+    tripId: (body.tripId as string).trim(),
+    date: (body.date as string).trim(),
+    seatIds: (body.seatIds as string[]).map((id: string) => id.trim()),
+    paymentMethod: (body.paymentMethod as 'cash' | 'card' | 'mobile' | undefined) || 'cash', // Default to cash
+    fromTerminalId: body.fromTerminalId ? (body.fromTerminalId as string).trim() : undefined,
+    toTerminalId: body.toTerminalId ? (body.toTerminalId as string).trim() : undefined,
   }
 
   return {
