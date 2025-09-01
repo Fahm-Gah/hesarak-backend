@@ -26,7 +26,7 @@
     "@payloadcms/payload-cloud": "3.48.0",
     "@payloadcms/richtext-lexical": "3.48.0",
     "@payloadcms/storage-uploadthing": "3.48.0",
-    "@payloadcms/translations": "^3.48.0",
+    "@payloadcms/translations": "3.48.0",
     "@payloadcms/ui": "3.48.0",
     "@types/moment-jalaali": "^0.7.9",
     "clsx": "^2.1.1",
