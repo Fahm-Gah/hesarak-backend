@@ -161,23 +161,30 @@ nano .env
 
 ```env
 # MongoDB Atlas
-DATABASE_URI=mongodb+srv://hesarak_user:your_password@hesarak-cluster.mongodb.net/hesarak?retryWrites=true&w=majority
+DATABASE_URI=mongodb://127.0.0.1/your-database-name
 
 # PayloadCMS
 PAYLOAD_SECRET=your_very_long_random_secret_key_here
-PAYLOAD_PUBLIC_SERVER_URL=https://your-domain.com
+NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+
+# CORS allowed origins (comma-separated)
+# Development: Additional origins for development/testing
+# Production: Your domain(s) and any additional allowed origins
+ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+
+# VPS IP address (for development testing from external devices)
+# Set this to your server's public IP when testing on VPS
+VPS_IP=your.vps.ip.address
 
 # UploadThing
 UPLOADTHING_SECRET=your_uploadthing_secret_key
-UPLOADTHING_APP_ID=your_uploadthing_app_id
-
-# Next.js
-NEXTAUTH_URL=https://your-domain.com
-NEXTAUTH_SECRET=another_very_long_random_secret_here
 
 # Other environment variables
-NODE_ENV=production
-PORT=3000
+NODE_ENV=development
+
+# Resend
+RESEND_API_KEY=your_resend_api_key
+
 ```
 
 ### Install dependencies:

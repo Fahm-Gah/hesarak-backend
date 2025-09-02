@@ -33,14 +33,28 @@ import { contactForm } from './endpoints/contactForm'
 import { TripRecords } from './collections/TripRecords'
 import { Drivers } from './collections/Drivers'
 
-const allowedOrigins =
-  process.env.NODE_ENV === 'development'
-    ? ['http://localhost:3000']
-    : process.env.ALLOWED_ORIGINS?.split(',') || [
-        'https://hesarak-backend.vercel.app',
-        'https://www.hesarakbus.com',
-        'https://hesarakbus.com',
-      ]
+const getAllowedOrigins = (): string[] => {
+  const baseUrls = [
+    process.env.NEXT_PUBLIC_SERVER_URL,
+    ...(process.env.ALLOWED_ORIGINS?.split(',') || []),
+  ]
+    .filter(Boolean)
+    .map((url) => url?.trim())
+
+  // Add development-specific URLs
+  if (process.env.NODE_ENV === 'development') {
+    baseUrls.push('http://localhost:3000')
+    // Add VPS IP for testing from external devices
+    if (process.env.VPS_IP) {
+      baseUrls.push(`http://${process.env.VPS_IP}:3000`)
+    }
+  }
+
+  // Remove duplicates and normalize (remove trailing slashes)
+  return [...new Set(baseUrls.map((url) => url?.replace(/\/$/, '') || '').filter(Boolean))]
+}
+
+const allowedOrigins = getAllowedOrigins()
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
