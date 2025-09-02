@@ -56,6 +56,14 @@ const getAllowedOrigins = (): string[] => {
 
 const allowedOrigins = getAllowedOrigins()
 
+// Debug logging to see what origins are being used
+console.log('🔍 Environment Variables:')
+console.log('  NEXT_PUBLIC_SERVER_URL:', process.env.NEXT_PUBLIC_SERVER_URL)
+console.log('  ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS)
+console.log('  VPS_IP:', process.env.VPS_IP)
+console.log('  NODE_ENV:', process.env.NODE_ENV)
+console.log('🔍 Final Allowed Origins:', allowedOrigins)
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
