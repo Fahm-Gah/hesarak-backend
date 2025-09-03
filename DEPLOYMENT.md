@@ -177,7 +177,7 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 VPS_IP=your.vps.ip.address
 
 # UploadThing
-UPLOADTHING_SECRET=your_uploadthing_secret_key
+UPLOADTHING_TOKEN=your_uploadthing_token
 
 # Resend
 RESEND_API_KEY=your_resend_api_key
