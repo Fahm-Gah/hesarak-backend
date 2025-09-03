@@ -80,10 +80,10 @@ apt install -y curl wget gnupg2 software-properties-common apt-transport-https c
 
 ## Step 4: Install Node.js and PNPM
 
-### Install Node.js 20.x:
+### Install Node.js 18.x:
 
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 apt install -y nodejs
 ```
 
@@ -102,7 +102,7 @@ npm install -g pm2
 ### Verify installations:
 
 ```bash
-node --version    # Should be v20.x
+node --version    # Should be v18.x
 npm --version
 pnpm --version
 pm2 --version
@@ -146,8 +146,8 @@ cd /var/www
 ### Clone your repository:
 
 ```bash
-git clone https://github.com/your-username/hesarak-backend.git hesarak
-cd hesarak
+git clone https://github.com/your-username/hesarak-backend.git hesarakbus
+cd hesarakbus
 ```
 
 ### Create production environment file:
@@ -179,11 +179,11 @@ VPS_IP=your.vps.ip.address
 # UploadThing
 UPLOADTHING_SECRET=your_uploadthing_secret_key
 
-# Other environment variables
-NODE_ENV=development
-
 # Resend
 RESEND_API_KEY=your_resend_api_key
+
+# Other environment variables
+NODE_ENV=development
 
 ```
 
@@ -210,7 +210,7 @@ pnpm build
 ### Create Nginx configuration:
 
 ```bash
-nano /etc/nginx/sites-available/hesarak
+nano /etc/nginx/sites-available/hesarakbus
 ```
 
 ### Add this configuration:
@@ -222,7 +222,7 @@ server {
 
     # Serve Next.js static files
     location /_next/static/ {
-        alias /var/www/hesarak/.next/static/;
+        alias /var/www/hesarakbus/.next/static/;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
@@ -248,7 +248,7 @@ server {
 ### Enable the site:
 
 ```bash
-ln -s /etc/nginx/sites-available/hesarak /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/hesarakbus /etc/nginx/sites-enabled/
 rm /etc/nginx/sites-enabled/default  # Remove default site
 nginx -t  # Test configuration
 systemctl reload nginx
@@ -259,8 +259,8 @@ systemctl reload nginx
 ### Start your application with PM2:
 
 ```bash
-cd /var/www/hesarak
-pm2 start npm --name "hesarak" -- start
+cd /var/www/hesarakbus
+pm2 start npm --name "hesarakbus" -- start
 ```
 
 ### Configure PM2 to start on boot:
@@ -275,7 +275,7 @@ pm2 save
 
 ```bash
 pm2 status
-pm2 logs hesarak
+pm2 logs hesarakbus
 pm2 monit
 ```
 
@@ -326,17 +326,17 @@ pm2 status
 ### Update application:
 
 ```bash
-cd /var/www/hesarak
+cd /var/www/hesarakbus
 git pull origin main
 pnpm install
 pnpm build
-pm2 restart hesarak
+pm2 restart hesarakbus
 ```
 
 ### Monitor logs:
 
 ```bash
-pm2 logs hesarak
+pm2 logs hesarakbus
 tail -f /var/log/nginx/access.log
 tail -f /var/log/nginx/error.log
 ```
@@ -354,8 +354,8 @@ curl -I http://localhost:3000  # Test if app responds
 ### Application won't start:
 
 ```bash
-pm2 logs hesarak  # Check application logs
-cd /var/www/hesarak && pnpm dev  # Test in development mode
+pm2 logs hesarakbus  # Check application logs
+cd /var/www/hesarakbus && pnpm dev  # Test in development mode
 ```
 
 ### Database connection issues:
@@ -404,7 +404,7 @@ free -h  # Memory usage
 1. **PM2 Cluster Mode**: Scale to use all CPU cores:
 
    ```bash
-   pm2 delete hesarak
+   pm2 delete hesarakbus
    pm2 start ecosystem.config.js
    ```
 
