@@ -1,280 +1,270 @@
-# حصارک پنجشیر (Hesarakbus) 🚌
+# Hesarak Bus Booking System 🚌
 
-A comprehensive bus ticket booking system built for Afghanistan, featuring Persian/Dari language support, modern web technologies, and a complete admin panel for managing bus schedules, bookings, and user profiles.
+Modern bus ticket booking platform for Afghanistan with Persian/Dari support, real-time seat selection, and comprehensive admin management.
 
-## 🌟 Features
+[![Deploy Status](https://github.com/Fahm-Gah/hesarak-backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/Fahm-Gah/hesarak-backend/actions)
+[![PayloadCMS](https://img.shields.io/badge/Payload-3.x-blue)](https://payloadcms.com)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org)
 
-- **Multi-language Support**: Primary Persian/Dari with English support
-- **Complete Booking System**: Search trips, select seats, and book tickets
-- **Admin Panel**: Comprehensive management interface powered by PayloadCMS
-- **User Management**: Phone-based authentication with role-based access control
-- **Real-time Seat Selection**: Visual seat maps with real-time availability
-- **Payment Integration**: Multiple payment method support
-- **Location Tracking**: Browser and IP-based geolocation
-- **Responsive Design**: Mobile-first design with RTL support
+## Features
 
-## 🛠️ Technology Stack
+- **🌐 Multi-language**: Persian/Dari primary with English support
+- **📱 Phone Auth**: Afghan phone number authentication (+93)
+- **💺 Visual Seat Selection**: Interactive seat maps with real-time availability
+- **👤 Role-Based Access**: Customer, Agent, Driver, Admin roles
+- **📍 Location Tracking**: Geolocation with privacy controls
+- **💳 Payment Support**: Multiple payment methods
+- **📊 Admin Dashboard**: Complete trip and booking management
+- **📱 Mobile Responsive**: RTL support with Jalali calendar
 
-- **Backend**: PayloadCMS 3.x with MongoDB
-- **Frontend**: Next.js 15 with React 19
-- **Database**: MongoDB with Mongoose
-- **File Storage**: UploadThing integration
+## Tech Stack
+
+- **Framework**: Next.js 15 + React 19
+- **CMS**: PayloadCMS 3.x
+- **Database**: MongoDB Atlas
+- **Storage**: UploadThing
 - **Styling**: TailwindCSS 4.x
-- **Authentication**: Phone-based auth with JWT
-- **Testing**: Vitest (integration) + Playwright (e2e)
+- **Deployment**: DigitalOcean VPS + GitHub Actions
 - **Package Manager**: PNPM
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
-- PNPM package manager
-- MongoDB instance (local or cloud)
-- UploadThing account for file storage
+- Node.js 20+
+- PNPM (`npm install -g pnpm`)
+- MongoDB (local or Atlas)
+- UploadThing account
 
-### 1. Clone the Repository
+### Installation
 
 ```bash
+# Clone repository
 git clone https://github.com/Fahm-Gah/hesarak-backend.git
 cd hesarak-backend
-```
 
-### 2. Install Dependencies
-
-```bash
+# Install dependencies
 pnpm install
-```
 
-### 3. Environment Setup
-
-Copy the example environment file and configure your settings:
-
-```bash
+# Setup environment
 cp .env.example .env
+# Edit .env with your configuration
+
+# Generate types
+pnpm generate:types
+
+# Start development
+pnpm dev
 ```
 
-Update your `.env` file with the following required variables:
+Visit:
 
-```bash
-# Database
-DATABASE_URI=mongodb://127.0.0.1/hesarakbus
+- Frontend: http://localhost:3000
+- Admin: http://localhost:3000/admin
 
-# PayloadCMS Secret (generate a secure random string)
-PAYLOAD_SECRET=your-super-secret-key-here
+### Environment Variables
 
-# UploadThing (get from https://uploadthing.com)
-UPLOADTHING_TOKEN=your-uploadthing-token
+```env
+# MongoDB
+DATABASE_URI=mongodb+srv://username:password@cluster.mongodb.net/hesarak
+
+# PayloadCMS
+PAYLOAD_SECRET=your-64-character-secret
+NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+
+# UploadThing
+UPLOADTHING_TOKEN=your-token
+
+# CORS (production)
+ALLOWED_ORIGINS=https://yourdomain.com
 
 # Environment
 NODE_ENV=development
 ```
 
-### 4. Database Setup
+## Development
 
-If using MongoDB locally, make sure MongoDB is running:
-
-```bash
-# On macOS with Homebrew
-brew services start mongodb/brew/mongodb-community
-
-# On Windows, start MongoDB service
-# On Linux, start with systemctl
-sudo systemctl start mongod
-```
-
-### 5. Generate TypeScript Types
-
-Generate types from PayloadCMS collections:
+### Commands
 
 ```bash
-pnpm generate:types
+pnpm dev              # Development server
+pnpm build            # Production build
+pnpm start            # Production server
+pnpm lint             # Run ESLint
+pnpm generate:types   # Generate TypeScript types
+pnpm test             # Run all tests
 ```
 
-### 6. Start Development Server
-
-```bash
-pnpm dev
-```
-
-The application will be available at:
-
-- **Frontend**: http://localhost:3000
-- **Admin Panel**: http://localhost:3000/admin
-
-### 7. Create Admin User
-
-1. Navigate to http://localhost:3000/admin
-2. Follow the on-screen instructions to create your first admin user
-3. Use an Afghan phone number format (e.g., +93 70 123 4567)
-
-## 🐳 Docker Setup (Alternative)
-
-If you prefer using Docker for local development:
-
-### 1. Update Environment
-
-Modify your `.env` file:
-
-```bash
-DATABASE_URI=mongodb://127.0.0.1/hesarakbus
-```
-
-### 2. Start with Docker Compose
-
-```bash
-docker-compose up -d
-```
-
-This will start:
-
-- MongoDB container
-- The application in development mode
-
-## 📁 Project Structure
+### Project Structure
 
 ```
 src/
 ├── app/
-│   ├── (frontend)/        # Public-facing application
-│   │   ├── (main)/       # Main app pages
-│   │   ├── auth/         # Authentication pages
-│   │   └── components/   # Shared UI components
-│   └── (payload)/        # Admin panel routes
-├── collections/          # PayloadCMS data models
-│   ├── Users.ts         # User authentication
-│   ├── Tickets.ts       # Booking system
-│   ├── TripSchedules.ts # Trip management
-│   └── ...
-├── components/          # Custom PayloadCMS components
-├── endpoints/           # Custom API endpoints
-├── access/             # Access control functions
-└── utils/              # Utility functions
+│   ├── (frontend)/       # Public application
+│   │   ├── (main)/      # Main pages
+│   │   └── auth/        # Authentication
+│   └── (payload)/       # Admin panel
+├── collections/         # Data models
+│   ├── Users.ts
+│   ├── Tickets.ts
+│   ├── TripSchedules.ts
+│   └── Buses.ts
+├── components/          # Custom components
+├── endpoints/           # API endpoints
+└── access/             # Access control
 ```
 
-## 🔧 Available Scripts
+## Features Guide
+
+### Authentication
+
+- Phone-based login with Afghan format validation
+- JWT tokens with 7-day expiration
+- Role hierarchy: Customer → Agent → Driver → Admin → SuperAdmin
+
+### Booking System
+
+- Search trips by date and route
+- Visual seat selection
+- Real-time availability
+- Booking validation and conflict prevention
+
+### Admin Panel
+
+- Trip schedule management
+- Bus fleet configuration
+- Seat layout designer
+- Booking management
+- User administration
+
+## Deployment
+
+### Production Setup
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed VPS deployment guide.
+
+### Quick Deploy
 
 ```bash
-# Development
-pnpm dev          # Start development server
-pnpm devsafe      # Clean start (removes .next folder)
+# GitHub Actions auto-deployment on push to main
+git push origin main
 
-# Building
-pnpm build        # Build for production
-pnpm start        # Start production server
-
-# Code Quality
-pnpm lint         # Run ESLint
-pnpm generate:types  # Generate TypeScript types
-
-# Testing
-pnpm test         # Run all tests
-pnpm test:int     # Run integration tests
-pnpm test:e2e     # Run end-to-end tests
-
-# PayloadCMS
-pnpm payload      # Access PayloadCMS CLI
+# Manual deployment
+ssh root@your-server
+cd /var/www/hesarak-backend
+git pull && pnpm install && pnpm build && pm2 restart hesarak-backend
 ```
 
-## 🌐 Key Features Setup
+### GitHub Actions
 
-### Phone Authentication
+Configure secrets in GitHub → Settings → Secrets:
 
-- Uses Afghan phone number format (+93 XX XXX XXXX)
-- Automatic phone number normalization to E.164 format
-- Role-based access control (customer, agent, driver, admin, etc.)
+- `DROPLET_HOST`: Server IP
+- `DROPLET_USERNAME`: SSH user
+- `DROPLET_PORT`: SSH port (22)
+- `DROPLET_SSH_KEY`: Private SSH key
 
-### Seat Selection System
-
-- Visual seat maps with drag-and-drop designer
-- Real-time seat availability checking
-- Booking conflict prevention
-
-### Persian/Dari Support
-
-- RTL layout support
-- Jalali calendar integration with moment-jalaali
-- Persian number formatting
-- Custom date picker components
-
-### Location Services
-
-- Browser geolocation API
-- IP-based location fallback
-- Privacy-compliant location tracking
-
-## 🔒 Access Control
-
-The application implements role-based access control:
-
-- **Customer**: Book tickets, manage profile
-- **Agent**: Help customers with bookings
-- **Driver**: Access trip information
-- **Editor**: Manage content
-- **Admin**: Full system access
-- **SuperAdmin**: Complete administrative control
-- **Dev**: Development and debugging access
-
-## 📱 API Endpoints
-
-Key custom endpoints:
-
-- `/api/search-trips` - Search available trips
-- `/api/book-ticket` - Create new bookings
-- `/api/get-user-tickets` - Retrieve user bookings
-- `/api/register-user` - User registration
-- `/api/provinces` - Geographic data
-
-## 🧪 Testing
-
-Run tests to ensure everything works:
+## Testing
 
 ```bash
-# Run all tests
-pnpm test
-
-# Integration tests only
+# Unit & Integration tests
 pnpm test:int
 
-# End-to-end tests only
+# E2E tests
 pnpm test:e2e
+
+# All tests
+pnpm test
 ```
 
-## 🚀 Production Deployment
+## API Documentation
 
-1. **Build the application**:
+### Public Endpoints
 
-   ```bash
-   pnpm build
-   ```
+- `POST /api/search-trips` - Search available trips
+- `POST /api/book-ticket` - Create booking
+- `GET /api/get-user-tickets` - User bookings
+- `POST /api/register-user` - User registration
+- `GET /api/provinces` - Province list
 
-2. **Set production environment variables**
-3. **Deploy to your hosting platform** (Vercel, Railway, etc.)
-4. **Configure production MongoDB instance**
-5. **Set up UploadThing for file storage**
+### Authentication
 
-## 🤝 Contributing
+```javascript
+// Headers
+{
+  "Authorization": "Bearer YOUR_JWT_TOKEN"
+}
+```
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes following the existing code patterns
-4. Run tests: `pnpm test`
-5. Commit changes: `git commit -m "Add feature"`
-6. Push to branch: `git push origin feature-name`
-7. Open a pull request
+## Performance
 
-## 📞 Support
+- Optimized for 1GB RAM VPS
+- Build time: ~2-3 minutes
+- Memory usage: ~700MB
+- Concurrent users: 100+
 
-If you encounter any issues or have questions:
+## Security
 
-- Check the [PayloadCMS Documentation](https://payloadcms.com/docs)
-- Review the project's CLAUDE.md file for development guidelines
-- Contact the development team
+- E.164 phone validation
+- Role-based access control
+- Environment variable protection
+- CORS configuration
+- Rate limiting on APIs
+- SQL injection prevention via Mongoose
 
-## 📄 License
+## Contributing
 
-This project is licensed under the MIT License.
+1. Fork repository
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add feature'`)
+4. Push branch (`git push origin feature/amazing`)
+5. Open Pull Request
+
+### Code Style
+
+- ESLint configuration included
+- Prettier formatting
+- TypeScript strict mode
+- Component naming: PascalCase
+- File naming: kebab-case
+
+## Troubleshooting
+
+### Common Issues
+
+**Build fails on VPS:**
+
+```bash
+# Add swap memory
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+```
+
+**Port 3000 in use:**
+
+```bash
+lsof -i :3000
+kill -9 <PID>
+```
+
+**MongoDB connection fails:**
+
+- Check Atlas network access
+- Verify connection string
+- Ensure IP whitelisting
+
+## Support
+
+- [PayloadCMS Docs](https://payloadcms.com/docs)
+- [Next.js Docs](https://nextjs.org/docs)
+- [Project Issues](https://github.com/Fahm-Gah/hesarak-backend/issues)
+
+## License
+
+MIT License - See [LICENSE](./LICENSE) for details
 
 ---
 
-Built with ❤️ for safe and comfortable bus travel across Afghanistan.
+Built with ❤️ for safe travel across Afghanistan

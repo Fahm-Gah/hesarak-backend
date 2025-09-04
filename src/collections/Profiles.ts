@@ -1,5 +1,6 @@
 import { profilesAccess } from '@/access/accessControls'
 import type { CollectionConfig } from 'payload'
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
 export const Profiles: CollectionConfig = {
   slug: 'profiles',
@@ -22,6 +23,23 @@ export const Profiles: CollectionConfig = {
       en: 'Bookings & Reservation System',
       fa: 'سیستم بوکینگ و قید کردن تکت',
     },
+  },
+  hooks: {
+    beforeChange: [
+      async ({ data }) => {
+        // Normalize phone number if provided
+        if (data?.phoneNumber) {
+          const parsedPhone = parsePhoneNumberFromString(data.phoneNumber, 'AF')
+          if (parsedPhone && parsedPhone.isValid()) {
+            data.phoneNumber = parsedPhone.format('E.164')
+          } else {
+            // If the number is not valid for Afghanistan, throw an error
+            throw new Error('Invalid phone number format for Afghanistan')
+          }
+        }
+        return data
+      },
+    ],
   },
   fields: [
     {
