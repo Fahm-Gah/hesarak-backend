@@ -1,233 +1,120 @@
-# DigitalOcean VPS Deployment Manual for حصارک پنجشیر
+# Production Deployment Guide
 
-This guide will help you deploy your PayloadCMS + Next.js bus booking application on a DigitalOcean VPS using MongoDB Atlas (free tier) and UploadThing for file storage.
+## Overview
+
+This guide covers deploying the Hesarak bus booking system to a DigitalOcean VPS with automated GitHub deployments.
 
 ## Prerequisites
 
-- DigitalOcean droplet (minimum 1GB RAM, 10GB storage recommended)
-- Domain name (optional but recommended)
-- SSH access to your droplet
+- DigitalOcean droplet (minimum 1GB RAM, Ubuntu 22.04)
+- Domain name pointing to your droplet IP
+- GitHub repository with your code
 - MongoDB Atlas account (free tier)
-- UploadThing account
+- UploadThing account for file storage
 
-## Step 1: Set Up MongoDB Atlas (Free Tier)
+## Initial Server Setup
 
-### Create MongoDB Atlas Account:
-
-1. Go to https://www.mongodb.com/cloud/atlas
-2. Sign up for a free account
-3. Create a new project called "hesarak"
-
-### Create a Free Cluster:
-
-1. Click "Create a cluster"
-2. Choose "M0 Sandbox" (Free tier - 512MB storage)
-3. Select a region close to your VPS location
-4. Name your cluster "hesarak-cluster"
-
-### Configure Database Access:
-
-1. Go to "Database Access" in left menu
-2. Click "Add New Database User"
-3. Create a user (e.g., `hesarak_user`) with a strong password
-4. Give it "Read and write to any database" role
-
-### Configure Network Access:
-
-1. Go to "Network Access" in left menu
-2. Click "Add IP Address"
-3. Add your VPS IP address, or use `0.0.0.0/0` for testing (less secure)
-
-### Get Connection String:
-
-1. Go to "Clusters" and click "Connect"
-2. Choose "Connect your application"
-3. Copy the connection string (looks like: `mongodb+srv://username:password@cluster.mongodb.net/database`)
-
-## Step 2: Set Up UploadThing Account
-
-### Create UploadThing Account:
-
-1. Go to https://uploadthing.com/
-2. Sign up with GitHub or email
-3. Create a new project
-
-### Get API Keys:
-
-1. In your UploadThing dashboard, go to API Keys
-2. Copy your App ID and API Key
-3. You'll need these for your environment variables
-
-## Step 3: Initial Server Setup
-
-### Connect to your droplet:
+### 1. Connect to Your VPS
 
 ```bash
-ssh root@your_droplet_ip
+ssh root@your_server_ip
 ```
 
-### Update system packages:
+### 2. System Updates & Dependencies
 
 ```bash
+# Update packages
 apt update && apt upgrade -y
-```
 
-### Install essential packages:
+# Install essentials
+apt install -y curl wget git nginx ufw
 
-```bash
-apt install -y curl wget gnupg2 software-properties-common apt-transport-https ca-certificates lsb-release ufw git
-```
-
-## Step 4: Install Node.js and PNPM
-
-### Install Node.js 18.x:
-
-```bash
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# Install Node.js 20.x
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 apt install -y nodejs
+
+# Install pnpm & PM2
+npm install -g pnpm pm2
 ```
 
-### Install PNPM globally:
+### 3. Configure Firewall
 
 ```bash
-npm install -g pnpm
+ufw allow 22/tcp    # SSH
+ufw allow 80/tcp    # HTTP
+ufw allow 443/tcp   # HTTPS
+ufw --force enable
 ```
 
-### Install PM2 process manager:
+## Application Setup
 
-```bash
-npm install -g pm2
-```
-
-### Verify installations:
-
-```bash
-node --version    # Should be v18.x
-npm --version
-pnpm --version
-pm2 --version
-```
-
-## Step 5: Install and Configure Nginx
-
-### Install Nginx:
-
-```bash
-apt install -y nginx
-```
-
-### Start and enable Nginx:
-
-```bash
-systemctl start nginx
-systemctl enable nginx
-```
-
-## Step 6: Configure Firewall
-
-### Set up UFW firewall:
-
-```bash
-ufw allow ssh
-ufw allow http
-ufw allow https
-ufw enable
-```
-
-## Step 7: Clone and Setup Your Application
-
-### Create application directory:
+### 1. Clone Repository
 
 ```bash
 mkdir -p /var/www
 cd /var/www
+git clone https://github.com/YOUR_USERNAME/hesarak-backend.git
+cd hesarak-backend
 ```
 
-### Clone your repository:
-
-```bash
-git clone https://github.com/your-username/hesarak-backend.git hesarakbus
-cd hesarakbus
-```
-
-### Create production environment file:
+### 2. Environment Configuration
 
 ```bash
 cp .env.example .env
 nano .env
 ```
 
-### Configure your .env file:
+Required environment variables:
 
 ```env
 # MongoDB Atlas
-DATABASE_URI=mongodb://127.0.0.1/your-database-name
+DATABASE_URI=mongodb+srv://username:password@cluster.mongodb.net/hesarak
 
 # PayloadCMS
-PAYLOAD_SECRET=your_very_long_random_secret_key_here
-NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+PAYLOAD_SECRET=your-64-character-random-string
+NEXT_PUBLIC_SERVER_URL=https://yourdomain.com
 
-# CORS allowed origins (comma-separated)
-# Development: Additional origins for development/testing
-# Production: Your domain(s) and any additional allowed origins
+# CORS
 ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 
-# VPS IP address (for development testing from external devices)
-# Set this to your server's public IP when testing on VPS
-VPS_IP=your.vps.ip.address
-
 # UploadThing
-UPLOADTHING_TOKEN=your_uploadthing_token
+UPLOADTHING_TOKEN=your-uploadthing-token
 
-# Resend
-RESEND_API_KEY=your_resend_api_key
-
-# Other environment variables
-NODE_ENV=development
-
+# Production
+NODE_ENV=production
 ```
 
-### Install dependencies:
+### 3. Initial Build & Start
 
 ```bash
-pnpm install
-```
+# Install dependencies
+pnpm install --frozen-lockfile
 
-### Generate TypeScript types:
-
-```bash
+# Generate types
 pnpm generate:types
+
+# Build application
+NODE_OPTIONS="--max-old-space-size=768" pnpm build
+
+# Start with PM2
+pm2 start pnpm --name "hesarak-backend" -- start
+pm2 save
+pm2 startup systemd -u root --hp /root
 ```
 
-### Build the application:
+## Nginx Configuration
+
+### 1. Create Site Configuration
 
 ```bash
-pnpm build
+nano /etc/nginx/sites-available/hesarak
 ```
-
-## Step 8: Configure Nginx Reverse Proxy
-
-### Create Nginx configuration:
-
-```bash
-nano /etc/nginx/sites-available/hesarakbus
-```
-
-### Add this configuration:
 
 ```nginx
 server {
     listen 80;
-    server_name your-domain.com www.your-domain.com;
+    server_name yourdomain.com www.yourdomain.com;
 
-    # Serve Next.js static files
-    location /_next/static/ {
-        alias /var/www/hesarakbus/.next/static/;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-
-    # Proxy to Next.js app
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -240,197 +127,191 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
-    # Increase upload size limit for UploadThing
     client_max_body_size 50M;
 }
 ```
 
-### Enable the site:
+### 2. Enable Site
 
 ```bash
-ln -s /etc/nginx/sites-available/hesarakbus /etc/nginx/sites-enabled/
-rm /etc/nginx/sites-enabled/default  # Remove default site
-nginx -t  # Test configuration
+ln -s /etc/nginx/sites-available/hesarak /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t
 systemctl reload nginx
 ```
 
-## Step 9: Configure PM2 Process Manager
-
-### Start your application with PM2:
-
-```bash
-cd /var/www/hesarakbus
-pm2 start npm --name "hesarakbus" -- start
-```
-
-### Configure PM2 to start on boot:
-
-```bash
-pm2 startup
-# Follow the instructions output by the command above
-pm2 save
-```
-
-### Monitor your application:
-
-```bash
-pm2 status
-pm2 logs hesarakbus
-pm2 monit
-```
-
-## Step 10: Set Up SSL Certificate (Optional but Recommended)
-
-### Install Certbot:
+### 3. SSL Setup (Let's Encrypt)
 
 ```bash
 apt install -y certbot python3-certbot-nginx
+certbot --nginx -d yourdomain.com -d www.yourdomain.com
 ```
 
-### Obtain SSL certificate:
+## Automated GitHub Deployments
+
+### 1. Generate SSH Key for GitHub Actions
+
+On your **local machine**:
 
 ```bash
-certbot --nginx -d your-domain.com -d www.your-domain.com
+ssh-keygen -t ed25519 -f ~/.ssh/github_deploy -N ""
 ```
 
-### Set up auto-renewal:
+### 2. Add Public Key to VPS
 
 ```bash
-crontab -e
+# Copy public key content
+cat ~/.ssh/github_deploy.pub
+
+# On VPS, add to authorized_keys
+echo "YOUR_PUBLIC_KEY_HERE" >> ~/.ssh/authorized_keys
 ```
 
-Add this line:
+### 3. Configure GitHub Secrets
 
-```
-0 12 * * * /usr/bin/certbot renew --quiet
-```
+Go to GitHub repo → Settings → Secrets → Actions, add:
 
-## Step 11: Final Verification
+- `DROPLET_HOST`: Your server IP
+- `DROPLET_USERNAME`: root
+- `DROPLET_PORT`: 22
+- `DROPLET_SSH_KEY`: Private key content (entire file including BEGIN/END)
 
-### Check all services are running:
+### 4. GitHub Actions Workflow
+
+Already configured in `.github/workflows/deploy.yml`. Pushes to `main` branch trigger automatic deployment.
+
+## MongoDB Atlas Setup
+
+### 1. Create Free Cluster
+
+1. Sign up at [mongodb.com/cloud/atlas](https://mongodb.com/cloud/atlas)
+2. Create M0 Sandbox cluster (free tier)
+3. Choose region closest to your VPS
+
+### 2. Configure Access
+
+1. **Database Access**: Create user with read/write permissions
+2. **Network Access**: Add your VPS IP address
+3. **Connection String**: Copy from Connect → Connect your application
+
+## Monitoring & Maintenance
+
+### View Application Status
 
 ```bash
-systemctl status nginx
-pm2 status
+pm2 status              # Process status
+pm2 logs hesarak-backend # Application logs
+pm2 monit               # Real-time monitoring
 ```
 
-### Test your application:
-
-- Visit `http://your-domain.com` (or `https://` if SSL is configured)
-- Check admin panel at `/admin`
-- Test file uploads to ensure UploadThing is working
-- Test database connection by creating a user or booking
-
-## Step 12: Maintenance Commands
-
-### Update application:
+### Manual Update
 
 ```bash
-cd /var/www/hesarakbus
+cd /var/www/hesarak-backend
 git pull origin main
-pnpm install
+pnpm install --frozen-lockfile
+pnpm generate:types
 pnpm build
-pm2 restart hesarakbus
+pm2 restart hesarak-backend
 ```
 
-### Monitor logs:
+### Check Deployment Logs
 
 ```bash
-pm2 logs hesarakbus
+# PM2 logs
+pm2 logs hesarak-backend --lines 50
+
+# Nginx logs
 tail -f /var/log/nginx/access.log
 tail -f /var/log/nginx/error.log
 ```
 
-### Check application health:
-
-```bash
-pm2 status
-pm2 monit
-curl -I http://localhost:3000  # Test if app responds
-```
-
 ## Troubleshooting
 
-### Application won't start:
+### Application Won't Start
 
 ```bash
-pm2 logs hesarakbus  # Check application logs
-cd /var/www/hesarakbus && pnpm dev  # Test in development mode
+# Check PM2 logs
+pm2 logs hesarak-backend
+
+# Test in development mode
+cd /var/www/hesarak-backend
+pnpm dev
 ```
 
-### Database connection issues:
-
-- Check your MongoDB Atlas connection string
-- Verify network access settings in MongoDB Atlas
-- Test connection with: `node -e "console.log(process.env.DATABASE_URI)"`
-
-### UploadThing issues:
-
-- Verify API keys in environment variables
-- Check UploadThing dashboard for usage and errors
-- Test file upload in admin panel
-
-### Nginx issues:
+### Build Failures
 
 ```bash
-nginx -t  # Test configuration
-systemctl status nginx
-tail -f /var/log/nginx/error.log
+# Clear cache and rebuild
+rm -rf .next node_modules
+pnpm install --force
+NODE_OPTIONS="--max-old-space-size=768" pnpm build
 ```
 
-### General debugging:
+### Port Already in Use
 
 ```bash
-# Check if port 3000 is listening
-netstat -tlnp | grep :3000
-
-# Check system resources
-htop
-df -h  # Disk space
-free -h  # Memory usage
+# Find process using port 3000
+lsof -i :3000
+# Kill if needed
+kill -9 <PID>
 ```
 
-## Security Considerations
+### Low Memory Issues
 
-1. **Environment Variables**: Never commit secrets to git
-2. **MongoDB Atlas**: Use strong passwords and IP whitelisting
-3. **Firewall**: Only allow necessary ports (80, 443, 22)
-4. **SSL**: Always use HTTPS in production
-5. **Updates**: Regularly update system packages and dependencies
-6. **UploadThing**: Configure proper file type restrictions and size limits
+For 1GB VPS, optimize build:
+
+```bash
+# Add swap file
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+```
+
+## Security Best Practices
+
+1. **Keep secrets secure**: Never commit `.env` files
+2. **Regular updates**: `apt update && apt upgrade`
+3. **Use SSH keys**: Disable password authentication
+4. **Configure firewall**: Only open necessary ports
+5. **Enable HTTPS**: Always use SSL in production
+6. **Monitor logs**: Check for suspicious activity
 
 ## Performance Optimization
 
-1. **PM2 Cluster Mode**: Scale to use all CPU cores:
+1. **Enable pnpm cache**:
 
    ```bash
-   pm2 delete hesarakbus
-   pm2 start ecosystem.config.js
+   pnpm config set store-dir ~/.pnpm-store
    ```
 
-2. **MongoDB Atlas Indexes**: Create appropriate indexes for your queries in Atlas dashboard
+2. **PM2 cluster mode** (for multi-core VPS):
 
-3. **Nginx Caching**: Configure static file caching
+   ```bash
+   pm2 start ecosystem.config.cjs
+   ```
 
-4. **Monitoring**: Use PM2 monitoring dashboard or external tools
+3. **Nginx caching**: Already configured for static files
 
-## Backup Strategy
+## Quick Commands Reference
 
-Since you're using cloud services, backups are handled automatically:
+```bash
+# Application control
+pm2 restart hesarak-backend  # Restart app
+pm2 stop hesarak-backend     # Stop app
+pm2 start hesarak-backend    # Start app
 
-- **MongoDB Atlas**: Automatic backups included in free tier
-- **UploadThing**: Files are stored redundantly in cloud
-- **Application Code**: Keep in Git repository
-- **Environment Variables**: Store securely (consider using a password manager)
+# Monitoring
+pm2 status                   # Check status
+pm2 logs                     # View all logs
+htop                         # System resources
 
-## Cost Considerations
-
-- **MongoDB Atlas Free Tier**: 512MB storage, shared CPU
-- **UploadThing**: Generous free tier, pay for additional storage/bandwidth
-- **DigitalOcean VPS**: $4-6/month for basic droplet
-- **Domain**: ~$10-15/year
-- **SSL**: Free with Let's Encrypt
+# Deployment
+git pull && pnpm install && pnpm build && pm2 restart hesarak-backend
+```
 
 ---
 
-Your حصارک پنجشیر application should now be fully deployed and running on your DigitalOcean VPS with cloud-hosted database and file storage!
+Your application is now deployed with automatic GitHub deployments. Push to `main` branch to trigger deployments!
