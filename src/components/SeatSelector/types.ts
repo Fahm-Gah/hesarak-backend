@@ -112,6 +112,7 @@ export interface Passenger {
   phoneNumber: string
   gender: 'male' | 'female' | 'other'
   email?: string
+  user?: User // Associated user account if exists
 }
 
 /**
@@ -129,6 +130,7 @@ export interface User {
   id: string
   email?: string
   phone?: string
+  roles?: string[]
   profile?: {
     fullName?: string
     [key: string]: any

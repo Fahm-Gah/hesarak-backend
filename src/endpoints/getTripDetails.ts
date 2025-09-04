@@ -117,6 +117,28 @@ export const getTripDetails: Endpoint = {
       // Note: isExpired is added by the afterRead hook
       const activeTickets = bookedTicketsResult.docs.filter((ticket: any) => !ticket.isExpired)
 
+      // For each passenger profile, find the associated user (if any)
+      const passengerUsers = new Map()
+      for (const ticket of activeTickets) {
+        if (ticket.passenger && typeof ticket.passenger === 'object') {
+          const profileId = ticket.passenger.id || ticket.passenger
+          if (profileId && !passengerUsers.has(profileId)) {
+            // Find user with this profile
+            const userResult = await payload.find({
+              collection: 'users',
+              where: {
+                profile: { equals: profileId },
+              },
+              depth: 0,
+              limit: 1,
+            })
+            if (userResult.docs.length > 0) {
+              passengerUsers.set(profileId, userResult.docs[0])
+            }
+          }
+        }
+      }
+
       // Create a map of booked seats and track current user's bookings
       const bookedSeatsMap = new Map<
         string,
@@ -124,6 +146,7 @@ export const getTripDetails: Endpoint = {
           ticketNumber: string
           passengerName: string
           passengerProfile: any
+          passengerUser?: any
           userId?: string
           isPaid: boolean
           paymentDeadline?: string
@@ -148,10 +171,16 @@ export const getTripDetails: Endpoint = {
             // Handle seat data format: {seat: "id"}
             const seatId = seatData.seat || seatData.id
             if (seatId) {
+              // Get passenger user if exists
+              const passengerProfileId = 
+                typeof ticket.passenger === 'object' ? ticket.passenger.id : ticket.passenger
+              const passengerUser = passengerProfileId ? passengerUsers.get(passengerProfileId) : null
+
               bookedSeatsMap.set(seatId, {
                 ticketNumber: ticket.ticketNumber,
                 passengerName: ticket.passenger?.fullName || 'Unknown Passenger',
                 passengerProfile: ticket.passenger,
+                passengerUser: passengerUser,
                 userId: ticket.bookedBy?.id,
                 isPaid: ticket.isPaid,
                 paymentDeadline: ticket.paymentDeadline,

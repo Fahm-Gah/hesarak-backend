@@ -87,7 +87,7 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
           return null
         })()
 
-        // Get the highest role of the bookedBy user
+        // Get the highest role helper function
         const getHighestRole = (roles: string[] | undefined) => {
           if (!Array.isArray(roles) || roles.length === 0) return 'customer'
           const roleHierarchy = [
@@ -106,6 +106,7 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
           }, 'customer')
         }
 
+        // Get the role of the user who booked the ticket
         const bookedByRole = (() => {
           if (typeof booking.bookedBy === 'object' && booking.bookedBy?.roles) {
             const highestRole = getHighestRole(booking.bookedBy.roles)
@@ -114,12 +115,23 @@ export const SeatSelectorField: FieldClientComponent = ({ path, readOnly = false
           return null
         })()
 
+        // Get the role of the passenger (if they have an associated user account)
+        const passengerRole = (() => {
+          // Check if passenger has a user field that contains role information
+          if (typeof booking.passenger === 'object' && booking.passenger?.user?.roles) {
+            const highestRole = getHighestRole(booking.passenger.user.roles)
+            return t.roles[highestRole as keyof typeof t.roles] || highestRole
+          }
+          // If passenger doesn't have a user account, they're just a guest/customer
+          return null
+        })()
+
         const statusText = status === 'booked' ? t.messages.seatBookedBy : t.messages.seatReservedBy
         const bookedByText = status === 'booked' ? t.messages.bookedBy : t.messages.reservedBy
         const msg = (
           <div>
             {t.seatTypes.seat} {statusText} <strong>{passengerName}</strong>
-            {bookedByRole && <span> ({bookedByRole})</span>}
+            {passengerRole && <span> ({passengerRole})</span>}
             {bookedByName && bookedByName !== passengerName && (
               <>
                 <br />
