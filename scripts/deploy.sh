@@ -44,7 +44,21 @@ fi
 
 log "✅ Deployment completed successfully!"
 
-# Optional: Send notification (Discord, Slack, etc.)
-# curl -X POST -H "Content-Type: application/json" \
-#   -d '{"content":"Deployment completed successfully!"}' \
-#   "$DISCORD_WEBHOOK_URL"
+# Send success notification
+if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+    curl -X POST -H "Content-Type: application/json" \
+      -d "{\"content\":\"✅ Deployment successful for hesarak-backend\nBranch: main\nTime: $(date)\"}" \
+      "$DISCORD_WEBHOOK_URL"
+fi
+
+# Send failure notification (add this to error handling)
+trap 'catch_error' ERR
+catch_error() {
+    log "❌ Deployment failed!"
+    if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+        curl -X POST -H "Content-Type: application/json" \
+          -d "{\"content\":\"❌ Deployment FAILED for hesarak-backend\nCheck logs: pm2 logs hesarak-backend\"}" \
+          "$DISCORD_WEBHOOK_URL"
+    fi
+    exit 1
+}
