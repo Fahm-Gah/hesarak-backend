@@ -1,0 +1,21 @@
+[Unit]
+Description=GitHub Webhook Deploy Server for Hesarak
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/hesarak-backend
+ExecStart=/usr/bin/node /var/www/hesarak-backend/scripts/webhook-deploy.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/hesarak-webhook.log
+StandardError=append:/var/log/hesarak-webhook-error.log
+
+# Environment variables
+Environment=NODE_ENV=production
+Environment=WEBHOOK_PORT=9000
+Environment=GITHUB_WEBHOOK_SECRET=your-webhook-secret-here
+
+[Install]
+WantedBy=multi-user.target
