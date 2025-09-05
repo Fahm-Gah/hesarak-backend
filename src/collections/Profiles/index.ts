@@ -1,6 +1,8 @@
 import { profilesAccess } from '@/access/accessControls'
 import type { CollectionConfig } from 'payload'
-import { parsePhoneNumberFromString } from 'libphonenumber-js'
+import { normalizePhone } from './hooks/normalizePhone'
+import { attachUser } from './hooks/attachUser'
+import { validatePhoneNumber } from './validation'
 
 export const Profiles: CollectionConfig = {
   slug: 'profiles',
@@ -25,47 +27,8 @@ export const Profiles: CollectionConfig = {
     },
   },
   hooks: {
-    beforeChange: [
-      async ({ data }) => {
-        // Normalize phone number if provided
-        if (data?.phoneNumber) {
-          const parsedPhone = parsePhoneNumberFromString(data.phoneNumber, 'AF')
-          if (parsedPhone && parsedPhone.isValid()) {
-            data.phoneNumber = parsedPhone.format('E.164')
-          } else {
-            // If the number is not valid for Afghanistan, throw an error
-            throw new Error('Invalid phone number format for Afghanistan')
-          }
-        }
-        return data
-      },
-    ],
-    afterRead: [
-      async ({ doc, req }) => {
-        // Find user associated with this profile if any
-        try {
-          const payload = req.payload
-          const userResult = await payload.find({
-            collection: 'users',
-            where: {
-              profile: { equals: doc.id },
-            },
-            depth: 0,
-            limit: 1,
-          })
-
-          if (userResult.docs.length > 0) {
-            // Add user information to the profile
-            doc.user = userResult.docs[0]
-          }
-        } catch (error) {
-          // Silently fail if we can't fetch the user
-          console.error('Failed to fetch user for profile:', error)
-        }
-
-        return doc
-      },
-    ],
+    beforeChange: [normalizePhone],
+    afterRead: [attachUser],
   },
   fields: [
     {
@@ -97,6 +60,7 @@ export const Profiles: CollectionConfig = {
       },
       type: 'text',
       required: false,
+      validate: validatePhoneNumber,
     },
     {
       name: 'gender',
