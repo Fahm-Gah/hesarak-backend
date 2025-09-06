@@ -87,6 +87,12 @@ export const errorMessages = {
     en: 'Your message has been sent successfully',
   },
 
+  // Validation errors
+  INVALID_PHONE_NUMBER: {
+    fa: 'شماره تلفن برای افغانستان نامعتبر است',
+    en: 'Invalid phone number for Afghanistan',
+  },
+
   // Generic errors
   INTERNAL_ERROR: {
     fa: 'قید کردن به دلیل خطای داخلی ناموفق بود. لطفاً دوباره تلاش کنید.',
